@@ -1,0 +1,34 @@
+# pmat quality gates configuration
+
+[gates]
+# TDG score threshold
+min_tdg_score = "B"
+
+# Complexity thresholds
+max_cyclomatic = 30
+max_cognitive = 25
+
+# Coverage thresholds (for code directories)
+min_line_coverage = 80
+min_branch_coverage = 70
+
+[exclude]
+# Exclude documentation and data files from code analysis
+patterns = [
+    "docs/**",
+    "*.md",
+    "*.json",
+    "*.yaml",
+    "*.toml",
+    "assets/**",
+    "transcripts/**",
+]
+
+[rust]
+# Rust-specific settings
+clippy_deny = ["warnings"]
+fmt_check = true
+
+[python]
+# Python-specific settings
+ruff_ignore = ["E501", "E722"]

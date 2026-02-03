@@ -1,0 +1,26 @@
+{
+  "name": "DB-mlops-genai",
+  "image": "mcr.microsoft.com/devcontainers/rust:1-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "postCreateCommand": "pip install uv && uv sync --all-extras && cargo install batuta realizar pmat",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "rust-lang.rust-analyzer",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff",
+        "databricks.databricks"
+      ]
+    }
+  },
+  "forwardPorts": [8080, 8000],
+  "remoteEnv": {
+    "RUST_LOG": "info"
+  }
+}

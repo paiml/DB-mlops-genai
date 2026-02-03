@@ -1,0 +1,20 @@
+# pmat metrics tracking
+
+[project]
+name = "DB-mlops-genai"
+description = "MLOps & GenAI Engineering on Databricks - Courses 3 & 4"
+
+[metrics]
+track_complexity = true
+track_coverage = true
+track_dependencies = true
+
+[thresholds]
+cyclomatic_warning = 20
+cyclomatic_error = 30
+cognitive_warning = 15
+cognitive_error = 25
+
+[languages]
+python = true
+rust = true

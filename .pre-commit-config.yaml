@@ -1,0 +1,33 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.3.0
+    hooks:
+      - id: ruff
+        args: [--fix, --ignore, "E501,E722"]
+      - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: rust-fmt
+        name: rust fmt
+        entry: bash -c 'for dir in demos/*/week*/; do if [ -f "$dir/Cargo.toml" ]; then (cd "$dir" && cargo fmt --check); fi; done'
+        language: system
+        pass_filenames: false
+        files: \.rs$
+
+      - id: rust-clippy
+        name: rust clippy
+        entry: bash -c 'for dir in demos/*/week*/; do if [ -f "$dir/Cargo.toml" ]; then (cd "$dir" && cargo clippy -- -D warnings); fi; done'
+        language: system
+        pass_filenames: false
+        files: \.rs$

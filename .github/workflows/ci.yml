@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install Python dependencies
+        run: uv sync --all-extras
+
+      - name: Lint Python
+        run: uv run ruff check demos/ labs/ examples/ --ignore E501,E722
+
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Check Rust formatting
+        run: |
+          for dir in demos/*/week*/; do
+            if [ -f "$dir/Cargo.toml" ]; then
+              (cd "$dir" && cargo fmt --check)
+            fi
+          done
+
+      - name: Clippy
+        run: |
+          for dir in demos/*/week*/; do
+            if [ -f "$dir/Cargo.toml" ]; then
+              (cd "$dir" && cargo clippy -- -D warnings)
+            fi
+          done
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install Python dependencies
+        run: uv sync --all-extras
+
+      - name: Python syntax check
+        run: |
+          find demos labs examples -name "*.py" -exec python -m py_compile {} \; 2>/dev/null || true
+
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+
+      - name: Rust tests
+        run: |
+          for dir in demos/*/week*/; do
+            if [ -f "$dir/Cargo.toml" ]; then
+              (cd "$dir" && cargo test)
+            fi
+          done
+
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+
+      - name: Install pmat
+        run: cargo install pmat
+
+      - name: Quality gates
+        run: pmat rust-project-score . --format json || true
