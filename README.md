@@ -1,2 +1,2 @@
 # DB-mlops-genai
-DataBricks MLOps and GenAI
+Databricks MLOps and GenAI
