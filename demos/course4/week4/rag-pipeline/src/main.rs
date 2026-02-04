@@ -319,7 +319,7 @@ Answer:"#.to_string()
             "Based on the context, machine learning is a field of AI that enables systems to learn from data.".to_string()
         } else if q_lower.contains("how") {
             "According to the retrieved documents, the process involves multiple steps as described in the context.".to_string()
-        } else if c_lower.contains(&q_lower.split_whitespace().next().unwrap_or("")) {
+        } else if c_lower.contains(q_lower.split_whitespace().next().unwrap_or("")) {
             format!(
                 "Based on the retrieved context, I found relevant information about your query: {}",
                 &context[..100.min(context.len())]
@@ -356,7 +356,7 @@ impl RagMetrics {
 
         let context_relevance = if response
             .context_used
-            .contains(&response.query.split_whitespace().next().unwrap_or(""))
+            .contains(response.query.split_whitespace().next().unwrap_or(""))
         {
             0.8
         } else {

@@ -186,7 +186,7 @@ impl MlflowClient {
         body: &serde_json::Value,
     ) -> Result<T, MlflowError> {
         self.client
-            .post(&self.endpoint(path))
+            .post(self.endpoint(path))
             .json(body)
             .send()
             .await?
@@ -198,7 +198,7 @@ impl MlflowClient {
     /// Execute POST request without response body
     async fn post_void(&self, path: &str, body: &serde_json::Value) -> Result<(), MlflowError> {
         self.client
-            .post(&self.endpoint(path))
+            .post(self.endpoint(path))
             .json(body)
             .send()
             .await?;

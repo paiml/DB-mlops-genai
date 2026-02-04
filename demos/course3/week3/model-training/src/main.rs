@@ -88,7 +88,7 @@ impl Dataset {
             let mut row = Vec::with_capacity(n_features);
             let mut y = rng.gen::<f64>() * 0.1; // noise
 
-            for (_j, &coeff) in coeffs.iter().enumerate() {
+            for &coeff in coeffs.iter() {
                 let val = rng.gen::<f64>() * 2.0 - 1.0;
                 row.push(val);
                 y += val * coeff;

@@ -134,7 +134,7 @@ impl FraudModel {
                 let pred = self.predict_proba(feat);
                 let error = (label as i32 as f64) - pred;
 
-                let feat_vec = vec![
+                let feat_arr = [
                     feat.amount_normalized,
                     feat.amount_log,
                     feat.is_high_risk_category,
@@ -143,7 +143,7 @@ impl FraudModel {
                     feat.is_online,
                 ];
 
-                for (w, &x) in self.weights.iter_mut().zip(feat_vec.iter()) {
+                for (w, &x) in self.weights.iter_mut().zip(feat_arr.iter()) {
                     *w += lr * error * x;
                 }
                 self.bias += lr * error;
@@ -152,7 +152,7 @@ impl FraudModel {
     }
 
     pub fn predict_proba(&self, features: &Features) -> f64 {
-        let feat_vec = vec![
+        let feat_arr = [
             features.amount_normalized,
             features.amount_log,
             features.is_high_risk_category,
@@ -165,7 +165,7 @@ impl FraudModel {
             + self
                 .weights
                 .iter()
-                .zip(feat_vec.iter())
+                .zip(feat_arr.iter())
                 .map(|(w, x)| w * x)
                 .sum::<f64>();
 
