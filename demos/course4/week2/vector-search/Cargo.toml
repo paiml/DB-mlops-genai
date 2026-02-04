@@ -1,8 +1,8 @@
 [package]
-name = "llm-serving"
+name = "vector-search"
 version = "0.1.0"
 edition = "2021"
-description = "LLM Serving Demo - Course 4 Week 1"
+description = "Vector Search Demo - Course 4 Week 2"
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }

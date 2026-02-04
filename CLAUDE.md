@@ -17,8 +17,8 @@ make demos      # Run demo validation
 
 ```
 demos/
-  course3/          # MLOps Engineering demos (weeks 1-6)
-  course4/          # GenAI Engineering demos (weeks 1-7)
+  course3/          # MLOps Engineering demos (weeks 1-3)
+  course4/          # GenAI Engineering demos (weeks 1-3)
 labs/
   course3/          # MLOps hands-on labs
   course4/          # GenAI hands-on labs
@@ -33,8 +33,8 @@ docs/
 ## Course Architecture
 
 **Dual-layer pedagogy:**
-1. **Databricks layer** — Hands-on with MLflow, Feature Store, Model Serving, Vector Search, Foundation Models
-2. **Sovereign AI Stack layer** — Build equivalent systems in Rust to understand internals
+1. **Databricks layer** (~80%) — Hands-on with MLflow, Feature Store, Model Serving, Vector Search, Foundation Models
+2. **Sovereign AI Stack layer** (~20%) — Build equivalent systems in Rust to understand internals
 
 ## Environment Setup
 
@@ -82,11 +82,12 @@ uv sync --all-extras
 
 Each demo follows the pattern:
 ```
-demos/course{3,4}/week{N}/
-  Cargo.toml          # Rust manifest (if Rust demo)
-  src/main.rs         # Rust entry point
-  notebook.py         # Databricks notebook export
-  README.md           # Demo instructions
+demos/course{3,4}/week{1-3}/
+  {demo-name}/
+    Cargo.toml          # Rust manifest
+    src/main.rs         # Rust entry point
+  databricks-{topic}/
+    {notebook}.py       # Databricks notebook export
 ```
 
 ## Testing

@@ -13,8 +13,8 @@ Master MLOps and GenAI engineering through hands-on labs on **Databricks Free Ed
 
 | Course | Title | Duration | Focus |
 |--------|-------|----------|-------|
-| **3** | MLOps Engineering | 30 hrs | MLflow, Feature Store, Model Serving |
-| **4** | GenAI Engineering | 34 hrs | Vector Search, RAG, Fine-Tuning |
+| **3** | MLOps Engineering | 3 weeks | MLflow, Feature Store, Model Serving |
+| **4** | GenAI Engineering | 3 weeks | Vector Search, RAG, Fine-Tuning |
 
 ## Architecture
 
@@ -63,8 +63,8 @@ make test-course4
 ## Design Philosophy
 
 **Dual-layer pedagogy:**
-- **Databricks layer** — Use production MLOps and GenAI tools effectively
-- **Sovereign AI Stack layer** — Build equivalent systems in Rust to understand internals
+- **Databricks layer** (~80%) — Use production MLOps and GenAI tools effectively
+- **Sovereign AI Stack layer** (~20%) — Build equivalent systems in Rust to understand internals
 
 *"Understand by building"* creates deeper retention than tutorials alone.
 
@@ -72,8 +72,8 @@ make test-course4
 
 ```
 demos/
-  course3/           # MLOps demos (weeks 1-6)
-  course4/           # GenAI demos (weeks 1-7)
+  course3/           # MLOps demos (weeks 1-3)
+  course4/           # GenAI demos (weeks 1-3)
 labs/
   course3/           # MLOps hands-on labs
   course4/           # GenAI hands-on labs
@@ -84,28 +84,21 @@ docs/
   outline.md         # Course outline
 ```
 
-## Course 3: MLOps Engineering
+## Course 3: MLOps Engineering (3 Weeks)
 
 | Week | Topic | Databricks | Sovereign AI |
 |------|-------|------------|--------------|
-| 1 | Experiment Tracking | MLflow | reqwest client |
-| 2 | Feature Engineering | Feature Store | trueno + alimentar |
-| 3 | Model Training | AutoML | aprender |
-| 4 | Model Serving | Model Serving | realizar |
-| 5 | Production Quality | Workflows | batuta + pmat |
-| 6 | Capstone | End-to-end | Full stack |
+| 1 | Tracking & Features | MLflow, Feature Store | trueno, alimentar |
+| 2 | Training & Serving | AutoML, Model Serving | aprender, realizar |
+| 3 | Production | Workflows, Monitoring | batuta, pmat |
 
-## Course 4: GenAI Engineering
+## Course 4: GenAI Engineering (3 Weeks)
 
 | Week | Topic | Databricks | Sovereign AI |
 |------|-------|------------|--------------|
-| 1 | LLM Serving | Foundation Models | realizar |
-| 2 | Prompt Engineering | Playground | batuta |
-| 3 | Vector Search | Vector Search | trueno-rag |
-| 4 | RAG Pipelines | Databricks RAG | trueno-rag |
-| 5 | Fine-Tuning | Databricks FT | entrenar |
-| 6 | Production | Model Serving | batuta |
-| 7 | Capstone | End-to-end | Full stack |
+| 1 | LLM & Prompts | Foundation Models | realizar |
+| 2 | Vectors & RAG | Vector Search, RAG | trueno-rag |
+| 3 | Fine-tune & Production | Fine-tuning, Serving | entrenar, batuta |
 
 ## Certification Alignment
 

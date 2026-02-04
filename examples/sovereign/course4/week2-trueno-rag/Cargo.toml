@@ -1,10 +1,12 @@
 [package]
-name = "llm-serving"
+name = "week2-trueno-rag"
 version = "0.1.0"
 edition = "2021"
-description = "LLM Serving Demo - Course 4 Week 1"
+description = "RAG pipeline with trueno-rag - Course 4 Week 2 Example"
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 thiserror = "1.0"
+
+[dev-dependencies]
