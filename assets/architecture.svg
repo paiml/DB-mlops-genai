@@ -1,5 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" font-family="system-ui, -apple-system, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650" font-family="system-ui, -apple-system, sans-serif">
   <defs>
+    <linearGradient id="databricksGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF3621;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#DB2B1C;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="rustGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#DEA584;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#B7410E;stop-opacity:1" />
+    </linearGradient>
     <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#7C3AED;stop-opacity:1" />
@@ -21,81 +29,179 @@
       <stop offset="100%" style="stop-color:#4F46E5;stop-opacity:1" />
     </linearGradient>
     <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.2"/>
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.15"/>
     </filter>
   </defs>
 
   <!-- Background -->
-  <rect width="800" height="600" fill="#F8FAFC"/>
+  <rect width="900" height="650" fill="#F8FAFC"/>
 
   <!-- Title -->
-  <text x="400" y="40" text-anchor="middle" font-size="24" font-weight="bold" fill="#1E293B">Sovereign AI Stack Architecture</text>
-  <text x="400" y="62" text-anchor="middle" font-size="14" fill="#64748B">MLOps &amp; GenAI Engineering on Databricks</text>
+  <text x="450" y="35" text-anchor="middle" font-size="22" font-weight="bold" fill="#1E293B">MLOps &amp; GenAI Engineering</text>
+  <text x="450" y="55" text-anchor="middle" font-size="13" fill="#64748B">Dual-Layer Architecture: Databricks + Sovereign AI Stack</text>
 
-  <!-- Orchestration Layer (Top) -->
-  <rect x="50" y="90" width="700" height="70" rx="8" fill="url(#headerGrad)" filter="url(#shadow)"/>
-  <text x="400" y="115" text-anchor="middle" font-size="16" font-weight="bold" fill="white">batuta</text>
-  <text x="400" y="135" text-anchor="middle" font-size="12" fill="#E0E7FF">Orchestration · Privacy Tiers · CLI · Stack Coordination</text>
-
-  <!-- Serving/Training/Registry Layer -->
-  <g transform="translate(50, 175)">
-    <rect x="0" y="0" width="220" height="80" rx="6" fill="url(#servingGrad)" filter="url(#shadow)"/>
-    <text x="110" y="30" text-anchor="middle" font-size="14" font-weight="bold" fill="white">realizar</text>
-    <text x="110" y="48" text-anchor="middle" font-size="11" fill="#DBEAFE">Inference Server</text>
-    <text x="110" y="64" text-anchor="middle" font-size="10" fill="#BFDBFE">GGUF · SafeTensors</text>
+  <!-- Column Headers -->
+  <g transform="translate(50, 75)">
+    <rect x="0" y="0" width="380" height="40" rx="6" fill="url(#databricksGrad)" filter="url(#shadow)"/>
+    <text x="190" y="26" text-anchor="middle" font-size="15" font-weight="bold" fill="white">Databricks Free Edition</text>
   </g>
-  <g transform="translate(290, 175)">
-    <rect x="0" y="0" width="220" height="80" rx="6" fill="url(#servingGrad)" filter="url(#shadow)"/>
-    <text x="110" y="30" text-anchor="middle" font-size="14" font-weight="bold" fill="white">entrenar</text>
-    <text x="110" y="48" text-anchor="middle" font-size="11" fill="#DBEAFE">Training</text>
-    <text x="110" y="64" text-anchor="middle" font-size="10" fill="#BFDBFE">LoRA · QLoRA · autograd</text>
-  </g>
-  <g transform="translate(530, 175)">
-    <rect x="0" y="0" width="220" height="80" rx="6" fill="url(#servingGrad)" filter="url(#shadow)"/>
-    <text x="110" y="30" text-anchor="middle" font-size="14" font-weight="bold" fill="white">pacha</text>
-    <text x="110" y="48" text-anchor="middle" font-size="11" fill="#DBEAFE">Model Registry</text>
-    <text x="110" y="64" text-anchor="middle" font-size="10" fill="#BFDBFE">Sign · Encrypt · Lineage</text>
+  <g transform="translate(470, 75)">
+    <rect x="0" y="0" width="380" height="40" rx="6" fill="url(#rustGrad)" filter="url(#shadow)"/>
+    <text x="190" y="26" text-anchor="middle" font-size="15" font-weight="bold" fill="white">Sovereign AI Stack (Rust)</text>
   </g>
 
-  <!-- ML Algorithms Layer -->
-  <rect x="50" y="270" width="700" height="70" rx="8" fill="url(#mlGrad)" filter="url(#shadow)"/>
-  <text x="400" y="295" text-anchor="middle" font-size="16" font-weight="bold" fill="white">aprender</text>
-  <text x="400" y="315" text-anchor="middle" font-size="12" fill="#D1FAE5">ML Algorithms: regression · trees · clustering · NAS</text>
+  <!-- Bidirectional Arrow -->
+  <g transform="translate(435, 95)">
+    <line x1="0" y1="0" x2="30" y2="0" stroke="#94A3B8" stroke-width="2"/>
+    <polygon points="0,-4 8,0 0,4" fill="#94A3B8"/>
+    <polygon points="30,-4 22,0 30,4" fill="#94A3B8"/>
+  </g>
 
-  <!-- Core Compute Layer -->
-  <rect x="50" y="355" width="700" height="70" rx="8" fill="url(#coreGrad)" filter="url(#shadow)"/>
-  <text x="400" y="380" text-anchor="middle" font-size="16" font-weight="bold" fill="white">trueno</text>
-  <text x="400" y="400" text-anchor="middle" font-size="12" fill="#FEF3C7">SIMD/GPU Compute · AVX2 · AVX-512 · NEON · wgpu</text>
+  <!-- Row 1: Orchestration -->
+  <text x="25" y="145" font-size="11" font-weight="bold" fill="#64748B" transform="rotate(-90, 25, 145)">ORCHESTRATION</text>
+  <g transform="translate(50, 125)">
+    <rect x="0" y="0" width="380" height="55" rx="6" fill="#FEE2E2" stroke="#FECACA" filter="url(#shadow)"/>
+    <text x="190" y="24" text-anchor="middle" font-size="13" font-weight="600" fill="#991B1B">Databricks Workflows</text>
+    <text x="190" y="42" text-anchor="middle" font-size="10" fill="#B91C1C">Jobs · Pipelines · Delta Live Tables</text>
+  </g>
+  <g transform="translate(470, 125)">
+    <rect x="0" y="0" width="380" height="55" rx="6" fill="url(#headerGrad)" filter="url(#shadow)"/>
+    <text x="190" y="24" text-anchor="middle" font-size="13" font-weight="600" fill="white">batuta</text>
+    <text x="190" y="42" text-anchor="middle" font-size="10" fill="#E0E7FF">Privacy Tiers · CLI · Stack Coordination</text>
+  </g>
 
-  <!-- Infrastructure Layer -->
-  <g transform="translate(50, 440)">
-    <rect x="0" y="0" width="165" height="70" rx="6" fill="url(#infraGrad)" filter="url(#shadow)"/>
-    <text x="82" y="28" text-anchor="middle" font-size="13" font-weight="bold" fill="white">trueno-rag</text>
-    <text x="82" y="48" text-anchor="middle" font-size="10" fill="#E0E7FF">BM25 + Vector</text>
+  <!-- Row 2: Experiment Tracking / Model Registry -->
+  <text x="25" y="225" font-size="11" font-weight="bold" fill="#64748B" transform="rotate(-90, 25, 225)">TRACKING</text>
+  <g transform="translate(50, 190)">
+    <rect x="0" y="0" width="185" height="55" rx="6" fill="#FEE2E2" stroke="#FECACA" filter="url(#shadow)"/>
+    <text x="92" y="24" text-anchor="middle" font-size="12" font-weight="600" fill="#991B1B">MLflow</text>
+    <text x="92" y="40" text-anchor="middle" font-size="9" fill="#B91C1C">Experiments · Runs</text>
   </g>
-  <g transform="translate(230, 440)">
-    <rect x="0" y="0" width="165" height="70" rx="6" fill="url(#infraGrad)" filter="url(#shadow)"/>
-    <text x="82" y="28" text-anchor="middle" font-size="13" font-weight="bold" fill="white">trueno-db</text>
-    <text x="82" y="48" text-anchor="middle" font-size="10" fill="#E0E7FF">GPU Analytics</text>
+  <g transform="translate(245, 190)">
+    <rect x="0" y="0" width="185" height="55" rx="6" fill="#FEE2E2" stroke="#FECACA" filter="url(#shadow)"/>
+    <text x="92" y="24" text-anchor="middle" font-size="12" font-weight="600" fill="#991B1B">Unity Catalog</text>
+    <text x="92" y="40" text-anchor="middle" font-size="9" fill="#B91C1C">Registry · Governance</text>
   </g>
-  <g transform="translate(410, 440)">
-    <rect x="0" y="0" width="165" height="70" rx="6" fill="url(#infraGrad)" filter="url(#shadow)"/>
-    <text x="82" y="28" text-anchor="middle" font-size="13" font-weight="bold" fill="white">alimentar</text>
-    <text x="82" y="48" text-anchor="middle" font-size="10" fill="#E0E7FF">Arrow · Parquet</text>
+  <g transform="translate(470, 190)">
+    <rect x="0" y="0" width="380" height="55" rx="6" fill="url(#servingGrad)" filter="url(#shadow)"/>
+    <text x="190" y="24" text-anchor="middle" font-size="13" font-weight="600" fill="white">pacha</text>
+    <text x="190" y="42" text-anchor="middle" font-size="10" fill="#DBEAFE">Model Registry · Ed25519 Signing · BLAKE3 · Encryption</text>
   </g>
-  <g transform="translate(590, 440)">
-    <rect x="0" y="0" width="160" height="70" rx="6" fill="url(#infraGrad)" filter="url(#shadow)"/>
-    <text x="80" y="28" text-anchor="middle" font-size="13" font-weight="bold" fill="white">pmat</text>
-    <text x="80" y="48" text-anchor="middle" font-size="10" fill="#E0E7FF">Quality Gates</text>
+
+  <!-- Row 3: Serving / Training -->
+  <text x="25" y="305" font-size="11" font-weight="bold" fill="#64748B" transform="rotate(-90, 25, 305)">SERVING</text>
+  <g transform="translate(50, 255)">
+    <rect x="0" y="0" width="185" height="55" rx="6" fill="#FEE2E2" stroke="#FECACA" filter="url(#shadow)"/>
+    <text x="92" y="24" text-anchor="middle" font-size="12" font-weight="600" fill="#991B1B">Model Serving</text>
+    <text x="92" y="40" text-anchor="middle" font-size="9" fill="#B91C1C">Endpoints · Batch</text>
   </g>
+  <g transform="translate(245, 255)">
+    <rect x="0" y="0" width="185" height="55" rx="6" fill="#FEE2E2" stroke="#FECACA" filter="url(#shadow)"/>
+    <text x="92" y="24" text-anchor="middle" font-size="12" font-weight="600" fill="#991B1B">Foundation Models</text>
+    <text x="92" y="40" text-anchor="middle" font-size="9" fill="#B91C1C">Playground · APIs</text>
+  </g>
+  <g transform="translate(470, 255)">
+    <rect x="0" y="0" width="185" height="55" rx="6" fill="url(#servingGrad)" filter="url(#shadow)"/>
+    <text x="92" y="24" text-anchor="middle" font-size="12" font-weight="600" fill="white">realizar</text>
+    <text x="92" y="40" text-anchor="middle" font-size="9" fill="#DBEAFE">GGUF · SafeTensors</text>
+  </g>
+  <g transform="translate(665, 255)">
+    <rect x="0" y="0" width="185" height="55" rx="6" fill="url(#servingGrad)" filter="url(#shadow)"/>
+    <text x="92" y="24" text-anchor="middle" font-size="12" font-weight="600" fill="white">entrenar</text>
+    <text x="92" y="40" text-anchor="middle" font-size="9" fill="#DBEAFE">LoRA · QLoRA</text>
+  </g>
+
+  <!-- Row 4: Features / RAG -->
+  <text x="25" y="375" font-size="11" font-weight="bold" fill="#64748B" transform="rotate(-90, 25, 375)">FEATURES</text>
+  <g transform="translate(50, 320)">
+    <rect x="0" y="0" width="185" height="55" rx="6" fill="#FEE2E2" stroke="#FECACA" filter="url(#shadow)"/>
+    <text x="92" y="24" text-anchor="middle" font-size="12" font-weight="600" fill="#991B1B">Feature Store</text>
+    <text x="92" y="40" text-anchor="middle" font-size="9" fill="#B91C1C">Online · Offline</text>
+  </g>
+  <g transform="translate(245, 320)">
+    <rect x="0" y="0" width="185" height="55" rx="6" fill="#FEE2E2" stroke="#FECACA" filter="url(#shadow)"/>
+    <text x="92" y="24" text-anchor="middle" font-size="12" font-weight="600" fill="#991B1B">Vector Search</text>
+    <text x="92" y="40" text-anchor="middle" font-size="9" fill="#B91C1C">Embeddings · RAG</text>
+  </g>
+  <g transform="translate(470, 320)">
+    <rect x="0" y="0" width="185" height="55" rx="6" fill="url(#mlGrad)" filter="url(#shadow)"/>
+    <text x="92" y="24" text-anchor="middle" font-size="12" font-weight="600" fill="white">aprender</text>
+    <text x="92" y="40" text-anchor="middle" font-size="9" fill="#D1FAE5">ML Algorithms</text>
+  </g>
+  <g transform="translate(665, 320)">
+    <rect x="0" y="0" width="185" height="55" rx="6" fill="url(#mlGrad)" filter="url(#shadow)"/>
+    <text x="92" y="24" text-anchor="middle" font-size="12" font-weight="600" fill="white">trueno-rag</text>
+    <text x="92" y="40" text-anchor="middle" font-size="9" fill="#D1FAE5">BM25 + HNSW</text>
+  </g>
+
+  <!-- Row 5: Compute / Data -->
+  <text x="25" y="445" font-size="11" font-weight="bold" fill="#64748B" transform="rotate(-90, 25, 445)">COMPUTE</text>
+  <g transform="translate(50, 385)">
+    <rect x="0" y="0" width="380" height="55" rx="6" fill="#FEE2E2" stroke="#FECACA" filter="url(#shadow)"/>
+    <text x="190" y="24" text-anchor="middle" font-size="13" font-weight="600" fill="#991B1B">Spark · SQL Warehouses · Photon</text>
+    <text x="190" y="42" text-anchor="middle" font-size="10" fill="#B91C1C">Distributed Compute · Delta Lake</text>
+  </g>
+  <g transform="translate(470, 385)">
+    <rect x="0" y="0" width="380" height="55" rx="6" fill="url(#coreGrad)" filter="url(#shadow)"/>
+    <text x="190" y="24" text-anchor="middle" font-size="13" font-weight="600" fill="white">trueno</text>
+    <text x="190" y="42" text-anchor="middle" font-size="10" fill="#FEF3C7">SIMD/GPU · AVX2 · AVX-512 · NEON · wgpu</text>
+  </g>
+
+  <!-- Row 6: Infrastructure -->
+  <text x="25" y="510" font-size="11" font-weight="bold" fill="#64748B" transform="rotate(-90, 25, 510)">DATA</text>
+  <g transform="translate(50, 450)">
+    <rect x="0" y="0" width="120" height="50" rx="5" fill="#FEE2E2" stroke="#FECACA" filter="url(#shadow)"/>
+    <text x="60" y="22" text-anchor="middle" font-size="11" font-weight="600" fill="#991B1B">Delta Lake</text>
+    <text x="60" y="38" text-anchor="middle" font-size="8" fill="#B91C1C">ACID Tables</text>
+  </g>
+  <g transform="translate(180, 450)">
+    <rect x="0" y="0" width="120" height="50" rx="5" fill="#FEE2E2" stroke="#FECACA" filter="url(#shadow)"/>
+    <text x="60" y="22" text-anchor="middle" font-size="11" font-weight="600" fill="#991B1B">DBFS</text>
+    <text x="60" y="38" text-anchor="middle" font-size="8" fill="#B91C1C">Storage</text>
+  </g>
+  <g transform="translate(310, 450)">
+    <rect x="0" y="0" width="120" height="50" rx="5" fill="#FEE2E2" stroke="#FECACA" filter="url(#shadow)"/>
+    <text x="60" y="22" text-anchor="middle" font-size="11" font-weight="600" fill="#991B1B">Genie</text>
+    <text x="60" y="38" text-anchor="middle" font-size="8" fill="#B91C1C">AI/BI</text>
+  </g>
+  <g transform="translate(470, 450)">
+    <rect x="0" y="0" width="120" height="50" rx="5" fill="url(#infraGrad)" filter="url(#shadow)"/>
+    <text x="60" y="22" text-anchor="middle" font-size="11" font-weight="600" fill="white">alimentar</text>
+    <text x="60" y="38" text-anchor="middle" font-size="8" fill="#E0E7FF">Arrow · Parquet</text>
+  </g>
+  <g transform="translate(600, 450)">
+    <rect x="0" y="0" width="120" height="50" rx="5" fill="url(#infraGrad)" filter="url(#shadow)"/>
+    <text x="60" y="22" text-anchor="middle" font-size="11" font-weight="600" fill="white">trueno-db</text>
+    <text x="60" y="38" text-anchor="middle" font-size="8" fill="#E0E7FF">GPU Analytics</text>
+  </g>
+  <g transform="translate(730, 450)">
+    <rect x="0" y="0" width="120" height="50" rx="5" fill="url(#infraGrad)" filter="url(#shadow)"/>
+    <text x="60" y="22" text-anchor="middle" font-size="11" font-weight="600" fill="white">pmat</text>
+    <text x="60" y="38" text-anchor="middle" font-size="8" fill="#E0E7FF">Quality Gates</text>
+  </g>
+
+  <!-- Course Labels -->
+  <g transform="translate(50, 515)">
+    <rect x="0" y="0" width="380" height="45" rx="6" fill="#F1F5F9" stroke="#E2E8F0"/>
+    <text x="190" y="18" text-anchor="middle" font-size="11" font-weight="bold" fill="#475569">Course 3: MLOps</text>
+    <text x="190" y="35" text-anchor="middle" font-size="9" fill="#64748B">MLflow · Feature Store · Model Serving · Workflows</text>
+  </g>
+  <g transform="translate(470, 515)">
+    <rect x="0" y="0" width="380" height="45" rx="6" fill="#F1F5F9" stroke="#E2E8F0"/>
+    <text x="190" y="18" text-anchor="middle" font-size="11" font-weight="bold" fill="#475569">Course 4: GenAI</text>
+    <text x="190" y="35" text-anchor="middle" font-size="9" fill="#64748B">Vector Search · RAG · Fine-Tuning · Production</text>
+  </g>
+
+  <!-- Mapping Lines (dotted) -->
+  <line x1="430" y1="152" x2="470" y2="152" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="430" y1="217" x2="470" y2="217" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="430" y1="282" x2="470" y2="282" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="430" y1="347" x2="470" y2="347" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="430" y1="412" x2="470" y2="412" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="430" y1="475" x2="470" y2="475" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="4"/>
 
   <!-- Footer -->
-  <text x="400" y="545" text-anchor="middle" font-size="11" fill="#94A3B8">Courses 3 &amp; 4 · Databricks Specialization on Coursera</text>
-  <text x="400" y="565" text-anchor="middle" font-size="10" fill="#CBD5E1">Generated by batuta · Rust-first · Zero-dependency inference</text>
-
-  <!-- Connection Lines -->
-  <line x1="400" y1="160" x2="400" y2="175" stroke="#94A3B8" stroke-width="2" stroke-dasharray="4"/>
-  <line x1="400" y1="255" x2="400" y2="270" stroke="#94A3B8" stroke-width="2" stroke-dasharray="4"/>
-  <line x1="400" y1="340" x2="400" y2="355" stroke="#94A3B8" stroke-width="2" stroke-dasharray="4"/>
-  <line x1="400" y1="425" x2="400" y2="440" stroke="#94A3B8" stroke-width="2" stroke-dasharray="4"/>
+  <text x="450" y="590" text-anchor="middle" font-size="12" font-weight="600" fill="#475569">"Understand by Building"</text>
+  <text x="450" y="608" text-anchor="middle" font-size="10" fill="#94A3B8">Use Databricks for production · Build from scratch in Rust to understand internals</text>
+  <text x="450" y="628" text-anchor="middle" font-size="9" fill="#CBD5E1">Databricks Specialization on Coursera · Courses 3 &amp; 4</text>
 </svg>
