@@ -1,0 +1,13 @@
+[package]
+name = "fraud-detection-capstone"
+version = "0.1.0"
+edition = "2021"
+description = "Fraud Detection Platform Capstone - Course 3 Week 6"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0"
+rand = "0.8"
+
+[dev-dependencies]
