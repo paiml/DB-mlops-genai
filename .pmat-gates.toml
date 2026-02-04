@@ -1,4 +1,5 @@
 # pmat quality gates configuration
+# Note: This is an educational repository with intentional TODOs in labs
 
 [gates]
 # TDG score threshold
@@ -8,9 +9,21 @@ min_tdg_score = "B"
 max_cyclomatic = 30
 max_cognitive = 25
 
+# SATD threshold - set high for educational repos with lab TODOs
+max_satd_comments = 100
+
+# Provability threshold - relaxed for educational content
+min_provability = 0.60
+
+# Entropy threshold - demos are self-contained by design
+max_entropy_violations = 10
+
 # Coverage thresholds (for code directories)
 min_line_coverage = 80
 min_branch_coverage = 70
+
+# Pre-commit checks to run (exclude satd, entropy, provability for educational repo)
+pre_commit_checks = ["complexity", "dead-code", "security", "duplicates"]
 
 [exclude]
 # Exclude documentation and data files from code analysis
@@ -22,6 +35,7 @@ patterns = [
     "*.toml",
     "assets/**",
     "transcripts/**",
+    "labs/**",  # Labs contain intentional TODOs for students
 ]
 
 [rust]

@@ -136,42 +136,42 @@ display(df)
 
 def validate_lab():
     """Validate lab completion."""
-    checks = []
+    checks = _run_validation_checks()
+    _display_results(checks)
 
-    # Check for required columns
+
+def _run_validation_checks():
+    """Run all validation checks."""
+    checks = []
     required_cols = ["amount_zscore", "amount_log", "time_bucket"]
 
     try:
-        # Get final dataframe (should be df_encoded or similar)
         final_df = df_encoded if 'df_encoded' in dir() else df
         cols = final_df.columns
-
-        for col in required_cols:
-            checks.append((f"Column '{col}' exists", col in cols))
-
-        # Check z-score is normalized
-        if "amount_zscore" in cols:
-            stats = final_df.agg(
-                F.mean("amount_zscore").alias("mean"),
-                F.stddev("amount_zscore").alias("std")
-            ).collect()[0]
-            checks.append(("Z-score mean ≈ 0", abs(stats["mean"]) < 0.1))
-    except Exception as e:
+        checks.extend([(f"Column '{col}' exists", col in cols) for col in required_cols])
+        checks.extend(_check_zscore_normalization(final_df, cols))
+    except Exception:
         checks.append(("Pipeline complete", False))
 
-    # Display results
+    return checks
+
+
+def _check_zscore_normalization(df, cols):
+    """Check if z-score is properly normalized."""
+    if "amount_zscore" not in cols:
+        return []
+    stats = df.agg(F.mean("amount_zscore").alias("mean")).collect()[0]
+    return [("Z-score mean ≈ 0", abs(stats["mean"]) < 0.1)]
+
+
+def _display_results(checks):
+    """Display validation results."""
     print("Lab Validation Results:")
     print("-" * 40)
-    all_passed = True
+    all_passed = all(passed for _, passed in checks)
     for name, passed in checks:
-        status = "✓" if passed else "✗"
-        print(f"  {status} {name}")
-        if not passed:
-            all_passed = False
-
-    if all_passed:
-        print("\n🎉 All checks passed! Lab complete.")
-    else:
-        print("\n⚠️ Some checks failed. Review your code.")
+        print(f"  {'✓' if passed else '✗'} {name}")
+    msg = "🎉 All checks passed!" if all_passed else "⚠️ Some checks failed."
+    print(f"\n{msg}")
 
 validate_lab()
