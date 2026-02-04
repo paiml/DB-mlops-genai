@@ -10,11 +10,11 @@ Train ML models with gradient descent and evaluate performance.
 
 ## Demo Code
 
-See [`demos/course3/week3/model-training/`](https://github.com/noahgift/DB-mlops-genai/tree/main/demos/course3/week3/model-training)
+See [`demos/course3/week3/model-training/`](https://github.com/paiml/DB-mlops-genai/tree/main/demos/course3/week3/model-training)
 
 ## Lab Exercise
 
-See [`labs/course3/week3/lab_3_4_automl.py`](https://github.com/noahgift/DB-mlops-genai/tree/main/labs/course3/week3)
+See [`labs/course3/week3/lab_3_4_automl.py`](https://github.com/paiml/DB-mlops-genai/tree/main/labs/course3/week3)
 
 ## Key Implementation
 

@@ -10,11 +10,11 @@ Build a vector search index with SIMD-accelerated similarity.
 
 ## Demo Code
 
-See [`demos/course4/week3/vector-search/`](https://github.com/noahgift/DB-mlops-genai/tree/main/demos/course4/week3/vector-search)
+See [`demos/course4/week3/vector-search/`](https://github.com/paiml/DB-mlops-genai/tree/main/demos/course4/week3/vector-search)
 
 ## Lab Exercise
 
-See [`labs/course4/week3/lab_3_5_embeddings.py`](https://github.com/noahgift/DB-mlops-genai/tree/main/labs/course4/week3)
+See [`labs/course4/week3/lab_3_5_embeddings.py`](https://github.com/paiml/DB-mlops-genai/tree/main/labs/course4/week3)
 
 ## Key Implementation
 

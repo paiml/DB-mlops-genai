@@ -10,11 +10,11 @@ Deploy GenAI systems with guardrails and monitoring.
 
 ## Demo Code
 
-See [`demos/course4/week6/production/`](https://github.com/noahgift/DB-mlops-genai/tree/main/demos/course4/week6/production)
+See [`demos/course4/week6/production/`](https://github.com/paiml/DB-mlops-genai/tree/main/demos/course4/week6/production)
 
 ## Lab Exercise
 
-See [`labs/course4/week6/lab_6_3_production.py`](https://github.com/noahgift/DB-mlops-genai/tree/main/labs/course4/week6)
+See [`labs/course4/week6/lab_6_3_production.py`](https://github.com/paiml/DB-mlops-genai/tree/main/labs/course4/week6)
 
 ## Key Implementation
 

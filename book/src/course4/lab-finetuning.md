@@ -10,11 +10,11 @@ Configure LoRA fine-tuning for domain adaptation.
 
 ## Demo Code
 
-See [`demos/course4/week5/fine-tuning/`](https://github.com/noahgift/DB-mlops-genai/tree/main/demos/course4/week5/fine-tuning)
+See [`demos/course4/week5/fine-tuning/`](https://github.com/paiml/DB-mlops-genai/tree/main/demos/course4/week5/fine-tuning)
 
 ## Lab Exercise
 
-See [`labs/course4/week5/lab_5_3_fine_tuning.py`](https://github.com/noahgift/DB-mlops-genai/tree/main/labs/course4/week5)
+See [`labs/course4/week5/lab_5_3_fine_tuning.py`](https://github.com/paiml/DB-mlops-genai/tree/main/labs/course4/week5)
 
 ## Key Implementation
 

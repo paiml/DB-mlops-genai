@@ -11,11 +11,11 @@ Build an MLflow REST client in Rust to understand experiment tracking internals.
 
 ## Demo Code
 
-See [`demos/course3/week1/mlflow-client/`](https://github.com/noahgift/DB-mlops-genai/tree/main/demos/course3/week1/mlflow-client)
+See [`demos/course3/week1/mlflow-client/`](https://github.com/paiml/DB-mlops-genai/tree/main/demos/course3/week1/mlflow-client)
 
 ## Lab Exercise
 
-See [`labs/course3/week1/lab_1_5_mlflow_client.py`](https://github.com/noahgift/DB-mlops-genai/tree/main/labs/course3/week1)
+See [`labs/course3/week1/lab_1_5_mlflow_client.py`](https://github.com/paiml/DB-mlops-genai/tree/main/labs/course3/week1)
 
 ## Key Implementation
 

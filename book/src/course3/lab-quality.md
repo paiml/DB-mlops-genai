@@ -10,11 +10,11 @@ Implement production quality enforcement with pmat.
 
 ## Demo Code
 
-See [`demos/course3/week5/quality-gates/`](https://github.com/noahgift/DB-mlops-genai/tree/main/demos/course3/week5/quality-gates)
+See [`demos/course3/week5/quality-gates/`](https://github.com/paiml/DB-mlops-genai/tree/main/demos/course3/week5/quality-gates)
 
 ## Lab Exercise
 
-See [`labs/course3/week5/lab_5_5_quality_gates.py`](https://github.com/noahgift/DB-mlops-genai/tree/main/labs/course3/week5)
+See [`labs/course3/week5/lab_5_5_quality_gates.py`](https://github.com/paiml/DB-mlops-genai/tree/main/labs/course3/week5)
 
 ## Configuration
 

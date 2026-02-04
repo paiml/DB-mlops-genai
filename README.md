@@ -2,8 +2,8 @@
 
 **Courses 3 & 4 of the Databricks Specialization on Coursera**
 
-[![CI](https://github.com/noahgift/DB-mlops-genai/actions/workflows/ci.yml/badge.svg)](https://github.com/noahgift/DB-mlops-genai/actions/workflows/ci.yml)
-[![Book](https://github.com/noahgift/DB-mlops-genai/actions/workflows/book.yml/badge.svg)](https://noahgift.github.io/DB-mlops-genai/)
+[![CI](https://github.com/paiml/DB-mlops-genai/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/DB-mlops-genai/actions/workflows/ci.yml)
+[![Book](https://github.com/paiml/DB-mlops-genai/actions/workflows/book.yml/badge.svg)](https://paiml.github.io/DB-mlops-genai/)
 [![Databricks](https://img.shields.io/badge/Platform-Databricks%20Free%20Edition-orange)](https://www.databricks.com/)
 [![Rust](https://img.shields.io/badge/Sovereign%20AI-Rust-blue)](https://www.rust-lang.org/)
 

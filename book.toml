@@ -13,8 +13,8 @@ create-missing = false
 [output.html]
 default-theme = "navy"
 preferred-dark-theme = "ayu"
-git-repository-url = "https://github.com/noahgift/DB-mlops-genai"
-edit-url-template = "https://github.com/noahgift/DB-mlops-genai/edit/main/{path}"
+git-repository-url = "https://github.com/paiml/DB-mlops-genai"
+edit-url-template = "https://github.com/paiml/DB-mlops-genai/edit/main/{path}"
 
 [output.html.fold]
 enable = true

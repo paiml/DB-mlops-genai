@@ -10,11 +10,11 @@ Build a model serving infrastructure with batching and health checks.
 
 ## Demo Code
 
-See [`demos/course3/week4/inference-server/`](https://github.com/noahgift/DB-mlops-genai/tree/main/demos/course3/week4/inference-server)
+See [`demos/course3/week4/inference-server/`](https://github.com/paiml/DB-mlops-genai/tree/main/demos/course3/week4/inference-server)
 
 ## Lab Exercise
 
-See [`labs/course3/week4/lab_4_5_serving.py`](https://github.com/noahgift/DB-mlops-genai/tree/main/labs/course3/week4)
+See [`labs/course3/week4/lab_4_5_serving.py`](https://github.com/paiml/DB-mlops-genai/tree/main/labs/course3/week4)
 
 ## Key Components
 

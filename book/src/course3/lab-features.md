@@ -10,11 +10,11 @@ Build a SIMD-accelerated feature computation pipeline.
 
 ## Demo Code
 
-See [`demos/course3/week2/feature-pipeline/`](https://github.com/noahgift/DB-mlops-genai/tree/main/demos/course3/week2/feature-pipeline)
+See [`demos/course3/week2/feature-pipeline/`](https://github.com/paiml/DB-mlops-genai/tree/main/demos/course3/week2/feature-pipeline)
 
 ## Lab Exercise
 
-See [`labs/course3/week2/lab_2_5_feature_pipeline.py`](https://github.com/noahgift/DB-mlops-genai/tree/main/labs/course3/week2)
+See [`labs/course3/week2/lab_2_5_feature_pipeline.py`](https://github.com/paiml/DB-mlops-genai/tree/main/labs/course3/week2)
 
 ## Key Transforms
 

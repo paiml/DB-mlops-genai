@@ -10,11 +10,11 @@ Build an end-to-end RAG system with chunking, retrieval, and generation.
 
 ## Demo Code
 
-See [`demos/course4/week4/rag-pipeline/`](https://github.com/noahgift/DB-mlops-genai/tree/main/demos/course4/week4/rag-pipeline)
+See [`demos/course4/week4/rag-pipeline/`](https://github.com/paiml/DB-mlops-genai/tree/main/demos/course4/week4/rag-pipeline)
 
 ## Lab Exercise
 
-See [`labs/course4/week4/lab_4_7_rag.py`](https://github.com/noahgift/DB-mlops-genai/tree/main/labs/course4/week4)
+See [`labs/course4/week4/lab_4_7_rag.py`](https://github.com/paiml/DB-mlops-genai/tree/main/labs/course4/week4)
 
 ## Key Implementation
 

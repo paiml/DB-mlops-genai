@@ -10,11 +10,11 @@ Build a BPE tokenizer to understand LLM text processing.
 
 ## Demo Code
 
-See [`demos/course4/week1/llm-serving/`](https://github.com/noahgift/DB-mlops-genai/tree/main/demos/course4/week1/llm-serving)
+See [`demos/course4/week1/llm-serving/`](https://github.com/paiml/DB-mlops-genai/tree/main/demos/course4/week1/llm-serving)
 
 ## Lab Exercise
 
-See [`labs/course4/week1/lab_1_7_tokenizer.py`](https://github.com/noahgift/DB-mlops-genai/tree/main/labs/course4/week1)
+See [`labs/course4/week1/lab_1_7_tokenizer.py`](https://github.com/paiml/DB-mlops-genai/tree/main/labs/course4/week1)
 
 ## Key Implementation
 

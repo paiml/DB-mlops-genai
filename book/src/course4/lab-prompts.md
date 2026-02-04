@@ -10,11 +10,11 @@ Build type-safe prompt templates with variable substitution.
 
 ## Demo Code
 
-See [`demos/course4/week2/prompt-engineering/`](https://github.com/noahgift/DB-mlops-genai/tree/main/demos/course4/week2/prompt-engineering)
+See [`demos/course4/week2/prompt-engineering/`](https://github.com/paiml/DB-mlops-genai/tree/main/demos/course4/week2/prompt-engineering)
 
 ## Lab Exercise
 
-See [`labs/course4/week2/lab_2_6_prompt_templates.py`](https://github.com/noahgift/DB-mlops-genai/tree/main/labs/course4/week2)
+See [`labs/course4/week2/lab_2_6_prompt_templates.py`](https://github.com/paiml/DB-mlops-genai/tree/main/labs/course4/week2)
 
 ## Key Implementation
 
