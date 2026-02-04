@@ -1,0 +1,29 @@
+[book]
+title = "MLOps & GenAI Engineering on Databricks"
+authors = ["Noah Gift"]
+description = "Courses 3 & 4 of the Databricks Specialization on Coursera"
+language = "en"
+multilingual = false
+src = "book/src"
+
+[build]
+build-dir = "book/output"
+create-missing = false
+
+[output.html]
+default-theme = "navy"
+preferred-dark-theme = "ayu"
+git-repository-url = "https://github.com/noahgift/DB-mlops-genai"
+edit-url-template = "https://github.com/noahgift/DB-mlops-genai/edit/main/{path}"
+
+[output.html.fold]
+enable = true
+level = 1
+
+[output.html.search]
+enable = true
+limit-results = 30
+use-hierarchical-nav = true
+
+[output.html.playground]
+editable = true

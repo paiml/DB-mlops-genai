@@ -25,22 +25,24 @@ jobs:
         run: uv run ruff check demos/ labs/ examples/ --ignore E501,E722
 
       - name: Install Rust
-        uses: dtolnay/rust-action@stable
+        uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy, rustfmt
 
       - name: Check Rust formatting
         run: |
-          for dir in demos/*/week*/; do
+          for dir in demos/course*/week*/*; do
             if [ -f "$dir/Cargo.toml" ]; then
+              echo "Checking format: $dir"
               (cd "$dir" && cargo fmt --check)
             fi
           done
 
       - name: Clippy
         run: |
-          for dir in demos/*/week*/; do
+          for dir in demos/course*/week*/*; do
             if [ -f "$dir/Cargo.toml" ]; then
+              echo "Clippy: $dir"
               (cd "$dir" && cargo clippy -- -D warnings)
             fi
           done
@@ -61,12 +63,13 @@ jobs:
           find demos labs examples -name "*.py" -exec python -m py_compile {} \; 2>/dev/null || true
 
       - name: Install Rust
-        uses: dtolnay/rust-action@stable
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Rust tests
         run: |
-          for dir in demos/*/week*/; do
+          for dir in demos/course*/week*/*; do
             if [ -f "$dir/Cargo.toml" ]; then
+              echo "Testing: $dir"
               (cd "$dir" && cargo test)
             fi
           done
@@ -77,10 +80,13 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Rust
-        uses: dtolnay/rust-action@stable
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Install pmat
         run: cargo install pmat
 
+      - name: Repository score
+        run: pmat repo-score
+
       - name: Quality gates
-        run: pmat rust-project-score . --format json || true
+        run: pmat quality-gate

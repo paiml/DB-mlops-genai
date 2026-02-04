@@ -2,6 +2,8 @@
 
 **Courses 3 & 4 of the Databricks Specialization on Coursera**
 
+[![CI](https://github.com/noahgift/DB-mlops-genai/actions/workflows/ci.yml/badge.svg)](https://github.com/noahgift/DB-mlops-genai/actions/workflows/ci.yml)
+[![Book](https://github.com/noahgift/DB-mlops-genai/actions/workflows/book.yml/badge.svg)](https://noahgift.github.io/DB-mlops-genai/)
 [![Databricks](https://img.shields.io/badge/Platform-Databricks%20Free%20Edition-orange)](https://www.databricks.com/)
 [![Rust](https://img.shields.io/badge/Sovereign%20AI-Rust-blue)](https://www.rust-lang.org/)
 
@@ -13,6 +15,10 @@ Master MLOps and GenAI engineering through hands-on labs on **Databricks Free Ed
 |--------|-------|----------|-------|
 | **3** | MLOps Engineering | 30 hrs | MLflow, Feature Store, Model Serving |
 | **4** | GenAI Engineering | 34 hrs | Vector Search, RAG, Fine-Tuning |
+
+## Architecture
+
+![Sovereign AI Stack Architecture](assets/architecture.svg)
 
 ## Prerequisites
 
@@ -54,19 +60,13 @@ make test-course3
 make test-course4
 ```
 
-## Course Architecture
+## Design Philosophy
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Databricks Free Edition                   │
-│  MLflow · Feature Store · Model Serving · Vector Search     │
-├─────────────────────────────────────────────────────────────┤
-│                    Sovereign AI Stack                        │
-│  trueno · aprender · realizar · entrenar · pacha · batuta   │
-└─────────────────────────────────────────────────────────────┘
-```
+**Dual-layer pedagogy:**
+- **Databricks layer** — Use production MLOps and GenAI tools effectively
+- **Sovereign AI Stack layer** — Build equivalent systems in Rust to understand internals
 
-**Dual pedagogy:** Use Databricks for production workflows, build from scratch in Rust to understand internals.
+*"Understand by building"* creates deeper retention than tutorials alone.
 
 ## Repository Structure
 
