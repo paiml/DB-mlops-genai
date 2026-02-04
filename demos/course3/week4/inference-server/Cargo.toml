@@ -1,0 +1,19 @@
+[package]
+name = "inference-server"
+version = "0.1.0"
+edition = "2021"
+description = "Model inference server demo - Course 3 Week 4"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0"
+tokio = { version = "1.0", features = ["full"] }
+axum = "0.7"
+tower = "0.4"
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+http = "1.0"
+
+[dev-dependencies]
