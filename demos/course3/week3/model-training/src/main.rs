@@ -520,6 +520,10 @@ fn simple_hash(data: &str) -> String {
 mod tests {
     use super::*;
 
+    // =========================================================================
+    // Dataset Tests
+    // =========================================================================
+
     #[test]
     fn test_dataset_generation() {
         let dataset = Dataset::generate_regression(100, 5, 42);
@@ -529,12 +533,58 @@ mod tests {
     }
 
     #[test]
+    fn test_dataset_classification() {
+        let dataset = Dataset::generate_classification(100, 4, 42);
+        assert_eq!(dataset.features.len(), 100);
+        assert_eq!(dataset.labels.len(), 100);
+        assert_eq!(dataset.feature_names.len(), 4);
+        // Labels should be binary
+        for label in &dataset.labels {
+            assert!(*label == 0.0 || *label == 1.0);
+        }
+    }
+
+    #[test]
+    fn test_dataset_feature_names() {
+        let dataset = Dataset::generate_regression(10, 3, 42);
+        assert_eq!(dataset.feature_names, vec!["feature_0", "feature_1", "feature_2"]);
+    }
+
+    #[test]
     fn test_train_test_split() {
         let dataset = Dataset::generate_regression(100, 5, 42);
         let (train, test) = dataset.train_test_split(0.2);
         assert_eq!(train.features.len(), 80);
         assert_eq!(test.features.len(), 20);
     }
+
+    #[test]
+    fn test_train_test_split_preserves_feature_names() {
+        let dataset = Dataset::generate_regression(100, 3, 42);
+        let (train, test) = dataset.train_test_split(0.3);
+        assert_eq!(train.feature_names, dataset.feature_names);
+        assert_eq!(test.feature_names, dataset.feature_names);
+    }
+
+    #[test]
+    fn test_train_test_split_zero_ratio() {
+        let dataset = Dataset::generate_regression(100, 3, 42);
+        let (train, test) = dataset.train_test_split(0.0);
+        assert_eq!(train.features.len(), 100);
+        assert_eq!(test.features.len(), 0);
+    }
+
+    #[test]
+    fn test_dataset_clone() {
+        let dataset = Dataset::generate_regression(10, 2, 42);
+        let cloned = dataset.clone();
+        assert_eq!(dataset.features.len(), cloned.features.len());
+        assert_eq!(dataset.labels.len(), cloned.labels.len());
+    }
+
+    // =========================================================================
+    // Linear Regression Tests
+    // =========================================================================
 
     #[test]
     fn test_linear_regression() {
@@ -547,6 +597,60 @@ mod tests {
     }
 
     #[test]
+    fn test_linear_regression_new() {
+        let model = LinearRegression::new(5, 0.01, 500);
+        assert_eq!(model.weights.len(), 5);
+        assert_eq!(model.bias, 0.0);
+        assert_eq!(model.learning_rate, 0.01);
+        assert_eq!(model.n_iterations, 500);
+    }
+
+    #[test]
+    fn test_linear_regression_predict() {
+        let mut model = LinearRegression::new(2, 0.1, 1);
+        model.weights = vec![1.0, 2.0];
+        model.bias = 0.5;
+
+        let predictions = model.predict(&[vec![1.0, 1.0], vec![2.0, 2.0]]);
+        assert_eq!(predictions.len(), 2);
+        assert!((predictions[0] - 3.5).abs() < 0.001); // 1*1 + 2*1 + 0.5 = 3.5
+        assert!((predictions[1] - 6.5).abs() < 0.001); // 1*2 + 2*2 + 0.5 = 6.5
+    }
+
+    #[test]
+    fn test_linear_regression_score_perfect() {
+        let mut model = LinearRegression::new(2, 0.1, 1);
+        model.weights = vec![1.0, 0.0];
+        model.bias = 0.0;
+
+        let features = vec![vec![0.0, 0.0], vec![1.0, 0.0], vec![2.0, 0.0]];
+        let labels = vec![0.0, 1.0, 2.0];
+        let score = model.score(&features, &labels);
+        assert!((score - 1.0).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_linear_regression_clone() {
+        let model = LinearRegression::new(3, 0.05, 200);
+        let cloned = model.clone();
+        assert_eq!(model.weights.len(), cloned.weights.len());
+        assert_eq!(model.bias, cloned.bias);
+    }
+
+    #[test]
+    fn test_linear_regression_serialization() {
+        let model = LinearRegression::new(3, 0.01, 100);
+        let json = serde_json::to_string(&model).unwrap();
+        let deserialized: LinearRegression = serde_json::from_str(&json).unwrap();
+        assert_eq!(model.weights.len(), deserialized.weights.len());
+        assert_eq!(model.learning_rate, deserialized.learning_rate);
+    }
+
+    // =========================================================================
+    // Decision Stump Tests
+    // =========================================================================
+
+    #[test]
     fn test_decision_stump() {
         let dataset = Dataset::generate_classification(100, 3, 42);
         let tree = DecisionStump::fit(&dataset.features, &dataset.labels);
@@ -554,6 +658,67 @@ mod tests {
         let accuracy = tree.accuracy(&dataset.features, &dataset.labels);
         assert!(accuracy > 0.5, "Accuracy should be better than random: {}", accuracy);
     }
+
+    #[test]
+    fn test_decision_stump_predict() {
+        let tree = DecisionStump {
+            feature_index: 0,
+            threshold: 0.5,
+            left_class: 0.0,
+            right_class: 1.0,
+        };
+
+        let features = vec![vec![0.3], vec![0.7]];
+        let predictions = tree.predict(&features);
+        assert_eq!(predictions, vec![0.0, 1.0]);
+    }
+
+    #[test]
+    fn test_decision_stump_accuracy_perfect() {
+        let tree = DecisionStump {
+            feature_index: 0,
+            threshold: 0.5,
+            left_class: 0.0,
+            right_class: 1.0,
+        };
+
+        let features = vec![vec![0.3], vec![0.7]];
+        let labels = vec![0.0, 1.0];
+        let accuracy = tree.accuracy(&features, &labels);
+        assert!((accuracy - 1.0).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_decision_stump_serialization() {
+        let tree = DecisionStump {
+            feature_index: 2,
+            threshold: 0.75,
+            left_class: 0.0,
+            right_class: 1.0,
+        };
+
+        let json = serde_json::to_string(&tree).unwrap();
+        let deserialized: DecisionStump = serde_json::from_str(&json).unwrap();
+        assert_eq!(tree.feature_index, deserialized.feature_index);
+        assert_eq!(tree.threshold, deserialized.threshold);
+    }
+
+    #[test]
+    fn test_decision_stump_clone() {
+        let tree = DecisionStump {
+            feature_index: 1,
+            threshold: 0.5,
+            left_class: 0.0,
+            right_class: 1.0,
+        };
+
+        let cloned = tree.clone();
+        assert_eq!(tree.feature_index, cloned.feature_index);
+    }
+
+    // =========================================================================
+    // Model Card Tests
+    // =========================================================================
 
     #[test]
     fn test_model_card() {
@@ -566,10 +731,125 @@ mod tests {
     }
 
     #[test]
+    fn test_model_card_new() {
+        let card = ModelCard::new("fraud-detector", "DecisionTree", "Detects fraud");
+        assert_eq!(card.name, "fraud-detector");
+        assert_eq!(card.model_type, "DecisionTree");
+        assert_eq!(card.description, "Detects fraud");
+        assert_eq!(card.version, "1.0.0");
+        assert_eq!(card.author, "sovereign-ai");
+    }
+
+    #[test]
+    fn test_model_card_chained_methods() {
+        let mut card = ModelCard::new("model", "Type", "Desc");
+        card.add_metric("a", 1.0)
+            .add_metric("b", 2.0)
+            .add_param("x", "1")
+            .add_param("y", "2");
+
+        assert_eq!(card.metrics.len(), 2);
+        assert_eq!(card.parameters.len(), 2);
+    }
+
+    #[test]
+    fn test_model_card_serialization() {
+        let mut card = ModelCard::new("test", "Linear", "Test model");
+        card.add_metric("r2", 0.95);
+
+        let json = serde_json::to_string(&card).unwrap();
+        let deserialized: ModelCard = serde_json::from_str(&json).unwrap();
+        assert_eq!(card.name, deserialized.name);
+        assert_eq!(card.metrics.get("r2"), deserialized.metrics.get("r2"));
+    }
+
+    #[test]
+    fn test_model_card_clone() {
+        let mut card = ModelCard::new("test", "Linear", "Test");
+        card.add_metric("acc", 0.9);
+        let cloned = card.clone();
+        assert_eq!(card.name, cloned.name);
+        assert_eq!(card.metrics.get("acc"), cloned.metrics.get("acc"));
+    }
+
+    // =========================================================================
+    // Error Tests
+    // =========================================================================
+
+    #[test]
+    fn test_error_training() {
+        let err = ModelError::Training("gradient explosion".to_string());
+        assert!(err.to_string().contains("gradient explosion"));
+    }
+
+    #[test]
+    fn test_error_registry() {
+        let err = ModelError::Registry("model not found".to_string());
+        assert!(err.to_string().contains("model not found"));
+    }
+
+    #[test]
+    fn test_error_serialization() {
+        let json_err = serde_json::from_str::<ModelCard>("invalid json");
+        assert!(json_err.is_err());
+        let err = ModelError::from(json_err.unwrap_err());
+        assert!(err.to_string().contains("Serialization"));
+    }
+
+    #[test]
+    fn test_error_debug() {
+        let err = ModelError::Training("test".to_string());
+        let debug_str = format!("{:?}", err);
+        assert!(debug_str.contains("Training"));
+    }
+
+    // =========================================================================
+    // Hash Tests
+    // =========================================================================
+
+    #[test]
+    fn test_simple_hash_deterministic() {
+        let hash1 = simple_hash("test data");
+        let hash2 = simple_hash("test data");
+        assert_eq!(hash1, hash2);
+    }
+
+    #[test]
+    fn test_simple_hash_different_inputs() {
+        let hash1 = simple_hash("data1");
+        let hash2 = simple_hash("data2");
+        assert_ne!(hash1, hash2);
+    }
+
+    #[test]
+    fn test_simple_hash_format() {
+        let hash = simple_hash("test");
+        assert_eq!(hash.len(), 16); // 16 hex chars for u64
+    }
+
+    // =========================================================================
+    // Serialization Round-Trip Tests
+    // =========================================================================
+
+    #[test]
     fn test_model_serialization() {
         let model = LinearRegression::new(3, 0.01, 100);
         let json = serde_json::to_string(&model).unwrap();
         let deserialized: LinearRegression = serde_json::from_str(&json).unwrap();
         assert_eq!(model.weights.len(), deserialized.weights.len());
+    }
+
+    #[test]
+    fn test_decision_stump_round_trip() {
+        let dataset = Dataset::generate_classification(50, 2, 42);
+        let tree = DecisionStump::fit(&dataset.features, &dataset.labels);
+
+        let json = serde_json::to_string(&tree).unwrap();
+        let restored: DecisionStump = serde_json::from_str(&json).unwrap();
+
+        // Predictions should be identical
+        let preds1 = tree.predict(&dataset.features);
+        let preds2 = restored.predict(&dataset.features);
+        assert_eq!(preds1, preds2);
     }
 }

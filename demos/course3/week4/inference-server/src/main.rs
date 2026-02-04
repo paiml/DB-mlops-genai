@@ -359,6 +359,10 @@ async fn main() {
 mod tests {
     use super::*;
 
+    // =========================================================================
+    // Linear Model Tests
+    // =========================================================================
+
     #[test]
     fn test_linear_model_predict() {
         let model = LinearModel::new("test", vec![1.0, 2.0, 3.0], 0.5);
@@ -375,6 +379,41 @@ mod tests {
     }
 
     #[test]
+    fn test_linear_model_new() {
+        let model = LinearModel::new("fraud-detector", vec![0.5, 0.3], 0.1);
+        assert_eq!(model.name, "fraud-detector");
+        assert_eq!(model.version, "1.0.0");
+        assert_eq!(model.weights.len(), 2);
+        assert_eq!(model.bias, 0.1);
+    }
+
+    #[test]
+    fn test_linear_model_predict_zeros() {
+        let model = LinearModel::new("test", vec![1.0, 2.0], 0.5);
+        let result = model.predict(&[0.0, 0.0]).unwrap();
+        assert!((result - 0.5).abs() < 0.001); // Just bias
+    }
+
+    #[test]
+    fn test_linear_model_predict_negative() {
+        let model = LinearModel::new("test", vec![1.0, -1.0], 0.0);
+        let result = model.predict(&[1.0, 2.0]).unwrap();
+        assert!((result - (-1.0)).abs() < 0.001); // 1*1 + (-1)*2 = -1
+    }
+
+    #[test]
+    fn test_linear_model_clone() {
+        let model = LinearModel::new("test", vec![1.0, 2.0], 0.5);
+        let cloned = model.clone();
+        assert_eq!(model.name, cloned.name);
+        assert_eq!(model.weights, cloned.weights);
+    }
+
+    // =========================================================================
+    // Batch Prediction Tests
+    // =========================================================================
+
+    #[test]
     fn test_batch_predict() {
         let model = LinearModel::new("test", vec![1.0, 2.0], 0.0);
         let batch = vec![vec![1.0, 0.0], vec![0.0, 1.0], vec![1.0, 1.0]];
@@ -384,6 +423,25 @@ mod tests {
         assert!((results[1] - 2.0).abs() < 0.001);
         assert!((results[2] - 3.0).abs() < 0.001);
     }
+
+    #[test]
+    fn test_batch_predict_empty() {
+        let model = LinearModel::new("test", vec![1.0, 2.0], 0.0);
+        let results = model.predict_batch(&[]).unwrap();
+        assert!(results.is_empty());
+    }
+
+    #[test]
+    fn test_batch_predict_error_propagates() {
+        let model = LinearModel::new("test", vec![1.0, 2.0], 0.0);
+        let batch = vec![vec![1.0], vec![1.0, 2.0]]; // First has wrong features
+        let result = model.predict_batch(&batch);
+        assert!(result.is_err());
+    }
+
+    // =========================================================================
+    // Metrics Tests
+    // =========================================================================
 
     #[test]
     fn test_metrics_tracking() {
@@ -396,6 +454,33 @@ mod tests {
     }
 
     #[test]
+    fn test_metrics_default() {
+        let metrics = ServerMetrics::default();
+        assert_eq!(metrics.total_requests, 0);
+        assert_eq!(metrics.total_predictions, 0);
+        assert_eq!(metrics.total_latency_ms, 0.0);
+    }
+
+    #[test]
+    fn test_metrics_avg_latency_zero_requests() {
+        let metrics = ServerMetrics::default();
+        assert_eq!(metrics.avg_latency(), 0.0);
+    }
+
+    #[test]
+    fn test_metrics_single_request() {
+        let mut metrics = ServerMetrics::default();
+        metrics.record_request(5, 2.5);
+        assert_eq!(metrics.total_requests, 1);
+        assert_eq!(metrics.total_predictions, 5);
+        assert!((metrics.avg_latency() - 2.5).abs() < 0.001);
+    }
+
+    // =========================================================================
+    // Serialization Tests
+    // =========================================================================
+
+    #[test]
     fn test_model_serialization() {
         let model = LinearModel::new("test", vec![1.0, 2.0, 3.0], 0.5);
         let json = serde_json::to_string(&model).unwrap();
@@ -405,10 +490,141 @@ mod tests {
     }
 
     #[test]
+    fn test_model_serialization_round_trip() {
+        let model = LinearModel::new("fraud", vec![0.5, -0.3, 0.8], 0.1);
+        let json = serde_json::to_string(&model).unwrap();
+        let restored: LinearModel = serde_json::from_str(&json).unwrap();
+
+        // Should produce identical predictions
+        let pred1 = model.predict(&[1.0, 2.0, 3.0]).unwrap();
+        let pred2 = restored.predict(&[1.0, 2.0, 3.0]).unwrap();
+        assert!((pred1 - pred2).abs() < 0.001);
+    }
+
+    // =========================================================================
+    // Request/Response Types Tests
+    // =========================================================================
+
+    #[test]
     fn test_predict_request_deserialization() {
         let json = r#"{"inputs": [[1.0, 2.0, 3.0]]}"#;
         let request: PredictRequest = serde_json::from_str(json).unwrap();
         assert_eq!(request.inputs.len(), 1);
         assert_eq!(request.inputs[0].len(), 3);
+    }
+
+    #[test]
+    fn test_predict_request_with_parameters() {
+        let json = r#"{"inputs": [[1.0]], "parameters": {"return_probabilities": true}}"#;
+        let request: PredictRequest = serde_json::from_str(json).unwrap();
+        assert!(request.parameters.return_probabilities);
+    }
+
+    #[test]
+    fn test_predict_parameters_default() {
+        let params = PredictParameters::default();
+        assert!(!params.return_probabilities);
+    }
+
+    #[test]
+    fn test_predict_response_serialization() {
+        let response = PredictResponse {
+            predictions: vec![0.5, 0.7],
+            model: "test".to_string(),
+            version: "1.0.0".to_string(),
+            latency_ms: 2.5,
+        };
+        let json = serde_json::to_string(&response).unwrap();
+        assert!(json.contains("predictions"));
+        assert!(json.contains("latency_ms"));
+    }
+
+    #[test]
+    fn test_health_response_serialization() {
+        let response = HealthResponse {
+            status: "healthy".to_string(),
+            model_loaded: true,
+            model_name: Some("test".to_string()),
+            version: Some("1.0.0".to_string()),
+        };
+        let json = serde_json::to_string(&response).unwrap();
+        let restored: HealthResponse = serde_json::from_str(&json).unwrap();
+        assert_eq!(response.status, restored.status);
+        assert_eq!(response.model_loaded, restored.model_loaded);
+    }
+
+    #[test]
+    fn test_model_info_response_serialization() {
+        let response = ModelInfoResponse {
+            name: "fraud-detector".to_string(),
+            version: "1.0.0".to_string(),
+            n_features: 5,
+            model_type: "LinearModel".to_string(),
+        };
+        let json = serde_json::to_string(&response).unwrap();
+        assert!(json.contains("n_features"));
+    }
+
+    #[test]
+    fn test_metrics_response_serialization() {
+        let response = MetricsResponse {
+            total_requests: 100,
+            total_predictions: 500,
+            avg_latency_ms: 2.5,
+            uptime_seconds: 3600,
+        };
+        let json = serde_json::to_string(&response).unwrap();
+        let restored: MetricsResponse = serde_json::from_str(&json).unwrap();
+        assert_eq!(response.total_requests, restored.total_requests);
+    }
+
+    #[test]
+    fn test_error_response_serialization() {
+        let response = ErrorResponse {
+            error: "Model not found".to_string(),
+            code: "MODEL_NOT_LOADED".to_string(),
+        };
+        let json = serde_json::to_string(&response).unwrap();
+        assert!(json.contains("MODEL_NOT_LOADED"));
+    }
+
+    // =========================================================================
+    // Error Type Tests
+    // =========================================================================
+
+    #[test]
+    fn test_inference_error_model_not_loaded() {
+        let err = InferenceError::ModelNotLoaded("fraud-detector".to_string());
+        assert!(err.to_string().contains("fraud-detector"));
+    }
+
+    #[test]
+    fn test_inference_error_invalid_input() {
+        let err = InferenceError::InvalidInput("wrong shape".to_string());
+        assert!(err.to_string().contains("wrong shape"));
+    }
+
+    #[test]
+    fn test_inference_error_prediction_failed() {
+        let err = InferenceError::PredictionFailed("NaN detected".to_string());
+        assert!(err.to_string().contains("NaN detected"));
+    }
+
+    #[test]
+    fn test_inference_error_debug() {
+        let err = InferenceError::InvalidInput("test".to_string());
+        let debug_str = format!("{:?}", err);
+        assert!(debug_str.contains("InvalidInput"));
+    }
+
+    // =========================================================================
+    // Demo Model Tests
+    // =========================================================================
+
+    #[test]
+    fn test_create_demo_model() {
+        let model = create_demo_model();
+        assert_eq!(model.name, "fraud-detector");
+        assert_eq!(model.weights.len(), 5);
     }
 }

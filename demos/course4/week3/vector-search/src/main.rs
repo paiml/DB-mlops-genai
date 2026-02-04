@@ -438,11 +438,49 @@ fn main() {
 mod tests {
     use super::*;
 
+    // =========================================================================
+    // Embedding Tests
+    // =========================================================================
+
+    #[test]
+    fn test_embedding_new() {
+        let emb = Embedding::new(vec![1.0, 2.0, 3.0]);
+        assert_eq!(emb.dimension, 3);
+        assert_eq!(emb.values.len(), 3);
+    }
+
+    #[test]
+    fn test_embedding_zeros() {
+        let emb = Embedding::zeros(5);
+        assert_eq!(emb.dimension, 5);
+        assert!(emb.values.iter().all(|&v| v == 0.0));
+    }
+
     #[test]
     fn test_embedding_normalize() {
         let emb = Embedding::new(vec![3.0, 4.0]);
         let norm = emb.normalize();
         assert!((norm.l2_norm() - 1.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_embedding_normalize_zero_vector() {
+        let emb = Embedding::zeros(3);
+        let norm = emb.normalize();
+        assert!((norm.l2_norm() - 0.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_embedding_l2_norm() {
+        let emb = Embedding::new(vec![3.0, 4.0]);
+        assert!((emb.l2_norm() - 5.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_embedding_dot() {
+        let a = Embedding::new(vec![1.0, 2.0]);
+        let b = Embedding::new(vec![3.0, 4.0]);
+        assert!((a.dot(&b) - 11.0).abs() < 1e-6); // 1*3 + 2*4 = 11
     }
 
     #[test]
@@ -456,11 +494,43 @@ mod tests {
     }
 
     #[test]
+    fn test_cosine_similarity_zero_vector() {
+        let a = Embedding::zeros(3);
+        let b = Embedding::new(vec![1.0, 0.0, 0.0]);
+        assert_eq!(a.cosine_similarity(&b), 0.0);
+    }
+
+    #[test]
     fn test_euclidean_distance() {
         let a = Embedding::new(vec![0.0, 0.0]);
         let b = Embedding::new(vec![3.0, 4.0]);
         assert!((a.euclidean_distance(&b) - 5.0).abs() < 1e-6);
     }
+
+    #[test]
+    fn test_euclidean_distance_same() {
+        let a = Embedding::new(vec![1.0, 2.0]);
+        assert!((a.euclidean_distance(&a) - 0.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_embedding_serialization() {
+        let emb = Embedding::new(vec![1.0, 2.0, 3.0]);
+        let json = serde_json::to_string(&emb).unwrap();
+        let restored: Embedding = serde_json::from_str(&json).unwrap();
+        assert_eq!(emb.values, restored.values);
+    }
+
+    #[test]
+    fn test_embedding_clone() {
+        let emb = Embedding::new(vec![1.0, 2.0]);
+        let cloned = emb.clone();
+        assert_eq!(emb.values, cloned.values);
+    }
+
+    // =========================================================================
+    // Embedder Tests
+    // =========================================================================
 
     #[test]
     fn test_simple_embedder() {
@@ -471,11 +541,92 @@ mod tests {
     }
 
     #[test]
+    fn test_simple_embedder_deterministic() {
+        let embedder = SimpleEmbedder::new(32);
+        let emb1 = embedder.embed("test input");
+        let emb2 = embedder.embed("test input");
+        assert_eq!(emb1.values, emb2.values);
+    }
+
+    #[test]
+    fn test_simple_embedder_different_inputs() {
+        let embedder = SimpleEmbedder::new(32);
+        let emb1 = embedder.embed("hello");
+        let emb2 = embedder.embed("world");
+        assert_ne!(emb1.values, emb2.values);
+    }
+
+    #[test]
+    fn test_simple_embedder_batch() {
+        let embedder = SimpleEmbedder::new(32);
+        let texts = ["one", "two", "three"];
+        let embeddings = embedder.embed_batch(&texts);
+        assert_eq!(embeddings.len(), 3);
+    }
+
+    #[test]
+    fn test_simple_embedder_clone() {
+        let embedder = SimpleEmbedder::new(64);
+        let cloned = embedder.clone();
+        let emb1 = embedder.embed("test");
+        let emb2 = cloned.embed("test");
+        assert_eq!(emb1.values, emb2.values);
+    }
+
+    // =========================================================================
+    // Document Tests
+    // =========================================================================
+
+    #[test]
+    fn test_document_new() {
+        let doc = Document::new("doc1", "Hello world");
+        assert_eq!(doc.id, "doc1");
+        assert_eq!(doc.content, "Hello world");
+        assert!(doc.metadata.is_empty());
+    }
+
+    #[test]
+    fn test_document_with_metadata() {
+        let doc = Document::new("doc1", "content")
+            .with_metadata("key1", "value1")
+            .with_metadata("key2", "value2");
+        assert_eq!(doc.metadata.len(), 2);
+        assert_eq!(doc.metadata.get("key1"), Some(&"value1".to_string()));
+    }
+
+    #[test]
+    fn test_document_serialization() {
+        let doc = Document::new("test", "content").with_metadata("k", "v");
+        let json = serde_json::to_string(&doc).unwrap();
+        let restored: Document = serde_json::from_str(&json).unwrap();
+        assert_eq!(doc.id, restored.id);
+        assert_eq!(doc.metadata, restored.metadata);
+    }
+
+    #[test]
+    fn test_document_clone() {
+        let doc = Document::new("test", "content");
+        let cloned = doc.clone();
+        assert_eq!(doc.id, cloned.id);
+    }
+
+    // =========================================================================
+    // Vector Index Tests
+    // =========================================================================
+
+    #[test]
     fn test_vector_index() {
         let mut index = VectorIndex::new(64);
         let doc = Document::new("test", "hello world");
         index.add(doc).unwrap();
         assert_eq!(index.len(), 1);
+    }
+
+    #[test]
+    fn test_vector_index_empty() {
+        let index = VectorIndex::new(64);
+        assert!(index.is_empty());
+        assert_eq!(index.len(), 0);
     }
 
     #[test]
@@ -491,6 +642,87 @@ mod tests {
     }
 
     #[test]
+    fn test_vector_search_top_k() {
+        let mut index = VectorIndex::new(32);
+        for i in 0..10 {
+            index.add(Document::new(&format!("doc{}", i), &format!("content {}", i))).unwrap();
+        }
+
+        let results = index.search("content", 3);
+        assert_eq!(results.len(), 3);
+    }
+
+    #[test]
+    fn test_vector_search_result_rank() {
+        let mut index = VectorIndex::new(32);
+        index.add(Document::new("a", "apple banana")).unwrap();
+        index.add(Document::new("b", "cherry date")).unwrap();
+
+        let results = index.search("apple", 2);
+        assert_eq!(results[0].rank, 1);
+        assert_eq!(results[1].rank, 2);
+    }
+
+    #[test]
+    fn test_search_result_serialization() {
+        let result = SearchResult {
+            document: Document::new("test", "content"),
+            score: 0.95,
+            rank: 1,
+        };
+        let json = serde_json::to_string(&result).unwrap();
+        let restored: SearchResult = serde_json::from_str(&json).unwrap();
+        assert_eq!(result.rank, restored.rank);
+    }
+
+    // =========================================================================
+    // Index Config Tests
+    // =========================================================================
+
+    #[test]
+    fn test_index_config() {
+        let config = IndexConfig::new("test", 512)
+            .with_metric(SimilarityMetric::DotProduct);
+        assert_eq!(config.dimension, 512);
+        assert!(matches!(config.metric, SimilarityMetric::DotProduct));
+    }
+
+    #[test]
+    fn test_index_config_defaults() {
+        let config = IndexConfig::new("test", 384);
+        assert!(matches!(config.metric, SimilarityMetric::Cosine));
+        assert!(matches!(config.index_type, IndexType::Flat));
+    }
+
+    #[test]
+    fn test_index_config_with_index_type() {
+        let config = IndexConfig::new("test", 512).with_index_type(IndexType::Hnsw);
+        assert!(matches!(config.index_type, IndexType::Hnsw));
+    }
+
+    #[test]
+    fn test_index_config_serialization() {
+        let config = IndexConfig::new("test", 256)
+            .with_metric(SimilarityMetric::Euclidean)
+            .with_index_type(IndexType::IvfFlat);
+        let json = serde_json::to_string(&config).unwrap();
+        let restored: IndexConfig = serde_json::from_str(&json).unwrap();
+        assert_eq!(config.name, restored.name);
+        assert_eq!(config.dimension, restored.dimension);
+    }
+
+    #[test]
+    fn test_index_config_clone() {
+        let config = IndexConfig::new("test", 128);
+        let cloned = config.clone();
+        assert_eq!(config.name, cloned.name);
+    }
+
+    // =========================================================================
+    // Chunker Tests
+    // =========================================================================
+
+    #[test]
     fn test_text_chunker() {
         let chunker = TextChunker::new(5, 2);
         let text = "one two three four five six seven eight nine ten";
@@ -504,10 +736,87 @@ mod tests {
     }
 
     #[test]
-    fn test_index_config() {
-        let config = IndexConfig::new("test", 512)
-            .with_metric(SimilarityMetric::DotProduct);
-        assert_eq!(config.dimension, 512);
-        assert!(matches!(config.metric, SimilarityMetric::DotProduct));
+    fn test_text_chunker_short_text() {
+        let chunker = TextChunker::new(10, 3);
+        let text = "short text";
+        let chunks = chunker.chunk(text);
+        assert_eq!(chunks.len(), 1);
+        assert_eq!(chunks[0], "short text");
+    }
+
+    #[test]
+    fn test_text_chunker_exact_size() {
+        let chunker = TextChunker::new(5, 0);
+        let text = "one two three four five";
+        let chunks = chunker.chunk(text);
+        assert_eq!(chunks.len(), 1);
+    }
+
+    #[test]
+    fn test_text_chunker_overlap() {
+        let chunker = TextChunker::new(4, 2);
+        let text = "a b c d e f g h";
+        let chunks = chunker.chunk(text);
+
+        // With overlap of 2, chunks should share some words
+        assert!(chunks.len() > 1);
+    }
+
+    #[test]
+    fn test_text_chunker_clone() {
+        let chunker = TextChunker::new(10, 3);
+        let cloned = chunker.clone();
+        let chunks1 = chunker.chunk("a b c d e f g h i j k l m");
+        let chunks2 = cloned.chunk("a b c d e f g h i j k l m");
+        assert_eq!(chunks1, chunks2);
+    }
+
+    // =========================================================================
+    // Error Tests
+    // =========================================================================
+
+    #[test]
+    fn test_vector_error_dimension_mismatch() {
+        let err = VectorError::DimensionMismatch { expected: 128, got: 64 };
+        let msg = err.to_string();
+        assert!(msg.contains("128"));
+        assert!(msg.contains("64"));
+    }
+
+    #[test]
+    fn test_vector_error_index() {
+        let err = VectorError::Index("not found".to_string());
+        assert!(err.to_string().contains("not found"));
+    }
+
+    #[test]
+    fn test_vector_error_embedding() {
+        let err = VectorError::Embedding("failed to embed".to_string());
+        assert!(err.to_string().contains("failed to embed"));
+    }
+
+    #[test]
+    fn test_vector_error_debug() {
+        let err = VectorError::Index("test".to_string());
+        let debug_str = format!("{:?}", err);
+        assert!(debug_str.contains("Index"));
+    }
+
+    // =========================================================================
+    // Similarity Metric Tests
+    // =========================================================================
+
+    #[test]
+    fn test_similarity_metric_copy() {
+        let m1 = SimilarityMetric::Cosine;
+        let m2 = m1;
+        assert!(matches!(m2, SimilarityMetric::Cosine));
+    }
+
+    #[test]
+    fn test_index_type_copy() {
+        let t1 = IndexType::Hnsw;
+        let t2 = t1;
+        assert!(matches!(t2, IndexType::Hnsw));
     }
 }

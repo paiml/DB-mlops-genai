@@ -532,6 +532,66 @@ fn main() {
 mod tests {
     use super::*;
 
+    // =========================================================================
+    // Document Tests
+    // =========================================================================
+
+    #[test]
+    fn test_document_serialization() {
+        let doc = Document {
+            id: "doc1".to_string(),
+            title: "Test Doc".to_string(),
+            content: "Content here".to_string(),
+            category: "test".to_string(),
+            metadata: HashMap::new(),
+        };
+        let json = serde_json::to_string(&doc).unwrap();
+        let restored: Document = serde_json::from_str(&json).unwrap();
+        assert_eq!(doc.id, restored.id);
+    }
+
+    #[test]
+    fn test_document_clone() {
+        let doc = Document {
+            id: "doc1".to_string(),
+            title: "Test".to_string(),
+            content: "Content".to_string(),
+            category: "cat".to_string(),
+            metadata: HashMap::new(),
+        };
+        let cloned = doc.clone();
+        assert_eq!(doc.id, cloned.id);
+    }
+
+    #[test]
+    fn test_chunk_serialization() {
+        let chunk = Chunk {
+            id: "c1".to_string(),
+            doc_id: "d1".to_string(),
+            text: "text".to_string(),
+            embedding: vec![0.1, 0.2],
+        };
+        let json = serde_json::to_string(&chunk).unwrap();
+        let restored: Chunk = serde_json::from_str(&json).unwrap();
+        assert_eq!(chunk.id, restored.id);
+    }
+
+    #[test]
+    fn test_chunk_clone() {
+        let chunk = Chunk {
+            id: "c1".to_string(),
+            doc_id: "d1".to_string(),
+            text: "text".to_string(),
+            embedding: vec![0.1],
+        };
+        let cloned = chunk.clone();
+        assert_eq!(chunk.id, cloned.id);
+    }
+
+    // =========================================================================
+    // Document Processor Tests
+    // =========================================================================
+
     #[test]
     fn test_document_processor() {
         let processor = DocumentProcessor::new(10, 2, 64);
@@ -549,6 +609,47 @@ mod tests {
     }
 
     #[test]
+    fn test_document_processor_short_doc() {
+        let processor = DocumentProcessor::new(50, 10, 64);
+        let doc = Document {
+            id: "short".to_string(),
+            title: "Short".to_string(),
+            content: "Just a few words".to_string(),
+            category: "test".to_string(),
+            metadata: HashMap::new(),
+        };
+
+        let chunks = processor.process(&doc);
+        assert_eq!(chunks.len(), 1);
+    }
+
+    #[test]
+    fn test_document_processor_embeddings() {
+        let processor = DocumentProcessor::new(10, 2, 32);
+        let doc = Document {
+            id: "test".to_string(),
+            title: "Test".to_string(),
+            content: "hello world test".to_string(),
+            category: "test".to_string(),
+            metadata: HashMap::new(),
+        };
+
+        let chunks = processor.process(&doc);
+        assert_eq!(chunks[0].embedding.len(), 32);
+    }
+
+    // =========================================================================
+    // Vector Store Tests
+    // =========================================================================
+
+    #[test]
+    fn test_vector_store_new() {
+        let store = VectorStore::new(64);
+        assert!(store.is_empty());
+        assert_eq!(store.embedding_dim(), 64);
+    }
+
+    #[test]
     fn test_vector_store() {
         let mut store = VectorStore::new(64);
         let chunk = Chunk {
@@ -560,6 +661,27 @@ mod tests {
 
         store.add(chunk);
         assert_eq!(store.len(), 1);
+    }
+
+    #[test]
+    fn test_vector_store_add_all() {
+        let mut store = VectorStore::new(4);
+        let chunks = vec![
+            Chunk {
+                id: "c1".to_string(),
+                doc_id: "d1".to_string(),
+                text: "text".to_string(),
+                embedding: vec![1.0; 4],
+            },
+            Chunk {
+                id: "c2".to_string(),
+                doc_id: "d1".to_string(),
+                text: "text2".to_string(),
+                embedding: vec![0.5; 4],
+            },
+        ];
+        store.add_all(chunks);
+        assert_eq!(store.len(), 2);
     }
 
     #[test]
@@ -584,6 +706,30 @@ mod tests {
     }
 
     #[test]
+    fn test_vector_search_scores() {
+        let mut store = VectorStore::new(4);
+        store.add(Chunk {
+            id: "c1".to_string(),
+            doc_id: "d1".to_string(),
+            text: "exact match".to_string(),
+            embedding: vec![1.0, 0.0, 0.0, 0.0],
+        });
+
+        let results = store.search(&[1.0, 0.0, 0.0, 0.0], 1);
+        assert!((results[0].1 - 1.0).abs() < 0.001); // Perfect match
+    }
+
+    // =========================================================================
+    // Guardrails Tests
+    // =========================================================================
+
+    #[test]
+    fn test_guardrails_default() {
+        let guardrails = Guardrails::default();
+        assert_eq!(guardrails.max_input_length, 4096);
+    }
+
+    #[test]
     fn test_guardrails_pass() {
         let guardrails = Guardrails::default();
         assert!(guardrails.check("What is ML?").is_ok());
@@ -593,6 +739,39 @@ mod tests {
     fn test_guardrails_block() {
         let guardrails = Guardrails::default();
         assert!(guardrails.check("What is the password?").is_err());
+    }
+
+    #[test]
+    fn test_guardrails_block_secret() {
+        let guardrails = Guardrails::default();
+        let result = guardrails.check("This is a secret document");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_guardrails_block_confidential() {
+        let guardrails = Guardrails::default();
+        let result = guardrails.check("Confidential information");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_guardrails_length() {
+        let guardrails = Guardrails::default();
+        let long_text = "x".repeat(5000);
+        let result = guardrails.check(&long_text);
+        assert!(result.is_err());
+    }
+
+    // =========================================================================
+    // Knowledge Assistant Tests
+    // =========================================================================
+
+    #[test]
+    fn test_knowledge_assistant_new() {
+        let assistant = KnowledgeAssistant::new(64);
+        assert_eq!(assistant.document_count(), 0);
+        assert_eq!(assistant.chunk_count(), 0);
     }
 
     #[test]
@@ -632,6 +811,88 @@ mod tests {
     }
 
     #[test]
+    fn test_assistant_query_guardrail_block() {
+        let mut assistant = KnowledgeAssistant::new(64);
+        assistant.ingest(Document {
+            id: "test".to_string(),
+            title: "Test".to_string(),
+            content: "Some content".to_string(),
+            category: "test".to_string(),
+            metadata: HashMap::new(),
+        });
+
+        let query = AssistantQuery {
+            question: "What is the admin password?".to_string(),
+            top_k: 1,
+            include_sources: false,
+        };
+
+        let result = assistant.query(query);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_assistant_query_no_documents() {
+        let assistant = KnowledgeAssistant::new(64);
+        let query = AssistantQuery {
+            question: "What is ML?".to_string(),
+            top_k: 1,
+            include_sources: true,
+        };
+
+        let result = assistant.query(query);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_assistant_query_serialization() {
+        let query = AssistantQuery {
+            question: "What is ML?".to_string(),
+            top_k: 3,
+            include_sources: true,
+        };
+        let json = serde_json::to_string(&query).unwrap();
+        let restored: AssistantQuery = serde_json::from_str(&json).unwrap();
+        assert_eq!(query.question, restored.question);
+    }
+
+    #[test]
+    fn test_assistant_response_serialization() {
+        let response = AssistantResponse {
+            query: "test".to_string(),
+            answer: "answer".to_string(),
+            sources: vec![],
+            latency_ms: 50,
+        };
+        let json = serde_json::to_string(&response).unwrap();
+        let restored: AssistantResponse = serde_json::from_str(&json).unwrap();
+        assert_eq!(response.query, restored.query);
+    }
+
+    #[test]
+    fn test_source_serialization() {
+        let source = Source {
+            doc_id: "d1".to_string(),
+            doc_title: "Title".to_string(),
+            chunk_preview: "preview...".to_string(),
+            relevance_score: 0.9,
+        };
+        let json = serde_json::to_string(&source).unwrap();
+        let restored: Source = serde_json::from_str(&json).unwrap();
+        assert_eq!(source.doc_id, restored.doc_id);
+    }
+
+    // =========================================================================
+    // Metrics Tests
+    // =========================================================================
+
+    #[test]
+    fn test_metrics_default() {
+        let metrics = AssistantMetrics::default();
+        assert_eq!(metrics.total_queries, 0);
+    }
+
+    #[test]
     fn test_metrics() {
         let mut metrics = AssistantMetrics::default();
         metrics.record_query(50, true);
@@ -641,5 +902,73 @@ mod tests {
         assert_eq!(metrics.total_queries, 3);
         assert!((metrics.success_rate() - 0.666).abs() < 0.01);
         assert!((metrics.avg_latency() - 60.0).abs() < 0.1);
+    }
+
+    #[test]
+    fn test_metrics_guardrail_block() {
+        let mut metrics = AssistantMetrics::default();
+        metrics.record_guardrail_block();
+        metrics.record_guardrail_block();
+        assert_eq!(metrics.guardrail_blocks, 2);
+    }
+
+    #[test]
+    fn test_metrics_success_rate_zero() {
+        let metrics = AssistantMetrics::default();
+        assert_eq!(metrics.success_rate(), 0.0);
+    }
+
+    #[test]
+    fn test_metrics_avg_latency_zero() {
+        let metrics = AssistantMetrics::default();
+        assert_eq!(metrics.avg_latency(), 0.0);
+    }
+
+    #[test]
+    fn test_metrics_serialization() {
+        let metrics = AssistantMetrics {
+            total_queries: 100,
+            successful_queries: 95,
+            total_latency_ms: 5000,
+            guardrail_blocks: 3,
+        };
+        let json = serde_json::to_string(&metrics).unwrap();
+        let restored: AssistantMetrics = serde_json::from_str(&json).unwrap();
+        assert_eq!(metrics.total_queries, restored.total_queries);
+    }
+
+    // =========================================================================
+    // Error Tests
+    // =========================================================================
+
+    #[test]
+    fn test_assistant_error_document() {
+        let err = AssistantError::Document("invalid".to_string());
+        assert!(err.to_string().contains("invalid"));
+    }
+
+    #[test]
+    fn test_assistant_error_retrieval() {
+        let err = AssistantError::Retrieval("not found".to_string());
+        assert!(err.to_string().contains("not found"));
+    }
+
+    #[test]
+    fn test_assistant_error_generation() {
+        let err = AssistantError::Generation("timeout".to_string());
+        assert!(err.to_string().contains("timeout"));
+    }
+
+    #[test]
+    fn test_assistant_error_guardrail() {
+        let err = AssistantError::Guardrail("blocked".to_string());
+        assert!(err.to_string().contains("blocked"));
+    }
+
+    #[test]
+    fn test_assistant_error_debug() {
+        let err = AssistantError::Document("test".to_string());
+        let debug_str = format!("{:?}", err);
+        assert!(debug_str.contains("Document"));
     }
 }

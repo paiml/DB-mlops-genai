@@ -497,6 +497,10 @@ fn main() {
 mod tests {
     use super::*;
 
+    // ========================================================================
+    // Grade Tests
+    // ========================================================================
+
     #[test]
     fn test_grade_from_score() {
         assert_eq!(Grade::from_score(95.0), Grade::A);
@@ -507,11 +511,102 @@ mod tests {
     }
 
     #[test]
+    fn test_grade_from_score_boundaries() {
+        assert_eq!(Grade::from_score(90.0), Grade::A);
+        assert_eq!(Grade::from_score(89.9), Grade::B);
+        assert_eq!(Grade::from_score(80.0), Grade::B);
+        assert_eq!(Grade::from_score(79.9), Grade::C);
+        assert_eq!(Grade::from_score(70.0), Grade::C);
+        assert_eq!(Grade::from_score(69.9), Grade::D);
+        assert_eq!(Grade::from_score(60.0), Grade::D);
+        assert_eq!(Grade::from_score(59.9), Grade::F);
+        assert_eq!(Grade::from_score(0.0), Grade::F);
+    }
+
+    #[test]
+    fn test_grade_passes_threshold() {
+        assert!(Grade::A.passes_threshold(Grade::A));
+        assert!(Grade::A.passes_threshold(Grade::B));
+        assert!(!Grade::B.passes_threshold(Grade::A));
+        assert!(Grade::F.passes_threshold(Grade::F));
+    }
+
+    #[test]
+    fn test_grade_ordering() {
+        assert!(Grade::A < Grade::B);
+        assert!(Grade::B < Grade::C);
+        assert!(Grade::C < Grade::D);
+        assert!(Grade::D < Grade::F);
+    }
+
+    #[test]
+    fn test_grade_clone_copy() {
+        let grade = Grade::A;
+        let cloned = grade.clone();
+        let copied = grade;
+        assert_eq!(cloned, copied);
+    }
+
+    #[test]
+    fn test_grade_serialization() {
+        let grade = Grade::B;
+        let json = serde_json::to_string(&grade).unwrap();
+        let parsed: Grade = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed, grade);
+    }
+
+    // ========================================================================
+    // Comparator Tests
+    // ========================================================================
+
+    #[test]
     fn test_comparator() {
         assert!(Comparator::GreaterThan.check(10.0, 5.0));
         assert!(!Comparator::GreaterThan.check(5.0, 10.0));
         assert!(Comparator::LessOrEqual.check(5.0, 5.0));
     }
+
+    #[test]
+    fn test_comparator_all_variants() {
+        // GreaterThan
+        assert!(Comparator::GreaterThan.check(10.0, 9.9));
+        assert!(!Comparator::GreaterThan.check(10.0, 10.0));
+
+        // LessThan
+        assert!(Comparator::LessThan.check(5.0, 10.0));
+        assert!(!Comparator::LessThan.check(10.0, 5.0));
+        assert!(!Comparator::LessThan.check(5.0, 5.0));
+
+        // GreaterOrEqual
+        assert!(Comparator::GreaterOrEqual.check(10.0, 10.0));
+        assert!(Comparator::GreaterOrEqual.check(11.0, 10.0));
+        assert!(!Comparator::GreaterOrEqual.check(9.0, 10.0));
+
+        // LessOrEqual
+        assert!(Comparator::LessOrEqual.check(10.0, 10.0));
+        assert!(Comparator::LessOrEqual.check(9.0, 10.0));
+        assert!(!Comparator::LessOrEqual.check(11.0, 10.0));
+    }
+
+    #[test]
+    fn test_comparator_clone_copy() {
+        let comp = Comparator::GreaterThan;
+        let cloned = comp.clone();
+        let copied = comp;
+        assert!(cloned.check(10.0, 5.0) == copied.check(10.0, 5.0));
+    }
+
+    #[test]
+    fn test_comparator_serialization() {
+        let comp = Comparator::LessOrEqual;
+        let json = serde_json::to_string(&comp).unwrap();
+        let parsed: Comparator = serde_json::from_str(&json).unwrap();
+        assert!(parsed.check(5.0, 5.0));
+    }
+
+    // ========================================================================
+    // QualityGate Tests
+    // ========================================================================
 
     #[test]
     fn test_quality_gate() {
@@ -538,6 +633,115 @@ mod tests {
     }
 
     #[test]
+    fn test_quality_gate_new() {
+        let gate = QualityGate::new("production-readiness");
+        assert_eq!(gate.name, "production-readiness");
+        assert!(gate.checks.is_empty());
+    }
+
+    #[test]
+    fn test_quality_gate_chaining() {
+        let mut gate = QualityGate::new("multi-check");
+        gate.add_check("metric1", 0.5, Comparator::GreaterThan)
+            .add_check("metric2", 100.0, Comparator::LessThan)
+            .add_check("metric3", 0.0, Comparator::GreaterOrEqual);
+
+        assert_eq!(gate.checks.len(), 3);
+    }
+
+    #[test]
+    fn test_quality_gate_missing_metric() {
+        let mut gate = QualityGate::new("test");
+        gate.add_check("missing", 0.5, Comparator::GreaterThan);
+
+        let metrics = HashMap::new();
+        let result = gate.evaluate(&metrics);
+        // Missing metric defaults to 0.0, so 0.0 > 0.5 is false
+        assert!(!result.passed);
+        assert_eq!(result.check_results[0].value, 0.0);
+    }
+
+    #[test]
+    fn test_quality_gate_all_checks_must_pass() {
+        let mut gate = QualityGate::new("test");
+        gate.add_check("good", 0.5, Comparator::GreaterThan)
+            .add_check("bad", 100.0, Comparator::GreaterThan);
+
+        let mut metrics = HashMap::new();
+        metrics.insert("good".to_string(), 0.9);
+        metrics.insert("bad".to_string(), 50.0);
+
+        let result = gate.evaluate(&metrics);
+        assert!(!result.passed);
+        assert!(result.check_results[0].passed);
+        assert!(!result.check_results[1].passed);
+    }
+
+    #[test]
+    fn test_quality_gate_serialization() {
+        let mut gate = QualityGate::new("test");
+        gate.add_check("acc", 0.9, Comparator::GreaterOrEqual);
+
+        let json = serde_json::to_string(&gate).unwrap();
+        let parsed: QualityGate = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed.name, gate.name);
+        assert_eq!(parsed.checks.len(), 1);
+    }
+
+    #[test]
+    fn test_quality_gate_clone() {
+        let mut gate = QualityGate::new("test");
+        gate.add_check("acc", 0.9, Comparator::GreaterOrEqual);
+
+        let cloned = gate.clone();
+        assert_eq!(cloned.name, gate.name);
+        assert_eq!(cloned.checks.len(), gate.checks.len());
+    }
+
+    // ========================================================================
+    // GateResult and CheckResult Tests
+    // ========================================================================
+
+    #[test]
+    fn test_gate_result_serialization() {
+        let result = GateResult {
+            name: "test".to_string(),
+            passed: true,
+            check_results: vec![CheckResult {
+                name: "accuracy".to_string(),
+                passed: true,
+                value: 0.95,
+                threshold: 0.9,
+                message: "OK".to_string(),
+            }],
+        };
+
+        let json = serde_json::to_string(&result).unwrap();
+        let parsed: GateResult = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed.name, "test");
+        assert!(parsed.passed);
+    }
+
+    #[test]
+    fn test_check_result_clone() {
+        let result = CheckResult {
+            name: "latency".to_string(),
+            passed: false,
+            value: 150.0,
+            threshold: 100.0,
+            message: "too slow".to_string(),
+        };
+
+        let cloned = result.clone();
+        assert_eq!(cloned.name, "latency");
+        assert!(!cloned.passed);
+    }
+
+    // ========================================================================
+    // Pipeline Tests
+    // ========================================================================
+
+    #[test]
     fn test_pipeline_order() {
         let mut pipeline = Pipeline::new("test");
         pipeline
@@ -550,6 +754,88 @@ mod tests {
     }
 
     #[test]
+    fn test_pipeline_new() {
+        let pipeline = Pipeline::new("ml-pipeline");
+        assert_eq!(pipeline.name, "ml-pipeline");
+        assert!(pipeline.stages.is_empty());
+        assert!(pipeline.quality_gates.is_empty());
+    }
+
+    #[test]
+    fn test_pipeline_add_quality_gate() {
+        let mut pipeline = Pipeline::new("test");
+        let gate = QualityGate::new("gate1");
+        pipeline.add_quality_gate(gate);
+        assert_eq!(pipeline.quality_gates.len(), 1);
+    }
+
+    #[test]
+    fn test_pipeline_parallel_stages() {
+        let mut pipeline = Pipeline::new("test");
+        pipeline
+            .add_stage("ingest", StageType::DataIngestion, vec![])
+            .add_stage("feature1", StageType::FeatureEngineering, vec!["ingest"])
+            .add_stage("feature2", StageType::FeatureEngineering, vec!["ingest"])
+            .add_stage("train", StageType::Training, vec!["feature1", "feature2"]);
+
+        let order = pipeline.execution_order();
+        // ingest must be first, train must be last
+        assert_eq!(order[0], "ingest");
+        assert_eq!(order[3], "train");
+    }
+
+    #[test]
+    fn test_pipeline_serialization() {
+        let mut pipeline = Pipeline::new("test");
+        pipeline.add_stage("ingest", StageType::DataIngestion, vec![]);
+
+        let json = serde_json::to_string(&pipeline).unwrap();
+        let parsed: Pipeline = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed.name, "test");
+        assert_eq!(parsed.stages.len(), 1);
+    }
+
+    #[test]
+    fn test_pipeline_clone() {
+        let mut pipeline = Pipeline::new("test");
+        pipeline.add_stage("stage1", StageType::Training, vec![]);
+
+        let cloned = pipeline.clone();
+        assert_eq!(cloned.name, pipeline.name);
+    }
+
+    // ========================================================================
+    // StageType Tests
+    // ========================================================================
+
+    #[test]
+    fn test_stage_type_all_variants() {
+        let types = vec![
+            StageType::DataIngestion,
+            StageType::FeatureEngineering,
+            StageType::Training,
+            StageType::Validation,
+            StageType::Deployment,
+            StageType::Monitoring,
+        ];
+
+        for stage_type in types {
+            let json = serde_json::to_string(&stage_type).unwrap();
+            let _parsed: StageType = serde_json::from_str(&json).unwrap();
+        }
+    }
+
+    #[test]
+    fn test_stage_type_clone() {
+        let stage_type = StageType::Training;
+        let _cloned = stage_type.clone();
+    }
+
+    // ========================================================================
+    // DriftMetrics Tests
+    // ========================================================================
+
+    #[test]
     fn test_drift_detection() {
         let baseline: Vec<f64> = vec![100.0; 10];
         let current: Vec<f64> = vec![200.0; 10];
@@ -557,6 +843,64 @@ mod tests {
         let drift = DriftMetrics::calculate("test", &baseline, &current);
         assert!(drift.drift_detected);
     }
+
+    #[test]
+    fn test_drift_no_drift() {
+        let baseline: Vec<f64> = vec![100.0; 10];
+        let current: Vec<f64> = vec![100.0; 10];
+
+        let drift = DriftMetrics::calculate("stable_feature", &baseline, &current);
+        assert!(!drift.drift_detected);
+        assert_eq!(drift.psi, 0.0);
+    }
+
+    #[test]
+    fn test_drift_baseline_zero() {
+        let baseline: Vec<f64> = vec![0.0; 10];
+        let current: Vec<f64> = vec![100.0; 10];
+
+        let drift = DriftMetrics::calculate("zero_baseline", &baseline, &current);
+        // Should return 0.0 PSI when baseline mean is 0
+        assert_eq!(drift.psi, 0.0);
+    }
+
+    #[test]
+    fn test_drift_metrics_values() {
+        let baseline: Vec<f64> = vec![10.0, 20.0, 30.0];
+        let current: Vec<f64> = vec![15.0, 25.0, 35.0];
+
+        let drift = DriftMetrics::calculate("feature_x", &baseline, &current);
+        assert_eq!(drift.feature_name, "feature_x");
+        assert_eq!(drift.baseline_mean, 20.0);
+        assert_eq!(drift.current_mean, 25.0);
+    }
+
+    #[test]
+    fn test_drift_metrics_serialization() {
+        let drift = DriftMetrics {
+            feature_name: "amount".to_string(),
+            baseline_mean: 100.0,
+            current_mean: 105.0,
+            psi: 0.05,
+            drift_detected: false,
+        };
+
+        let json = serde_json::to_string(&drift).unwrap();
+        let parsed: DriftMetrics = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed.feature_name, "amount");
+        assert!(!parsed.drift_detected);
+    }
+
+    #[test]
+    fn test_drift_metrics_clone() {
+        let drift = DriftMetrics::calculate("test", &[100.0], &[110.0]);
+        let cloned = drift.clone();
+        assert_eq!(cloned.feature_name, drift.feature_name);
+    }
+
+    // ========================================================================
+    // TdgScore Tests
+    // ========================================================================
 
     #[test]
     fn test_tdg_score() {
@@ -583,5 +927,238 @@ mod tests {
         );
 
         assert!(tdg.overall_grade <= Grade::B);
+    }
+
+    #[test]
+    fn test_tdg_score_with_vulnerabilities() {
+        let tdg = TdgScore::calculate(
+            ComplexityMetrics {
+                cyclomatic_avg: 5.0,
+                cyclomatic_max: 10,
+                cognitive_avg: 5.0,
+                cognitive_max: 10,
+            },
+            CoverageMetrics {
+                line_coverage: 90.0,
+                branch_coverage: 90.0,
+                mutation_score: 90.0,
+            },
+            DocumentationMetrics {
+                doc_coverage: 90.0,
+                readme_score: 90.0,
+            },
+            SecurityMetrics {
+                vulnerabilities: 1,
+                advisories: 0,
+            },
+        );
+
+        // Security score becomes 0 with vulnerabilities
+        assert!(tdg.overall_grade >= Grade::C);
+    }
+
+    #[test]
+    fn test_tdg_score_with_advisories_only() {
+        let tdg = TdgScore::calculate(
+            ComplexityMetrics {
+                cyclomatic_avg: 5.0,
+                cyclomatic_max: 10,
+                cognitive_avg: 5.0,
+                cognitive_max: 10,
+            },
+            CoverageMetrics {
+                line_coverage: 90.0,
+                branch_coverage: 90.0,
+                mutation_score: 90.0,
+            },
+            DocumentationMetrics {
+                doc_coverage: 90.0,
+                readme_score: 90.0,
+            },
+            SecurityMetrics {
+                vulnerabilities: 0,
+                advisories: 2,
+            },
+        );
+
+        // Security score is 50 with only advisories, bringing overall to ~78 (C grade)
+        assert!(tdg.overall_grade == Grade::C);
+    }
+
+    #[test]
+    fn test_tdg_score_high_complexity() {
+        let tdg = TdgScore::calculate(
+            ComplexityMetrics {
+                cyclomatic_avg: 50.0,
+                cyclomatic_max: 100,
+                cognitive_avg: 40.0,
+                cognitive_max: 80,
+            },
+            CoverageMetrics {
+                line_coverage: 90.0,
+                branch_coverage: 90.0,
+                mutation_score: 90.0,
+            },
+            DocumentationMetrics {
+                doc_coverage: 90.0,
+                readme_score: 90.0,
+            },
+            SecurityMetrics {
+                vulnerabilities: 0,
+                advisories: 0,
+            },
+        );
+
+        // High complexity should reduce score
+        assert!(tdg.overall_grade >= Grade::B);
+    }
+
+    #[test]
+    fn test_tdg_score_serialization() {
+        let tdg = TdgScore::calculate(
+            ComplexityMetrics {
+                cyclomatic_avg: 5.0,
+                cyclomatic_max: 10,
+                cognitive_avg: 5.0,
+                cognitive_max: 10,
+            },
+            CoverageMetrics {
+                line_coverage: 80.0,
+                branch_coverage: 80.0,
+                mutation_score: 80.0,
+            },
+            DocumentationMetrics {
+                doc_coverage: 80.0,
+                readme_score: 80.0,
+            },
+            SecurityMetrics {
+                vulnerabilities: 0,
+                advisories: 0,
+            },
+        );
+
+        let json = serde_json::to_string(&tdg).unwrap();
+        let parsed: TdgScore = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed.complexity.cyclomatic_avg, 5.0);
+    }
+
+    #[test]
+    fn test_tdg_score_clone() {
+        let tdg = TdgScore::calculate(
+            ComplexityMetrics {
+                cyclomatic_avg: 5.0,
+                cyclomatic_max: 10,
+                cognitive_avg: 5.0,
+                cognitive_max: 10,
+            },
+            CoverageMetrics {
+                line_coverage: 80.0,
+                branch_coverage: 80.0,
+                mutation_score: 80.0,
+            },
+            DocumentationMetrics {
+                doc_coverage: 80.0,
+                readme_score: 80.0,
+            },
+            SecurityMetrics {
+                vulnerabilities: 0,
+                advisories: 0,
+            },
+        );
+
+        let cloned = tdg.clone();
+        assert_eq!(cloned.overall_grade, tdg.overall_grade);
+    }
+
+    // ========================================================================
+    // Metrics Component Tests
+    // ========================================================================
+
+    #[test]
+    fn test_complexity_metrics_serialization() {
+        let metrics = ComplexityMetrics {
+            cyclomatic_avg: 10.5,
+            cyclomatic_max: 25,
+            cognitive_avg: 8.3,
+            cognitive_max: 18,
+        };
+
+        let json = serde_json::to_string(&metrics).unwrap();
+        let parsed: ComplexityMetrics = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed.cyclomatic_avg, 10.5);
+    }
+
+    #[test]
+    fn test_coverage_metrics_serialization() {
+        let metrics = CoverageMetrics {
+            line_coverage: 95.5,
+            branch_coverage: 88.2,
+            mutation_score: 75.0,
+        };
+
+        let json = serde_json::to_string(&metrics).unwrap();
+        let parsed: CoverageMetrics = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed.line_coverage, 95.5);
+    }
+
+    #[test]
+    fn test_documentation_metrics_clone() {
+        let metrics = DocumentationMetrics {
+            doc_coverage: 90.0,
+            readme_score: 85.0,
+        };
+
+        let cloned = metrics.clone();
+        assert_eq!(cloned.doc_coverage, 90.0);
+    }
+
+    #[test]
+    fn test_security_metrics_clone() {
+        let metrics = SecurityMetrics {
+            vulnerabilities: 0,
+            advisories: 3,
+        };
+
+        let cloned = metrics.clone();
+        assert_eq!(cloned.advisories, 3);
+    }
+
+    // ========================================================================
+    // QualityError Tests
+    // ========================================================================
+
+    #[test]
+    fn test_quality_error_gate_failed() {
+        let err = QualityError::GateFailed("accuracy check".to_string());
+        assert!(err.to_string().contains("Quality gate failed"));
+        assert!(err.to_string().contains("accuracy check"));
+    }
+
+    #[test]
+    fn test_quality_error_threshold_exceeded() {
+        let err = QualityError::ThresholdExceeded {
+            metric: "latency".to_string(),
+            value: 150.0,
+            threshold: 100.0,
+        };
+        let msg = err.to_string();
+        assert!(msg.contains("Threshold exceeded"));
+        assert!(msg.contains("latency"));
+        assert!(msg.contains("150"));
+        assert!(msg.contains("100"));
+    }
+
+    #[test]
+    fn test_quality_error_pipeline() {
+        let err = QualityError::Pipeline("stage failed".to_string());
+        assert!(err.to_string().contains("Pipeline error"));
+        assert!(err.to_string().contains("stage failed"));
+    }
+
+    #[test]
+    fn test_quality_error_debug() {
+        let err = QualityError::GateFailed("test".to_string());
+        let debug = format!("{:?}", err);
+        assert!(debug.contains("GateFailed"));
     }
 }

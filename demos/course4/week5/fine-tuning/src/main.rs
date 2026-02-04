@@ -517,6 +517,18 @@ fn main() {
 mod tests {
     use super::*;
 
+    // =========================================================================
+    // Training Sample Tests
+    // =========================================================================
+
+    #[test]
+    fn test_training_sample_new() {
+        let sample = TrainingSample::new("Summarize", "text", "output");
+        assert_eq!(sample.instruction, "Summarize");
+        assert_eq!(sample.input, "text");
+        assert_eq!(sample.output, "output");
+    }
+
     #[test]
     fn test_training_sample_format() {
         let sample = TrainingSample::new("Summarize", "input text", "summary");
@@ -526,10 +538,50 @@ mod tests {
     }
 
     #[test]
+    fn test_training_sample_format_no_input() {
+        let sample = TrainingSample::new("Say hello", "", "Hello!");
+        let alpaca = sample.format_alpaca();
+        assert!(!alpaca.contains("### Input:"));
+    }
+
+    #[test]
+    fn test_training_sample_format_chat() {
+        let sample = TrainingSample::new("Summarize", "text", "output");
+        let chat = sample.format_chat();
+        assert!(chat.contains("<|user|>"));
+        assert!(chat.contains("<|assistant|>"));
+    }
+
+    #[test]
+    fn test_training_sample_serialization() {
+        let sample = TrainingSample::new("Instr", "In", "Out");
+        let json = serde_json::to_string(&sample).unwrap();
+        let restored: TrainingSample = serde_json::from_str(&json).unwrap();
+        assert_eq!(sample.instruction, restored.instruction);
+    }
+
+    #[test]
+    fn test_training_sample_clone() {
+        let sample = TrainingSample::new("test", "in", "out");
+        let cloned = sample.clone();
+        assert_eq!(sample.instruction, cloned.instruction);
+    }
+
+    // =========================================================================
+    // Dataset Tests
+    // =========================================================================
+
+    #[test]
     fn test_training_dataset() {
         let mut dataset = TrainingDataset::new(DataFormat::Alpaca);
         dataset.add(TrainingSample::new("test", "", "output"));
         assert_eq!(dataset.len(), 1);
+    }
+
+    #[test]
+    fn test_training_dataset_empty() {
+        let dataset = TrainingDataset::new(DataFormat::ChatML);
+        assert!(dataset.is_empty());
     }
 
     #[test]
@@ -545,11 +597,94 @@ mod tests {
     }
 
     #[test]
+    fn test_dataset_format_all() {
+        let mut dataset = TrainingDataset::new(DataFormat::Alpaca);
+        dataset.add(TrainingSample::new("Instr1", "In1", "Out1"));
+        dataset.add(TrainingSample::new("Instr2", "In2", "Out2"));
+
+        let formatted = dataset.format_all();
+        assert_eq!(formatted.len(), 2);
+    }
+
+    #[test]
+    fn test_dataset_clone() {
+        let mut dataset = TrainingDataset::new(DataFormat::Alpaca);
+        dataset.add(TrainingSample::new("test", "", "out"));
+        let cloned = dataset.clone();
+        assert_eq!(dataset.len(), cloned.len());
+    }
+
+    #[test]
+    fn test_data_format_eq() {
+        assert_eq!(DataFormat::Alpaca, DataFormat::Alpaca);
+        assert_ne!(DataFormat::Alpaca, DataFormat::ChatML);
+    }
+
+    // =========================================================================
+    // LoRA Config Tests
+    // =========================================================================
+
+    #[test]
     fn test_lora_config() {
         let lora = LoraConfig::new(8, 16);
         assert_eq!(lora.r, 8);
         assert_eq!(lora.alpha, 16);
         assert!((lora.scaling_factor() - 2.0).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_lora_config_default() {
+        let lora = LoraConfig::default();
+        assert_eq!(lora.r, 8);
+        assert_eq!(lora.alpha, 16);
+        assert_eq!(lora.bias, "none");
+    }
+
+    #[test]
+    fn test_lora_config_with_dropout() {
+        let lora = LoraConfig::new(8, 16).with_dropout(0.1);
+        assert_eq!(lora.dropout, 0.1);
+    }
+
+    #[test]
+    fn test_lora_config_with_targets() {
+        let lora = LoraConfig::new(8, 16).with_targets(vec!["q_proj", "k_proj"]);
+        assert_eq!(lora.target_modules.len(), 2);
+    }
+
+    #[test]
+    fn test_lora_trainable_params() {
+        let lora = LoraConfig::new(8, 16);
+        let params = lora.trainable_params(7_000_000_000);
+        assert!(params > 0);
+        assert!(params < 7_000_000_000 / 100);
+    }
+
+    #[test]
+    fn test_lora_config_serialization() {
+        let lora = LoraConfig::new(16, 32);
+        let json = serde_json::to_string(&lora).unwrap();
+        let restored: LoraConfig = serde_json::from_str(&json).unwrap();
+        assert_eq!(lora.r, restored.r);
+    }
+
+    #[test]
+    fn test_lora_config_clone() {
+        let lora = LoraConfig::new(8, 16);
+        let cloned = lora.clone();
+        assert_eq!(lora.r, cloned.r);
+    }
+
+    // =========================================================================
+    // QLoRA Config Tests
+    // =========================================================================
+
+    #[test]
+    fn test_qlora_config_default() {
+        let qlora = QloraConfig::default();
+        assert_eq!(qlora.bits, 4);
+        assert!(qlora.double_quant);
+        assert_eq!(qlora.quant_type, "nf4");
     }
 
     #[test]
@@ -560,12 +695,86 @@ mod tests {
     }
 
     #[test]
+    fn test_qlora_memory_reduction_no_double() {
+        let mut qlora = QloraConfig::default();
+        qlora.double_quant = false;
+        let reduction = qlora.memory_reduction();
+        assert_eq!(reduction, 0.25); // 4/16
+    }
+
+    #[test]
+    fn test_qlora_serialization() {
+        let qlora = QloraConfig::default();
+        let json = serde_json::to_string(&qlora).unwrap();
+        let restored: QloraConfig = serde_json::from_str(&json).unwrap();
+        assert_eq!(qlora.bits, restored.bits);
+    }
+
+    #[test]
+    fn test_qlora_clone() {
+        let qlora = QloraConfig::default();
+        let cloned = qlora.clone();
+        assert_eq!(qlora.bits, cloned.bits);
+    }
+
+    // =========================================================================
+    // Training Config Tests
+    // =========================================================================
+
+    #[test]
     fn test_training_config() {
         let config = TrainingConfig::default();
         assert_eq!(config.effective_batch_size(), 16); // 4 * 4
 
         let steps = config.steps_per_epoch(160);
         assert_eq!(steps, 10); // 160 / 16
+    }
+
+    #[test]
+    fn test_training_config_default() {
+        let config = TrainingConfig::default();
+        assert_eq!(config.batch_size, 4);
+        assert_eq!(config.epochs, 3);
+        assert!(config.bf16);
+    }
+
+    #[test]
+    fn test_training_config_total_steps() {
+        let config = TrainingConfig::default();
+        let total = config.total_steps(160);
+        assert_eq!(total, 30); // 10 steps/epoch * 3 epochs
+    }
+
+    #[test]
+    fn test_training_config_serialization() {
+        let config = TrainingConfig::default();
+        let json = serde_json::to_string(&config).unwrap();
+        let restored: TrainingConfig = serde_json::from_str(&json).unwrap();
+        assert_eq!(config.batch_size, restored.batch_size);
+    }
+
+    #[test]
+    fn test_training_config_clone() {
+        let config = TrainingConfig::default();
+        let cloned = config.clone();
+        assert_eq!(config.learning_rate, cloned.learning_rate);
+    }
+
+    // =========================================================================
+    // Training History Tests
+    // =========================================================================
+
+    #[test]
+    fn test_training_history_new() {
+        let history = TrainingHistory::new();
+        assert!(history.is_empty());
+        assert_eq!(history.len(), 0);
+    }
+
+    #[test]
+    fn test_training_history_default() {
+        let history = TrainingHistory::default();
+        assert!(history.is_empty());
     }
 
     #[test]
@@ -589,5 +798,87 @@ mod tests {
         assert_eq!(history.len(), 2);
         assert!((history.latest_loss().unwrap() - 1.8).abs() < 0.001);
         assert!((history.average_loss() - 1.9).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_training_history_empty_average() {
+        let history = TrainingHistory::new();
+        assert_eq!(history.average_loss(), 0.0);
+    }
+
+    #[test]
+    fn test_training_history_latest_none() {
+        let history = TrainingHistory::new();
+        assert!(history.latest_loss().is_none());
+    }
+
+    #[test]
+    fn test_training_metrics_serialization() {
+        let metrics = TrainingMetrics {
+            step: 100,
+            epoch: 1.5,
+            loss: 0.5,
+            learning_rate: 1e-5,
+            grad_norm: 0.8,
+        };
+        let json = serde_json::to_string(&metrics).unwrap();
+        let restored: TrainingMetrics = serde_json::from_str(&json).unwrap();
+        assert_eq!(metrics.step, restored.step);
+    }
+
+    // =========================================================================
+    // Training Simulator Tests
+    // =========================================================================
+
+    #[test]
+    fn test_training_simulator() {
+        let config = TrainingConfig::default();
+        let lora = LoraConfig::default();
+        let mut simulator = TrainingSimulator::new(config, lora);
+
+        let mut dataset = TrainingDataset::new(DataFormat::Alpaca);
+        for i in 0..32 {
+            dataset.add(TrainingSample::new(&format!("Instr{}", i), "", "Out"));
+        }
+
+        simulator.simulate_training(&dataset).unwrap();
+        assert!(!simulator.history().is_empty());
+    }
+
+    #[test]
+    fn test_training_simulator_lora_config() {
+        let config = TrainingConfig::default();
+        let lora = LoraConfig::new(16, 32);
+        let simulator = TrainingSimulator::new(config, lora);
+        assert_eq!(simulator.lora_config().r, 16);
+    }
+
+    // =========================================================================
+    // Error Tests
+    // =========================================================================
+
+    #[test]
+    fn test_training_error_config() {
+        let err = TrainingError::Config("invalid lr".to_string());
+        assert!(err.to_string().contains("invalid lr"));
+    }
+
+    #[test]
+    fn test_training_error_data() {
+        let err = TrainingError::Data("missing file".to_string());
+        assert!(err.to_string().contains("missing file"));
+    }
+
+    #[test]
+    fn test_training_error_training() {
+        let err = TrainingError::Training("OOM".to_string());
+        assert!(err.to_string().contains("OOM"));
+    }
+
+    #[test]
+    fn test_training_error_debug() {
+        let err = TrainingError::Config("test".to_string());
+        let debug_str = format!("{:?}", err);
+        assert!(debug_str.contains("Config"));
     }
 }

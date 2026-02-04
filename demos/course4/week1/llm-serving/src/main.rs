@@ -545,6 +545,10 @@ fn main() {
 mod tests {
     use super::*;
 
+    // =========================================================================
+    // Tokenizer Tests
+    // =========================================================================
+
     #[test]
     fn test_tokenizer_encode_decode() {
         let tokenizer = SimpleTokenizer::new();
@@ -566,6 +570,46 @@ mod tests {
     }
 
     #[test]
+    fn test_tokenizer_default() {
+        let tokenizer = SimpleTokenizer::default();
+        assert!(tokenizer.vocab_size() > 4);
+    }
+
+    #[test]
+    fn test_tokenizer_vocab_size() {
+        let tokenizer = SimpleTokenizer::new();
+        assert!(tokenizer.vocab_size() > 0);
+    }
+
+    #[test]
+    fn test_tokenizer_encode_unknown() {
+        let tokenizer = SimpleTokenizer::new();
+        let tokens = tokenizer.encode("xyz123unknown");
+        // Should contain UNK tokens for unknown chars
+        assert!(tokens.contains(&3));
+    }
+
+    #[test]
+    fn test_tokenizer_decode_filters_special() {
+        let tokenizer = SimpleTokenizer::new();
+        let tokens = vec![0, 1, 2, 3]; // All special tokens
+        let decoded = tokenizer.decode(&tokens);
+        assert!(!decoded.contains("<s>"));
+        assert!(!decoded.contains("</s>"));
+    }
+
+    #[test]
+    fn test_tokenizer_clone() {
+        let tokenizer = SimpleTokenizer::new();
+        let cloned = tokenizer.clone();
+        assert_eq!(tokenizer.vocab_size(), cloned.vocab_size());
+    }
+
+    // =========================================================================
+    // Model Info Tests
+    // =========================================================================
+
+    #[test]
     fn test_model_info() {
         let info = ModelInfo::new("test-model", 1_000_000);
         assert_eq!(info.name, "test-model");
@@ -574,6 +618,62 @@ mod tests {
         let info = info.with_quantization("Q4_K_M");
         assert_eq!(info.quantization, Some("Q4_K_M".to_string()));
     }
+
+    #[test]
+    fn test_model_info_defaults() {
+        let info = ModelInfo::new("llama", 7_000_000_000);
+        assert_eq!(info.version, "1.0.0");
+        assert_eq!(info.architecture, "transformer");
+        assert_eq!(info.context_length, 4096);
+        assert!(info.quantization.is_none());
+    }
+
+    #[test]
+    fn test_model_info_serialization() {
+        let info = ModelInfo::new("test", 1000).with_quantization("Q8_0");
+        let json = serde_json::to_string(&info).unwrap();
+        let restored: ModelInfo = serde_json::from_str(&json).unwrap();
+        assert_eq!(info.name, restored.name);
+        assert_eq!(info.quantization, restored.quantization);
+    }
+
+    #[test]
+    fn test_model_info_clone() {
+        let info = ModelInfo::new("test", 1000);
+        let cloned = info.clone();
+        assert_eq!(info.name, cloned.name);
+    }
+
+    // =========================================================================
+    // Generation Config Tests
+    // =========================================================================
+
+    #[test]
+    fn test_generation_config_default() {
+        let config = GenerationConfig::default();
+        assert_eq!(config.max_tokens, 256);
+        assert!((config.temperature - 0.7).abs() < 0.001);
+        assert!((config.top_p - 0.9).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_generation_config_serialization() {
+        let config = GenerationConfig::default();
+        let json = serde_json::to_string(&config).unwrap();
+        let restored: GenerationConfig = serde_json::from_str(&json).unwrap();
+        assert_eq!(config.max_tokens, restored.max_tokens);
+    }
+
+    #[test]
+    fn test_generation_config_clone() {
+        let config = GenerationConfig::default();
+        let cloned = config.clone();
+        assert_eq!(config.max_tokens, cloned.max_tokens);
+    }
+
+    // =========================================================================
+    // Completion Tests
+    // =========================================================================
 
     #[test]
     fn test_completion() {
@@ -591,6 +691,85 @@ mod tests {
         assert!(!response.choices.is_empty());
         assert!(response.choices[0].text.contains("Paris"));
     }
+
+    #[test]
+    fn test_completion_hello() {
+        let model = ModelInfo::new("test", 1000);
+        let server = LlmServer::new(model);
+
+        let request = CompletionRequest {
+            prompt: "Hello, how are you?".to_string(),
+            max_tokens: Some(50),
+            temperature: None,
+            stop: None,
+        };
+
+        let response = server.complete(&request).unwrap();
+        assert!(response.choices[0].text.contains("Hello"));
+    }
+
+    #[test]
+    fn test_completion_ai_question() {
+        let model = ModelInfo::new("test", 1000);
+        let server = LlmServer::new(model);
+
+        let request = CompletionRequest {
+            prompt: "What is AI?".to_string(),
+            max_tokens: Some(50),
+            temperature: None,
+            stop: None,
+        };
+
+        let response = server.complete(&request).unwrap();
+        assert!(!response.choices[0].text.is_empty());
+    }
+
+    #[test]
+    fn test_completion_usage_tracking() {
+        let model = ModelInfo::new("test", 1000);
+        let server = LlmServer::new(model);
+
+        let request = CompletionRequest {
+            prompt: "Hello".to_string(),
+            max_tokens: Some(50),
+            temperature: None,
+            stop: None,
+        };
+
+        let response = server.complete(&request).unwrap();
+        assert!(response.usage.prompt_tokens > 0);
+        assert!(response.usage.completion_tokens > 0);
+        assert_eq!(
+            response.usage.total_tokens,
+            response.usage.prompt_tokens + response.usage.completion_tokens
+        );
+    }
+
+    #[test]
+    fn test_completion_response_serialization() {
+        let response = CompletionResponse {
+            id: "test-123".to_string(),
+            model: "llama".to_string(),
+            choices: vec![Choice {
+                index: 0,
+                text: "Hello!".to_string(),
+                finish_reason: "stop".to_string(),
+            }],
+            usage: Usage {
+                prompt_tokens: 5,
+                completion_tokens: 3,
+                total_tokens: 8,
+            },
+        };
+
+        let json = serde_json::to_string(&response).unwrap();
+        let restored: CompletionResponse = serde_json::from_str(&json).unwrap();
+        assert_eq!(response.id, restored.id);
+    }
+
+    // =========================================================================
+    // Chat Tests
+    // =========================================================================
 
     #[test]
     fn test_chat() {
@@ -613,6 +792,62 @@ mod tests {
     }
 
     #[test]
+    fn test_chat_multiple_messages() {
+        let model = ModelInfo::new("test", 1000);
+        let server = LlmServer::new(model);
+
+        let request = ChatRequest {
+            model: "test".to_string(),
+            messages: vec![
+                ChatMessage {
+                    role: "system".to_string(),
+                    content: "You are helpful.".to_string(),
+                },
+                ChatMessage {
+                    role: "user".to_string(),
+                    content: "Hello".to_string(),
+                },
+            ],
+            max_tokens: Some(50),
+            temperature: None,
+        };
+
+        let response = server.chat(&request).unwrap();
+        assert!(!response.choices.is_empty());
+    }
+
+    #[test]
+    fn test_chat_message_serialization() {
+        let msg = ChatMessage {
+            role: "user".to_string(),
+            content: "Hello".to_string(),
+        };
+        let json = serde_json::to_string(&msg).unwrap();
+        let restored: ChatMessage = serde_json::from_str(&json).unwrap();
+        assert_eq!(msg.role, restored.role);
+    }
+
+    #[test]
+    fn test_chat_request_serialization() {
+        let request = ChatRequest {
+            model: "test".to_string(),
+            messages: vec![ChatMessage {
+                role: "user".to_string(),
+                content: "Hello".to_string(),
+            }],
+            max_tokens: Some(100),
+            temperature: Some(0.5),
+        };
+        let json = serde_json::to_string(&request).unwrap();
+        let restored: ChatRequest = serde_json::from_str(&json).unwrap();
+        assert_eq!(request.model, restored.model);
+    }
+
+    // =========================================================================
+    // Quantization Tests
+    // =========================================================================
+
+    #[test]
     fn test_quantization_info() {
         let q4 = QuantizationInfo::gguf_q4();
         assert_eq!(q4.bits, 4);
@@ -624,10 +859,131 @@ mod tests {
     }
 
     #[test]
-    fn test_generation_config_default() {
-        let config = GenerationConfig::default();
-        assert_eq!(config.max_tokens, 256);
-        assert!((config.temperature - 0.7).abs() < 0.001);
-        assert!((config.top_p - 0.9).abs() < 0.001);
+    fn test_quantization_q4_details() {
+        let q4 = QuantizationInfo::gguf_q4();
+        assert!(q4.method.contains("Q4"));
+        assert!(q4.group_size.is_some());
+    }
+
+    #[test]
+    fn test_quantization_q8_details() {
+        let q8 = QuantizationInfo::gguf_q8();
+        assert!(q8.method.contains("Q8"));
+        assert!(q8.group_size.is_none());
+    }
+
+    #[test]
+    fn test_quantization_serialization() {
+        let q4 = QuantizationInfo::gguf_q4();
+        let json = serde_json::to_string(&q4).unwrap();
+        let restored: QuantizationInfo = serde_json::from_str(&json).unwrap();
+        assert_eq!(q4.bits, restored.bits);
+    }
+
+    #[test]
+    fn test_quantization_clone() {
+        let q4 = QuantizationInfo::gguf_q4();
+        let cloned = q4.clone();
+        assert_eq!(q4.bits, cloned.bits);
+    }
+
+    // =========================================================================
+    // LLM Server Tests
+    // =========================================================================
+
+    #[test]
+    fn test_server_model_info() {
+        let model = ModelInfo::new("test", 1000);
+        let server = LlmServer::new(model);
+        assert_eq!(server.model_info().name, "test");
+    }
+
+    #[test]
+    fn test_server_tokenizer() {
+        let model = ModelInfo::new("test", 1000);
+        let server = LlmServer::new(model);
+        assert!(server.tokenizer().vocab_size() > 0);
+    }
+
+    #[test]
+    fn test_server_with_config() {
+        let model = ModelInfo::new("test", 1000);
+        let config = GenerationConfig {
+            max_tokens: 128,
+            ..Default::default()
+        };
+        let _server = LlmServer::new(model).with_config(config);
+    }
+
+    // =========================================================================
+    // Error Tests
+    // =========================================================================
+
+    #[test]
+    fn test_llm_error_tokenization() {
+        let err = LlmError::Tokenization("invalid token".to_string());
+        assert!(err.to_string().contains("invalid token"));
+    }
+
+    #[test]
+    fn test_llm_error_model() {
+        let err = LlmError::Model("not loaded".to_string());
+        assert!(err.to_string().contains("not loaded"));
+    }
+
+    #[test]
+    fn test_llm_error_generation() {
+        let err = LlmError::Generation("timeout".to_string());
+        assert!(err.to_string().contains("timeout"));
+    }
+
+    #[test]
+    fn test_llm_error_debug() {
+        let err = LlmError::Model("test".to_string());
+        let debug_str = format!("{:?}", err);
+        assert!(debug_str.contains("Model"));
+    }
+
+    // =========================================================================
+    // API Type Tests
+    // =========================================================================
+
+    #[test]
+    fn test_choice_serialization() {
+        let choice = Choice {
+            index: 0,
+            text: "Hello".to_string(),
+            finish_reason: "stop".to_string(),
+        };
+        let json = serde_json::to_string(&choice).unwrap();
+        let restored: Choice = serde_json::from_str(&json).unwrap();
+        assert_eq!(choice.index, restored.index);
+    }
+
+    #[test]
+    fn test_usage_serialization() {
+        let usage = Usage {
+            prompt_tokens: 10,
+            completion_tokens: 5,
+            total_tokens: 15,
+        };
+        let json = serde_json::to_string(&usage).unwrap();
+        let restored: Usage = serde_json::from_str(&json).unwrap();
+        assert_eq!(usage.total_tokens, restored.total_tokens);
+    }
+
+    #[test]
+    fn test_chat_choice_serialization() {
+        let choice = ChatChoice {
+            index: 0,
+            message: ChatMessage {
+                role: "assistant".to_string(),
+                content: "Hi!".to_string(),
+            },
+            finish_reason: "stop".to_string(),
+        };
+        let json = serde_json::to_string(&choice).unwrap();
+        let restored: ChatChoice = serde_json::from_str(&json).unwrap();
+        assert_eq!(choice.message.role, restored.message.role);
     }
 }

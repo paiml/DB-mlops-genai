@@ -10,7 +10,6 @@
 
 use rand::Rng;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use std::time::Instant;
 
 // ============================================================================
@@ -379,7 +378,7 @@ fn main() {
     feature_engine.fit(&train_tx);
 
     let train_features: Vec<Features> = train_tx.iter().map(|tx| feature_engine.transform(tx)).collect();
-    let test_features: Vec<Features> = test_tx.iter().map(|tx| feature_engine.transform(tx)).collect();
+    let _test_features: Vec<Features> = test_tx.iter().map(|tx| feature_engine.transform(tx)).collect();
 
     println!("   Amount mean: {:.2}", feature_engine.amount_mean);
     println!("   Amount std: {:.2}", feature_engine.amount_std);
@@ -464,6 +463,77 @@ fn main() {
 mod tests {
     use super::*;
 
+    // =========================================================================
+    // Transaction Tests
+    // =========================================================================
+
+    #[test]
+    fn test_transaction_serialization() {
+        let tx = Transaction {
+            id: 1,
+            amount: 100.0,
+            merchant_category: 5,
+            hour_of_day: 14,
+            day_of_week: 3,
+            is_online: true,
+        };
+        let json = serde_json::to_string(&tx).unwrap();
+        let restored: Transaction = serde_json::from_str(&json).unwrap();
+        assert_eq!(tx.id, restored.id);
+        assert_eq!(tx.amount, restored.amount);
+    }
+
+    #[test]
+    fn test_transaction_clone() {
+        let tx = Transaction {
+            id: 1,
+            amount: 100.0,
+            merchant_category: 5,
+            hour_of_day: 14,
+            day_of_week: 3,
+            is_online: true,
+        };
+        let cloned = tx.clone();
+        assert_eq!(tx.id, cloned.id);
+    }
+
+    // =========================================================================
+    // Features Tests
+    // =========================================================================
+
+    #[test]
+    fn test_features_serialization() {
+        let features = Features {
+            amount_normalized: 1.5,
+            amount_log: 4.6,
+            is_high_risk_category: 1.0,
+            is_night_transaction: 0.0,
+            is_weekend: 1.0,
+            is_online: 1.0,
+        };
+        let json = serde_json::to_string(&features).unwrap();
+        let restored: Features = serde_json::from_str(&json).unwrap();
+        assert_eq!(features.amount_normalized, restored.amount_normalized);
+    }
+
+    #[test]
+    fn test_features_clone() {
+        let features = Features {
+            amount_normalized: 1.5,
+            amount_log: 4.6,
+            is_high_risk_category: 1.0,
+            is_night_transaction: 0.0,
+            is_weekend: 1.0,
+            is_online: 1.0,
+        };
+        let cloned = features.clone();
+        assert_eq!(features.amount_normalized, cloned.amount_normalized);
+    }
+
+    // =========================================================================
+    // Feature Engine Tests
+    // =========================================================================
+
     #[test]
     fn test_feature_transform() {
         let engine = FeatureEngine::new();
@@ -484,6 +554,96 @@ mod tests {
     }
 
     #[test]
+    fn test_feature_engine_new() {
+        let engine = FeatureEngine::new();
+        assert_eq!(engine.amount_mean, 100.0);
+        assert_eq!(engine.amount_std, 50.0);
+        assert_eq!(engine.high_risk_categories.len(), 3);
+    }
+
+    #[test]
+    fn test_feature_engine_default() {
+        let engine = FeatureEngine::default();
+        assert_eq!(engine.amount_mean, 100.0);
+    }
+
+    #[test]
+    fn test_feature_engine_fit() {
+        let mut engine = FeatureEngine::new();
+        let transactions = vec![
+            Transaction { id: 0, amount: 100.0, merchant_category: 1, hour_of_day: 12, day_of_week: 1, is_online: false },
+            Transaction { id: 1, amount: 200.0, merchant_category: 2, hour_of_day: 14, day_of_week: 2, is_online: true },
+            Transaction { id: 2, amount: 300.0, merchant_category: 3, hour_of_day: 16, day_of_week: 3, is_online: false },
+        ];
+        engine.fit(&transactions);
+        assert!((engine.amount_mean - 200.0).abs() < 0.001);
+    }
+
+    #[test]
+    fn test_feature_engine_low_risk_category() {
+        let engine = FeatureEngine::new();
+        let tx = Transaction {
+            id: 1,
+            amount: 100.0,
+            merchant_category: 1, // Not in high_risk_categories
+            hour_of_day: 12,
+            day_of_week: 2,
+            is_online: false,
+        };
+        let features = engine.transform(&tx);
+        assert_eq!(features.is_high_risk_category, 0.0);
+    }
+
+    #[test]
+    fn test_feature_engine_daytime_transaction() {
+        let engine = FeatureEngine::new();
+        let tx = Transaction {
+            id: 1,
+            amount: 100.0,
+            merchant_category: 1,
+            hour_of_day: 12, // Daytime
+            day_of_week: 2,
+            is_online: false,
+        };
+        let features = engine.transform(&tx);
+        assert_eq!(features.is_night_transaction, 0.0);
+    }
+
+    #[test]
+    fn test_feature_engine_weekday() {
+        let engine = FeatureEngine::new();
+        let tx = Transaction {
+            id: 1,
+            amount: 100.0,
+            merchant_category: 1,
+            hour_of_day: 12,
+            day_of_week: 2, // Weekday
+            is_online: false,
+        };
+        let features = engine.transform(&tx);
+        assert_eq!(features.is_weekend, 0.0);
+    }
+
+    #[test]
+    fn test_feature_engine_amount_log() {
+        let engine = FeatureEngine::new();
+        let tx = Transaction {
+            id: 1,
+            amount: 99.0, // ln(100) ≈ 4.605
+            merchant_category: 1,
+            hour_of_day: 12,
+            day_of_week: 2,
+            is_online: false,
+        };
+        let features = engine.transform(&tx);
+        assert!((features.amount_log - 4.605).abs() < 0.01);
+    }
+
+    // =========================================================================
+    // Fraud Model Tests
+    // =========================================================================
+
+    #[test]
     fn test_model_predict() {
         let model = FraudModel::new();
         let features = Features {
@@ -498,6 +658,101 @@ mod tests {
         let pred = model.predict(&features);
         assert!(pred.fraud_probability >= 0.0 && pred.fraud_probability <= 1.0);
     }
+
+    #[test]
+    fn test_fraud_model_new() {
+        let model = FraudModel::new();
+        assert_eq!(model.name, "fraud-detector");
+        assert_eq!(model.version, "1.0.0");
+        assert_eq!(model.weights.len(), 6);
+        assert_eq!(model.threshold, 0.5);
+    }
+
+    #[test]
+    fn test_fraud_model_default() {
+        let model = FraudModel::default();
+        assert_eq!(model.name, "fraud-detector");
+    }
+
+    #[test]
+    fn test_fraud_model_predict_proba_range() {
+        let model = FraudModel::new();
+        let features = Features {
+            amount_normalized: 0.0,
+            amount_log: 0.0,
+            is_high_risk_category: 0.0,
+            is_night_transaction: 0.0,
+            is_weekend: 0.0,
+            is_online: 0.0,
+        };
+        let prob = model.predict_proba(&features);
+        assert!(prob >= 0.0 && prob <= 1.0);
+    }
+
+    #[test]
+    fn test_fraud_model_confidence() {
+        let model = FraudModel::new();
+        let features = Features {
+            amount_normalized: 10.0, // Extreme value
+            amount_log: 10.0,
+            is_high_risk_category: 1.0,
+            is_night_transaction: 1.0,
+            is_weekend: 1.0,
+            is_online: 1.0,
+        };
+        let pred = model.predict(&features);
+        assert!(pred.confidence >= 0.0 && pred.confidence <= 1.0);
+    }
+
+    #[test]
+    fn test_fraud_model_serialization() {
+        let model = FraudModel::new();
+        let json = serde_json::to_string(&model).unwrap();
+        let restored: FraudModel = serde_json::from_str(&json).unwrap();
+        assert_eq!(model.name, restored.name);
+        assert_eq!(model.weights.len(), restored.weights.len());
+    }
+
+    #[test]
+    fn test_fraud_model_clone() {
+        let model = FraudModel::new();
+        let cloned = model.clone();
+        assert_eq!(model.name, cloned.name);
+    }
+
+    // =========================================================================
+    // Prediction Tests
+    // =========================================================================
+
+    #[test]
+    fn test_prediction_serialization() {
+        let pred = Prediction {
+            transaction_id: 42,
+            fraud_probability: 0.85,
+            is_fraud: true,
+            confidence: 0.7,
+        };
+        let json = serde_json::to_string(&pred).unwrap();
+        let restored: Prediction = serde_json::from_str(&json).unwrap();
+        assert_eq!(pred.transaction_id, restored.transaction_id);
+        assert_eq!(pred.is_fraud, restored.is_fraud);
+    }
+
+    #[test]
+    fn test_prediction_clone() {
+        let pred = Prediction {
+            transaction_id: 42,
+            fraud_probability: 0.85,
+            is_fraud: true,
+            confidence: 0.7,
+        };
+        let cloned = pred.clone();
+        assert_eq!(pred.transaction_id, cloned.transaction_id);
+    }
+
+    // =========================================================================
+    // Inference Server Tests
+    // =========================================================================
 
     #[test]
     fn test_inference_server() {
@@ -520,6 +775,46 @@ mod tests {
     }
 
     #[test]
+    fn test_inference_server_batch() {
+        let model = FraudModel::new();
+        let engine = FeatureEngine::new();
+        let mut server = InferenceServer::new(model, engine);
+
+        let transactions = vec![
+            Transaction { id: 1, amount: 100.0, merchant_category: 1, hour_of_day: 12, day_of_week: 2, is_online: false },
+            Transaction { id: 2, amount: 200.0, merchant_category: 5, hour_of_day: 3, day_of_week: 6, is_online: true },
+        ];
+
+        let predictions = server.predict_batch(&transactions);
+        assert_eq!(predictions.len(), 2);
+        assert_eq!(server.get_metrics().total_requests, 2);
+    }
+
+    #[test]
+    fn test_server_metrics_fraud_count() {
+        let mut model = FraudModel::new();
+        model.threshold = 0.0; // Everything is fraud
+        let engine = FeatureEngine::new();
+        let mut server = InferenceServer::new(model, engine);
+
+        let tx = Transaction {
+            id: 1,
+            amount: 100.0,
+            merchant_category: 1,
+            hour_of_day: 12,
+            day_of_week: 2,
+            is_online: false,
+        };
+
+        server.predict(&tx);
+        assert!(server.get_metrics().total_fraud_detected >= 1);
+    }
+
+    // =========================================================================
+    // Quality Evaluation Tests
+    // =========================================================================
+
+    #[test]
     fn test_quality_evaluation() {
         let predictions = vec![
             Prediction { transaction_id: 0, fraud_probability: 0.9, is_fraud: true, confidence: 0.8 },
@@ -533,9 +828,117 @@ mod tests {
     }
 
     #[test]
+    fn test_quality_evaluation_all_wrong() {
+        let predictions = vec![
+            Prediction { transaction_id: 0, fraud_probability: 0.9, is_fraud: true, confidence: 0.8 },
+            Prediction { transaction_id: 1, fraud_probability: 0.9, is_fraud: true, confidence: 0.8 },
+        ];
+        let labels = vec![false, false]; // All wrong
+
+        let report = evaluate_model(&predictions, &labels, 1.0);
+        assert_eq!(report.accuracy, 0.0);
+        assert!(!report.passed);
+    }
+
+    #[test]
+    fn test_quality_evaluation_latency_gate() {
+        let predictions = vec![
+            Prediction { transaction_id: 0, fraud_probability: 0.9, is_fraud: true, confidence: 0.8 },
+        ];
+        let labels = vec![true];
+
+        let report = evaluate_model(&predictions, &labels, 100.0); // High latency
+        assert!(!report.passed); // Should fail due to latency
+    }
+
+    #[test]
+    fn test_quality_report_serialization() {
+        let report = QualityReport {
+            accuracy: 0.95,
+            precision: 0.92,
+            recall: 0.88,
+            f1_score: 0.90,
+            latency_avg_ms: 2.5,
+            passed: true,
+        };
+        let json = serde_json::to_string(&report).unwrap();
+        let restored: QualityReport = serde_json::from_str(&json).unwrap();
+        assert_eq!(report.accuracy, restored.accuracy);
+    }
+
+    #[test]
+    fn test_quality_report_clone() {
+        let report = QualityReport {
+            accuracy: 0.95,
+            precision: 0.92,
+            recall: 0.88,
+            f1_score: 0.90,
+            latency_avg_ms: 2.5,
+            passed: true,
+        };
+        let cloned = report.clone();
+        assert_eq!(report.accuracy, cloned.accuracy);
+    }
+
+    #[test]
+    fn test_evaluate_model_no_positives() {
+        let predictions = vec![
+            Prediction { transaction_id: 0, fraud_probability: 0.1, is_fraud: false, confidence: 0.8 },
+            Prediction { transaction_id: 1, fraud_probability: 0.1, is_fraud: false, confidence: 0.8 },
+        ];
+        let labels = vec![false, false];
+
+        let report = evaluate_model(&predictions, &labels, 1.0);
+        // No positive predictions or labels, precision/recall should handle gracefully
+        assert_eq!(report.accuracy, 1.0);
+    }
+
+    // =========================================================================
+    // Data Generation Tests
+    // =========================================================================
+
+    #[test]
     fn test_data_generation() {
         let (tx, labels) = generate_transactions(100);
         assert_eq!(tx.len(), 100);
         assert_eq!(labels.len(), 100);
+    }
+
+    #[test]
+    fn test_data_generation_ids() {
+        let (tx, _) = generate_transactions(10);
+        for (i, t) in tx.iter().enumerate() {
+            assert_eq!(t.id, i as u64);
+        }
+    }
+
+    #[test]
+    fn test_data_generation_bounds() {
+        let (tx, _) = generate_transactions(50);
+        for t in &tx {
+            assert!(t.amount >= 10.0 && t.amount <= 510.0);
+            assert!(t.hour_of_day < 24);
+            assert!(t.day_of_week < 7);
+            assert!(t.merchant_category < 20);
+        }
+    }
+
+    #[test]
+    fn test_data_generation_small() {
+        let (tx, labels) = generate_transactions(1);
+        assert_eq!(tx.len(), 1);
+        assert_eq!(labels.len(), 1);
+    }
+
+    // =========================================================================
+    // Server Metrics Tests
+    // =========================================================================
+
+    #[test]
+    fn test_server_metrics_default() {
+        let metrics = ServerMetrics::default();
+        assert_eq!(metrics.total_requests, 0);
+        assert_eq!(metrics.total_fraud_detected, 0);
+        assert_eq!(metrics.total_latency_ms, 0.0);
     }
 }

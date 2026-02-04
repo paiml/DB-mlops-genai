@@ -468,6 +468,25 @@ fn main() {
 mod tests {
     use super::*;
 
+    // =========================================================================
+    // Document Tests
+    // =========================================================================
+
+    #[test]
+    fn test_document_new() {
+        let doc = Document::new("doc1", "Hello world");
+        assert_eq!(doc.id, "doc1");
+        assert_eq!(doc.content, "Hello world");
+        assert!(doc.chunks.is_empty());
+    }
+
+    #[test]
+    fn test_document_with_metadata() {
+        let doc = Document::new("doc1", "content")
+            .with_metadata("key", "value");
+        assert_eq!(doc.metadata.get("key"), Some(&"value".to_string()));
+    }
+
     #[test]
     fn test_document_chunking() {
         let mut doc = Document::new("test", "one two three four five six seven eight nine ten");
@@ -480,11 +499,91 @@ mod tests {
     }
 
     #[test]
+    fn test_document_chunking_short() {
+        let mut doc = Document::new("test", "one two three");
+        doc.chunk(10, 2);
+        assert_eq!(doc.chunks.len(), 1);
+    }
+
+    #[test]
+    fn test_document_chunk_ids() {
+        let mut doc = Document::new("doc1", "hello world this is a test document");
+        doc.chunk(10, 0);  // Single chunk
+        assert!(doc.chunks[0].id.contains("doc1-chunk-0"));
+    }
+
+    #[test]
+    fn test_chunk_serialization() {
+        let chunk = Chunk {
+            id: "c1".to_string(),
+            text: "test".to_string(),
+            start_char: 0,
+            end_char: 4,
+        };
+        let json = serde_json::to_string(&chunk).unwrap();
+        let restored: Chunk = serde_json::from_str(&json).unwrap();
+        assert_eq!(chunk.id, restored.id);
+    }
+
+    #[test]
+    fn test_document_clone() {
+        let doc = Document::new("test", "content").with_metadata("k", "v");
+        let cloned = doc.clone();
+        assert_eq!(doc.id, cloned.id);
+        assert_eq!(doc.metadata, cloned.metadata);
+    }
+
+    // =========================================================================
+    // Embedding Tests
+    // =========================================================================
+
+    #[test]
+    fn test_embedding_new() {
+        let emb = Embedding::new(vec![1.0, 2.0, 3.0]);
+        assert_eq!(emb.0.len(), 3);
+    }
+
+    #[test]
+    fn test_embedding_from_text() {
+        let emb = Embedding::from_text("hello world", 32);
+        assert_eq!(emb.0.len(), 32);
+        // Should be normalized
+        let norm: f32 = emb.0.iter().map(|v| v * v).sum::<f32>().sqrt();
+        assert!((norm - 1.0).abs() < 1e-5);
+    }
+
+    #[test]
     fn test_embedding_similarity() {
         let e1 = Embedding::from_text("machine learning", 64);
         let e2 = Embedding::from_text("machine learning", 64);
         let sim = e1.cosine_similarity(&e2);
         assert!((sim - 1.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn test_embedding_similarity_different() {
+        let e1 = Embedding::from_text("machine learning", 64);
+        let e2 = Embedding::from_text("cooking recipes", 64);
+        let sim = e1.cosine_similarity(&e2);
+        assert!(sim < 1.0);
+    }
+
+    #[test]
+    fn test_embedding_clone() {
+        let emb = Embedding::new(vec![1.0, 2.0]);
+        let cloned = emb.clone();
+        assert_eq!(emb.0, cloned.0);
+    }
+
+    // =========================================================================
+    // Vector Store Tests
+    // =========================================================================
+
+    #[test]
+    fn test_vector_store_new() {
+        let store = VectorStore::new(64);
+        assert!(store.is_empty());
+        assert_eq!(store.len(), 0);
     }
 
     #[test]
@@ -514,6 +613,41 @@ mod tests {
     }
 
     #[test]
+    fn test_vector_search_top_k() {
+        let mut store = VectorStore::new(32);
+
+        for i in 0..5 {
+            let mut doc = Document::new(&format!("doc{}", i), &format!("content {}", i));
+            doc.chunk(10, 0);
+            store.add_document(&doc);
+        }
+
+        let results = store.search("content", 2);
+        assert_eq!(results.len(), 2);
+    }
+
+    #[test]
+    fn test_retrieved_chunk_rank() {
+        let mut store = VectorStore::new(32);
+        let mut doc = Document::new("test", "hello world foo bar");
+        doc.chunk(2, 0);
+        store.add_document(&doc);
+
+        let results = store.search("hello", 2);
+        assert_eq!(results[0].rank, 1);
+    }
+
+    // =========================================================================
+    // RAG Pipeline Tests
+    // =========================================================================
+
+    #[test]
+    fn test_rag_pipeline_new() {
+        let rag = RagPipeline::new(64);
+        assert_eq!(rag.document_count(), 0);
+    }
+
+    #[test]
     fn test_rag_pipeline() {
         let mut rag = RagPipeline::new(64).with_top_k(2);
 
@@ -524,6 +658,61 @@ mod tests {
         let response = rag.query("What is machine learning?");
         assert!(response.is_ok());
     }
+
+    #[test]
+    fn test_rag_pipeline_with_template() {
+        let rag = RagPipeline::new(64)
+            .with_template("Custom template: {context} - {question}");
+        // Template should be updated
+        assert!(rag.document_count() == 0);
+    }
+
+    #[test]
+    fn test_rag_pipeline_empty() {
+        let rag = RagPipeline::new(64);
+        let result = rag.query("test query");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_rag_response_sources() {
+        let mut rag = RagPipeline::new(64).with_top_k(2);
+        let mut doc = Document::new("test", "Machine learning algorithms process data");
+        doc.chunk(5, 1);
+        rag.ingest(doc);
+
+        let response = rag.query("machine learning").unwrap();
+        assert!(!response.sources.is_empty());
+    }
+
+    #[test]
+    fn test_rag_response_serialization() {
+        let response = RagResponse {
+            query: "test".to_string(),
+            answer: "answer".to_string(),
+            sources: vec![],
+            context_used: "context".to_string(),
+        };
+        let json = serde_json::to_string(&response).unwrap();
+        let restored: RagResponse = serde_json::from_str(&json).unwrap();
+        assert_eq!(response.query, restored.query);
+    }
+
+    #[test]
+    fn test_source_serialization() {
+        let source = Source {
+            chunk_id: "c1".to_string(),
+            text_preview: "preview".to_string(),
+            score: 0.9,
+        };
+        let json = serde_json::to_string(&source).unwrap();
+        let restored: Source = serde_json::from_str(&json).unwrap();
+        assert_eq!(source.chunk_id, restored.chunk_id);
+    }
+
+    // =========================================================================
+    // RAG Metrics Tests
+    // =========================================================================
 
     #[test]
     fn test_rag_metrics() {
@@ -540,5 +729,76 @@ mod tests {
 
         let metrics = RagMetrics::evaluate(&response, Some("Machine learning systems"));
         assert!(metrics.retrieval_precision > 0.0);
+    }
+
+    #[test]
+    fn test_rag_metrics_no_ground_truth() {
+        let response = RagResponse {
+            query: "test".to_string(),
+            answer: "answer".to_string(),
+            sources: vec![Source {
+                chunk_id: "1".to_string(),
+                text_preview: "test".to_string(),
+                score: 0.8,
+            }],
+            context_used: "context".to_string(),
+        };
+
+        let metrics = RagMetrics::evaluate(&response, None);
+        assert_eq!(metrics.answer_faithfulness, 0.7);
+    }
+
+    #[test]
+    fn test_rag_metrics_empty_sources() {
+        let response = RagResponse {
+            query: "test".to_string(),
+            answer: "answer".to_string(),
+            sources: vec![],
+            context_used: "context".to_string(),
+        };
+
+        let metrics = RagMetrics::evaluate(&response, None);
+        assert_eq!(metrics.retrieval_precision, 0.0);
+    }
+
+    #[test]
+    fn test_rag_metrics_serialization() {
+        let metrics = RagMetrics {
+            retrieval_precision: 0.9,
+            context_relevance: 0.8,
+            answer_faithfulness: 0.7,
+        };
+        let json = serde_json::to_string(&metrics).unwrap();
+        let restored: RagMetrics = serde_json::from_str(&json).unwrap();
+        assert_eq!(metrics.retrieval_precision, restored.retrieval_precision);
+    }
+
+    // =========================================================================
+    // Error Tests
+    // =========================================================================
+
+    #[test]
+    fn test_rag_error_retrieval() {
+        let err = RagError::Retrieval("not found".to_string());
+        assert!(err.to_string().contains("not found"));
+    }
+
+    #[test]
+    fn test_rag_error_generation() {
+        let err = RagError::Generation("timeout".to_string());
+        assert!(err.to_string().contains("timeout"));
+    }
+
+    #[test]
+    fn test_rag_error_document() {
+        let err = RagError::Document("invalid format".to_string());
+        assert!(err.to_string().contains("invalid format"));
+    }
+
+    #[test]
+    fn test_rag_error_debug() {
+        let err = RagError::Retrieval("test".to_string());
+        let debug_str = format!("{:?}", err);
+        assert!(debug_str.contains("Retrieval"));
     }
 }

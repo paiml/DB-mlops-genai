@@ -548,6 +548,61 @@ fn main() {
 mod tests {
     use super::*;
 
+    // =========================================================================
+    // Request/Response Tests
+    // =========================================================================
+
+    #[test]
+    fn test_request_serialization() {
+        let request = GenAIRequest {
+            id: "req-1".to_string(),
+            prompt: "Hello".to_string(),
+            model: "llama".to_string(),
+            max_tokens: 100,
+            temperature: 0.7,
+            user_id: Some("user-1".to_string()),
+        };
+        let json = serde_json::to_string(&request).unwrap();
+        let restored: GenAIRequest = serde_json::from_str(&json).unwrap();
+        assert_eq!(request.id, restored.id);
+    }
+
+    #[test]
+    fn test_response_serialization() {
+        let response = GenAIResponse {
+            id: "resp-1".to_string(),
+            request_id: "req-1".to_string(),
+            model: "llama".to_string(),
+            content: "Hello!".to_string(),
+            usage: TokenUsage {
+                prompt_tokens: 5,
+                completion_tokens: 3,
+                total_tokens: 8,
+            },
+            latency_ms: 50,
+            guardrails_passed: true,
+        };
+        let json = serde_json::to_string(&response).unwrap();
+        let restored: GenAIResponse = serde_json::from_str(&json).unwrap();
+        assert_eq!(response.id, restored.id);
+    }
+
+    #[test]
+    fn test_token_usage_serialization() {
+        let usage = TokenUsage {
+            prompt_tokens: 10,
+            completion_tokens: 20,
+            total_tokens: 30,
+        };
+        let json = serde_json::to_string(&usage).unwrap();
+        let restored: TokenUsage = serde_json::from_str(&json).unwrap();
+        assert_eq!(usage.total_tokens, restored.total_tokens);
+    }
+
+    // =========================================================================
+    // Guardrails Tests
+    // =========================================================================
+
     #[test]
     fn test_guardrails_pass() {
         let guardrails = Guardrails::default();
@@ -572,11 +627,104 @@ mod tests {
     }
 
     #[test]
+    fn test_guardrails_pii_phone() {
+        let guardrails = Guardrails::default();
+        let result = guardrails.check_input("Call me at 1234567890");
+        assert!(!result.passed);
+        assert!(result.violations.iter().any(|v| v.contains("phone")));
+    }
+
+    #[test]
+    fn test_guardrails_length() {
+        let guardrails = Guardrails::default();
+        let long_input = "x".repeat(5000);
+        let result = guardrails.check_input(&long_input);
+        assert!(!result.passed);
+        assert!(result.violations.iter().any(|v| v.contains("length")));
+    }
+
+    #[test]
+    fn test_guardrails_output() {
+        let guardrails = Guardrails::default();
+        let short_output = "Hello world";
+        let result = guardrails.check_output(short_output);
+        assert!(result.passed);
+    }
+
+    #[test]
+    fn test_guardrails_output_long() {
+        let guardrails = Guardrails::default();
+        let long_output = "x".repeat(3000);
+        let result = guardrails.check_output(&long_output);
+        assert!(!result.passed);
+    }
+
+    #[test]
+    fn test_guardrail_result_serialization() {
+        let result = GuardrailResult {
+            passed: false,
+            violations: vec!["blocked".to_string()],
+        };
+        let json = serde_json::to_string(&result).unwrap();
+        let restored: GuardrailResult = serde_json::from_str(&json).unwrap();
+        assert_eq!(result.passed, restored.passed);
+    }
+
+    // =========================================================================
+    // Rate Limiter Tests
+    // =========================================================================
+
+    #[test]
     fn test_rate_limiter() {
         let mut limiter = RateLimiter::new(10, 1000);
         assert!(limiter.check());
         limiter.record(100);
         assert!(limiter.check());
+    }
+
+    #[test]
+    fn test_rate_limiter_usage() {
+        let mut limiter = RateLimiter::new(10, 1000);
+        limiter.record(100);
+        limiter.record(100);
+
+        let (req_usage, token_usage) = limiter.usage();
+        assert_eq!(req_usage, 0.2); // 2/10
+        assert_eq!(token_usage, 0.2); // 200/1000
+    }
+
+    #[test]
+    fn test_rate_limiter_reset() {
+        let mut limiter = RateLimiter::new(10, 1000);
+        limiter.record(500);
+        limiter.reset();
+
+        let (req_usage, token_usage) = limiter.usage();
+        assert_eq!(req_usage, 0.0);
+        assert_eq!(token_usage, 0.0);
+    }
+
+    #[test]
+    fn test_rate_limiter_clone() {
+        let limiter = RateLimiter::new(10, 1000);
+        let cloned = limiter.clone();
+        assert!(cloned.check());
+    }
+
+    // =========================================================================
+    // A/B Router Tests
+    // =========================================================================
+
+    #[test]
+    fn test_ab_router_new() {
+        let router = ABRouter::new();
+        assert!(router.route("nonexistent", 0).is_none());
+    }
+
+    #[test]
+    fn test_ab_router_default() {
+        let router = ABRouter::default();
+        assert!(router.route("test", 0).is_none());
     }
 
     #[test]
@@ -606,6 +754,66 @@ mod tests {
     }
 
     #[test]
+    fn test_ab_router_inactive() {
+        let mut router = ABRouter::new();
+        router.add_experiment(Experiment {
+            name: "test".to_string(),
+            variants: vec![Variant {
+                name: "a".to_string(),
+                model: "model".to_string(),
+                weight: 1.0,
+            }],
+            active: false,
+        });
+
+        assert!(router.route("test", 0).is_none());
+    }
+
+    #[test]
+    fn test_experiment_serialization() {
+        let exp = Experiment {
+            name: "test".to_string(),
+            variants: vec![Variant {
+                name: "a".to_string(),
+                model: "model".to_string(),
+                weight: 1.0,
+            }],
+            active: true,
+        };
+        let json = serde_json::to_string(&exp).unwrap();
+        let restored: Experiment = serde_json::from_str(&json).unwrap();
+        assert_eq!(exp.name, restored.name);
+    }
+
+    #[test]
+    fn test_variant_serialization() {
+        let variant = Variant {
+            name: "control".to_string(),
+            model: "llama-7b".to_string(),
+            weight: 0.5,
+        };
+        let json = serde_json::to_string(&variant).unwrap();
+        let restored: Variant = serde_json::from_str(&json).unwrap();
+        assert_eq!(variant.name, restored.name);
+    }
+
+    // =========================================================================
+    // Metrics Tests
+    // =========================================================================
+
+    #[test]
+    fn test_metrics_new() {
+        let metrics = ProductionMetrics::new();
+        assert_eq!(metrics.total_requests, 0);
+    }
+
+    #[test]
+    fn test_metrics_default() {
+        let metrics = ProductionMetrics::default();
+        assert_eq!(metrics.total_requests, 0);
+    }
+
+    #[test]
     fn test_metrics() {
         let mut metrics = ProductionMetrics::new();
         metrics.record_request(50, 100, true);
@@ -615,6 +823,52 @@ mod tests {
         assert_eq!(metrics.total_requests, 3);
         assert_eq!(metrics.successful_requests, 2);
         assert!((metrics.success_rate() - 0.666).abs() < 0.01);
+    }
+
+    #[test]
+    fn test_metrics_guardrail_violation() {
+        let mut metrics = ProductionMetrics::new();
+        metrics.record_guardrail_violation();
+        metrics.record_guardrail_violation();
+        assert_eq!(metrics.guardrail_violations, 2);
+    }
+
+    #[test]
+    fn test_metrics_success_rate_zero() {
+        let metrics = ProductionMetrics::new();
+        assert_eq!(metrics.success_rate(), 0.0);
+    }
+
+    #[test]
+    fn test_metrics_serialization() {
+        let metrics = ProductionMetrics {
+            total_requests: 100,
+            successful_requests: 95,
+            failed_requests: 5,
+            total_tokens: 10000,
+            avg_latency_ms: 50.0,
+            p99_latency_ms: 200.0,
+            guardrail_violations: 2,
+        };
+        let json = serde_json::to_string(&metrics).unwrap();
+        let restored: ProductionMetrics = serde_json::from_str(&json).unwrap();
+        assert_eq!(metrics.total_requests, restored.total_requests);
+    }
+
+    // =========================================================================
+    // Production Server Tests
+    // =========================================================================
+
+    #[test]
+    fn test_production_server_new() {
+        let server = ProductionServer::new();
+        assert_eq!(server.metrics().total_requests, 0);
+    }
+
+    #[test]
+    fn test_production_server_default() {
+        let server = ProductionServer::default();
+        assert_eq!(server.metrics().total_requests, 0);
     }
 
     #[test]
@@ -631,5 +885,56 @@ mod tests {
 
         let result = server.process(request);
         assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_production_server_guardrail_block() {
+        let mut server = ProductionServer::new();
+        let request = GenAIRequest {
+            id: "test".to_string(),
+            prompt: "My password is secret".to_string(),
+            model: "test-model".to_string(),
+            max_tokens: 100,
+            temperature: 0.7,
+            user_id: None,
+        };
+
+        let result = server.process(request);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_production_server_ab_router() {
+        let server = ProductionServer::new();
+        let _router = server.ab_router();
+    }
+
+    // =========================================================================
+    // Error Tests
+    // =========================================================================
+
+    #[test]
+    fn test_production_error_guardrail() {
+        let err = ProductionError::Guardrail("blocked".to_string());
+        assert!(err.to_string().contains("blocked"));
+    }
+
+    #[test]
+    fn test_production_error_rate_limit() {
+        let err = ProductionError::RateLimit;
+        assert!(err.to_string().contains("Rate limit"));
+    }
+
+    #[test]
+    fn test_production_error_model() {
+        let err = ProductionError::Model("not loaded".to_string());
+        assert!(err.to_string().contains("not loaded"));
+    }
+
+    #[test]
+    fn test_production_error_debug() {
+        let err = ProductionError::RateLimit;
+        let debug_str = format!("{:?}", err);
+        assert!(debug_str.contains("RateLimit"));
     }
 }

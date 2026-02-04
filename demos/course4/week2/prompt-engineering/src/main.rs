@@ -513,6 +513,10 @@ Based on the text, here are the extracted entities:
 mod tests {
     use super::*;
 
+    // =========================================================================
+    // Template Tests
+    // =========================================================================
+
     #[test]
     fn test_template_extraction() {
         let template = PromptTemplate::new("test", "Hello {name}, your order {order_id} is ready.");
@@ -539,11 +543,91 @@ mod tests {
     }
 
     #[test]
+    fn test_template_no_variables() {
+        let template = PromptTemplate::new("static", "Hello World!");
+        assert!(template.variables.is_empty());
+        let result = template.format(&HashMap::new()).unwrap();
+        assert_eq!(result, "Hello World!");
+    }
+
+    #[test]
+    fn test_template_with_description() {
+        let template = PromptTemplate::new("test", "Hello {name}!")
+            .with_description("A greeting template");
+        assert_eq!(template.description, "A greeting template");
+    }
+
+    #[test]
+    fn test_template_serialization() {
+        let template = PromptTemplate::new("test", "Hello {name}!")
+            .with_description("Greeting");
+        let json = serde_json::to_string(&template).unwrap();
+        let restored: PromptTemplate = serde_json::from_str(&json).unwrap();
+        assert_eq!(template.name, restored.name);
+    }
+
+    #[test]
+    fn test_template_clone() {
+        let template = PromptTemplate::new("test", "Hello {name}!");
+        let cloned = template.clone();
+        assert_eq!(template.name, cloned.name);
+        assert_eq!(template.variables, cloned.variables);
+    }
+
+    #[test]
+    fn test_template_multiple_same_var() {
+        let template = PromptTemplate::new("test", "{name} says hi to {name}");
+        assert_eq!(template.variables.len(), 1); // Should dedupe
+    }
+
+    // =========================================================================
+    // Library Tests
+    // =========================================================================
+
+    #[test]
     fn test_prompt_library() {
         let library = PromptLibrary::new();
         assert!(library.get("classify_sentiment").is_some());
         assert!(library.get("nonexistent").is_none());
     }
+
+    #[test]
+    fn test_prompt_library_default() {
+        let library = PromptLibrary::default();
+        assert!(!library.list().is_empty());
+    }
+
+    #[test]
+    fn test_prompt_library_list() {
+        let library = PromptLibrary::new();
+        let names = library.list();
+        assert!(names.contains(&"classify_sentiment"));
+        assert!(names.contains(&"math_cot"));
+        assert!(names.contains(&"extract_entities"));
+    }
+
+    #[test]
+    fn test_prompt_library_add() {
+        let mut library = PromptLibrary::new();
+        let initial_count = library.list().len();
+
+        library.add(PromptTemplate::new("custom", "Custom template"));
+        assert_eq!(library.list().len(), initial_count + 1);
+        assert!(library.get("custom").is_some());
+    }
+
+    #[test]
+    fn test_prompt_library_all_templates_valid() {
+        let library = PromptLibrary::new();
+        for name in library.list() {
+            let template = library.get(name).unwrap();
+            assert!(!template.template.is_empty());
+        }
+    }
+
+    // =========================================================================
+    // Builder Tests
+    // =========================================================================
 
     #[test]
     fn test_prompt_builder() {
@@ -556,6 +640,70 @@ mod tests {
         assert!(prompt.contains("Input: input"));
         assert!(prompt.contains("Output: output"));
     }
+
+    #[test]
+    fn test_prompt_builder_minimal() {
+        let builder = PromptBuilder::new("Do this task");
+        let prompt = builder.build();
+        assert!(prompt.contains("Do this task"));
+        assert!(prompt.contains("Response:"));
+    }
+
+    #[test]
+    fn test_prompt_builder_with_context() {
+        let builder = PromptBuilder::new("Analyze")
+            .add_context("Context 1")
+            .add_context("Context 2");
+        let prompt = builder.build();
+        assert!(prompt.contains("Context:"));
+        assert!(prompt.contains("Context 1"));
+        assert!(prompt.contains("Context 2"));
+    }
+
+    #[test]
+    fn test_prompt_builder_with_output_format() {
+        let builder = PromptBuilder::new("Classify")
+            .output_format("JSON object with 'label' field");
+        let prompt = builder.build();
+        assert!(prompt.contains("Output format:"));
+    }
+
+    #[test]
+    fn test_prompt_builder_clone() {
+        let builder = PromptBuilder::new("test").system("sys");
+        let cloned = builder.clone();
+        assert_eq!(builder.build(), cloned.build());
+    }
+
+    // =========================================================================
+    // Technique Tests
+    // =========================================================================
+
+    #[test]
+    fn test_prompt_technique_descriptions() {
+        assert!(!PromptTechnique::ZeroShot.description().is_empty());
+        assert!(!PromptTechnique::FewShot.description().is_empty());
+        assert!(!PromptTechnique::ChainOfThought.description().is_empty());
+        assert!(!PromptTechnique::RoleBased.description().is_empty());
+        assert!(!PromptTechnique::Structured.description().is_empty());
+    }
+
+    #[test]
+    fn test_prompt_technique_eq() {
+        assert_eq!(PromptTechnique::ZeroShot, PromptTechnique::ZeroShot);
+        assert_ne!(PromptTechnique::ZeroShot, PromptTechnique::FewShot);
+    }
+
+    #[test]
+    fn test_prompt_technique_copy() {
+        let t1 = PromptTechnique::FewShot;
+        let t2 = t1;
+        assert_eq!(t1, t2);
+    }
+
+    // =========================================================================
+    // Parser Tests
+    // =========================================================================
 
     #[test]
     fn test_json_parser() {
@@ -572,6 +720,39 @@ mod tests {
     }
 
     #[test]
+    fn test_json_parser_array() {
+        let output = "Result: [1, 2, 3]";
+        let parsed: Vec<i32> = JsonOutputParser::parse(output).unwrap();
+        assert_eq!(parsed, vec![1, 2, 3]);
+    }
+
+    #[test]
+    fn test_json_parser_nested() {
+        let output = r#"{"outer": {"inner": "value"}}"#;
+        let parsed: HashMap<String, HashMap<String, String>> = JsonOutputParser::parse(output).unwrap();
+        assert_eq!(
+            parsed.get("outer").unwrap().get("inner"),
+            Some(&"value".to_string())
+        );
+    }
+
+    #[test]
+    fn test_entity_extraction_serialization() {
+        let entities = EntityExtraction {
+            people: vec!["John".to_string()],
+            organizations: vec!["Acme".to_string()],
+            locations: vec!["NYC".to_string()],
+        };
+        let json = serde_json::to_string(&entities).unwrap();
+        let restored: EntityExtraction = serde_json::from_str(&json).unwrap();
+        assert_eq!(entities.people, restored.people);
+    }
+
+    // =========================================================================
+    // Metrics Tests
+    // =========================================================================
+
+    #[test]
     fn test_prompt_metrics() {
         let builder = PromptBuilder::new("test")
             .add_example("a", "b")
@@ -582,5 +763,78 @@ mod tests {
 
         assert_eq!(metrics.example_count, 2);
         assert_eq!(metrics.technique, PromptTechnique::FewShot);
+    }
+
+    #[test]
+    fn test_prompt_metrics_zero_shot() {
+        let builder = PromptBuilder::new("Classify this text");
+        let prompt = builder.build();
+        let metrics = PromptMetrics::analyze(&prompt, &builder);
+
+        assert_eq!(metrics.example_count, 0);
+        assert_eq!(metrics.technique, PromptTechnique::ZeroShot);
+    }
+
+    #[test]
+    fn test_prompt_metrics_role_based() {
+        let builder = PromptBuilder::new("Classify")
+            .system("You are an expert classifier");
+        let prompt = builder.build();
+        let metrics = PromptMetrics::analyze(&prompt, &builder);
+
+        assert!(metrics.has_system);
+        assert_eq!(metrics.technique, PromptTechnique::RoleBased);
+    }
+
+    #[test]
+    fn test_prompt_metrics_structured() {
+        let builder = PromptBuilder::new("Extract entities")
+            .output_format("JSON with people, places, orgs");
+        let prompt = builder.build();
+        let metrics = PromptMetrics::analyze(&prompt, &builder);
+
+        assert!(metrics.has_output_format);
+        assert_eq!(metrics.technique, PromptTechnique::Structured);
+    }
+
+    #[test]
+    fn test_prompt_metrics_token_count() {
+        let builder = PromptBuilder::new("This is a test instruction");
+        let prompt = builder.build();
+        let metrics = PromptMetrics::analyze(&prompt, &builder);
+
+        assert!(metrics.token_count > 0);
+    }
+
+    #[test]
+    fn test_prompt_metrics_clone() {
+        let builder = PromptBuilder::new("test");
+        let prompt = builder.build();
+        let metrics = PromptMetrics::analyze(&prompt, &builder);
+        let cloned = metrics.clone();
+        assert_eq!(metrics.token_count, cloned.token_count);
+    }
+
+    // =========================================================================
+    // Error Tests
+    // =========================================================================
+
+    #[test]
+    fn test_prompt_error_template() {
+        let err = PromptError::Template("missing variable".to_string());
+        assert!(err.to_string().contains("missing variable"));
+    }
+
+    #[test]
+    fn test_prompt_error_validation() {
+        let err = PromptError::Validation("invalid JSON".to_string());
+        assert!(err.to_string().contains("invalid JSON"));
+    }
+
+    #[test]
+    fn test_prompt_error_debug() {
+        let err = PromptError::Template("test".to_string());
+        let debug_str = format!("{:?}", err);
+        assert!(debug_str.contains("Template"));
     }
 }

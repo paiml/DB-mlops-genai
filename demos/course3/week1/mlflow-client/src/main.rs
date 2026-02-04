@@ -406,6 +406,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 mod tests {
     use super::*;
 
+    // ========================================================================
+    // Metric Tests
+    // ========================================================================
+
     #[test]
     fn test_metric_serialization() {
         let metric = Metric {
@@ -421,11 +425,77 @@ mod tests {
     }
 
     #[test]
+    fn test_metric_deserialization() {
+        let json = r#"{"key":"loss","value":0.05,"timestamp":123456,"step":10}"#;
+        let metric: Metric = serde_json::from_str(json).unwrap();
+        assert_eq!(metric.key, "loss");
+        assert!((metric.value - 0.05).abs() < 0.001);
+        assert_eq!(metric.step, 10);
+    }
+
+    #[test]
+    fn test_metric_default_step() {
+        let json = r#"{"key":"acc","value":0.9,"timestamp":123}"#;
+        let metric: Metric = serde_json::from_str(json).unwrap();
+        assert_eq!(metric.step, 0); // default
+    }
+
+    #[test]
+    fn test_metric_clone() {
+        let metric = Metric {
+            key: "f1".to_string(),
+            value: 0.88,
+            timestamp: 999,
+            step: 1,
+        };
+        let cloned = metric.clone();
+        assert_eq!(metric.key, cloned.key);
+        assert_eq!(metric.value, cloned.value);
+    }
+
+    // ========================================================================
+    // RunStatus Tests
+    // ========================================================================
+
+    #[test]
     fn test_run_status_serialization() {
         let status = RunStatus::Finished;
         let json = serde_json::to_string(&status).unwrap();
         assert_eq!(json, "\"FINISHED\"");
     }
+
+    #[test]
+    fn test_run_status_all_variants() {
+        let statuses = vec![
+            (RunStatus::Running, "RUNNING"),
+            (RunStatus::Scheduled, "SCHEDULED"),
+            (RunStatus::Finished, "FINISHED"),
+            (RunStatus::Failed, "FAILED"),
+            (RunStatus::Killed, "KILLED"),
+        ];
+
+        for (status, expected) in statuses {
+            assert_eq!(format!("{}", status), expected);
+        }
+    }
+
+    #[test]
+    fn test_run_status_deserialization() {
+        let json = "\"RUNNING\"";
+        let status: RunStatus = serde_json::from_str(json).unwrap();
+        assert!(matches!(status, RunStatus::Running));
+    }
+
+    #[test]
+    fn test_run_status_debug() {
+        let status = RunStatus::Failed;
+        let debug = format!("{:?}", status);
+        assert!(debug.contains("Failed"));
+    }
+
+    // ========================================================================
+    // Param Tests
+    // ========================================================================
 
     #[test]
     fn test_param_creation() {
@@ -438,8 +508,228 @@ mod tests {
     }
 
     #[test]
+    fn test_param_serialization() {
+        let param = Param {
+            key: "epochs".to_string(),
+            value: "100".to_string(),
+        };
+        let json = serde_json::to_string(&param).unwrap();
+        assert!(json.contains("epochs"));
+        assert!(json.contains("100"));
+    }
+
+    #[test]
+    fn test_param_clone() {
+        let param = Param {
+            key: "batch_size".to_string(),
+            value: "32".to_string(),
+        };
+        let cloned = param.clone();
+        assert_eq!(param.key, cloned.key);
+    }
+
+    // ========================================================================
+    // RunTag Tests
+    // ========================================================================
+
+    #[test]
+    fn test_run_tag_creation() {
+        let tag = RunTag {
+            key: "mlflow.user".to_string(),
+            value: "alice".to_string(),
+        };
+        assert_eq!(tag.key, "mlflow.user");
+        assert_eq!(tag.value, "alice");
+    }
+
+    #[test]
+    fn test_run_tag_serialization() {
+        let tag = RunTag {
+            key: "version".to_string(),
+            value: "1.0.0".to_string(),
+        };
+        let json = serde_json::to_string(&tag).unwrap();
+        let deserialized: RunTag = serde_json::from_str(&json).unwrap();
+        assert_eq!(tag.key, deserialized.key);
+    }
+
+    // ========================================================================
+    // Experiment Tests
+    // ========================================================================
+
+    #[test]
+    fn test_experiment_serialization() {
+        let exp = Experiment {
+            experiment_id: "123".to_string(),
+            name: "my-experiment".to_string(),
+            artifact_location: Some("/artifacts".to_string()),
+            lifecycle_stage: "active".to_string(),
+            tags: vec![],
+        };
+        let json = serde_json::to_string(&exp).unwrap();
+        assert!(json.contains("my-experiment"));
+        assert!(json.contains("123"));
+    }
+
+    #[test]
+    fn test_experiment_with_tags() {
+        let exp = Experiment {
+            experiment_id: "456".to_string(),
+            name: "tagged-exp".to_string(),
+            artifact_location: None,
+            lifecycle_stage: "active".to_string(),
+            tags: vec![ExperimentTag {
+                key: "team".to_string(),
+                value: "ml".to_string(),
+            }],
+        };
+        assert_eq!(exp.tags.len(), 1);
+        assert_eq!(exp.tags[0].key, "team");
+    }
+
+    #[test]
+    fn test_experiment_clone() {
+        let exp = Experiment {
+            experiment_id: "789".to_string(),
+            name: "clone-test".to_string(),
+            artifact_location: None,
+            lifecycle_stage: "deleted".to_string(),
+            tags: vec![],
+        };
+        let cloned = exp.clone();
+        assert_eq!(exp.experiment_id, cloned.experiment_id);
+    }
+
+    // ========================================================================
+    // RunData Tests
+    // ========================================================================
+
+    #[test]
+    fn test_run_data_default() {
+        let data = RunData::default();
+        assert!(data.metrics.is_empty());
+        assert!(data.params.is_empty());
+        assert!(data.tags.is_empty());
+    }
+
+    #[test]
+    fn test_run_data_with_metrics() {
+        let data = RunData {
+            metrics: vec![Metric {
+                key: "acc".to_string(),
+                value: 0.9,
+                timestamp: 123,
+                step: 0,
+            }],
+            params: vec![],
+            tags: vec![],
+        };
+        assert_eq!(data.metrics.len(), 1);
+    }
+
+    // ========================================================================
+    // RunInfo Tests
+    // ========================================================================
+
+    #[test]
+    fn test_run_info_serialization() {
+        let info = RunInfo {
+            run_id: "run-123".to_string(),
+            experiment_id: "exp-456".to_string(),
+            status: RunStatus::Running,
+            start_time: 1000,
+            end_time: None,
+            artifact_uri: Some("/artifacts/run-123".to_string()),
+            lifecycle_stage: "active".to_string(),
+        };
+        let json = serde_json::to_string(&info).unwrap();
+        assert!(json.contains("run-123"));
+        assert!(json.contains("RUNNING"));
+    }
+
+    #[test]
+    fn test_run_info_with_end_time() {
+        let info = RunInfo {
+            run_id: "completed-run".to_string(),
+            experiment_id: "exp-1".to_string(),
+            status: RunStatus::Finished,
+            start_time: 1000,
+            end_time: Some(2000),
+            artifact_uri: None,
+            lifecycle_stage: "active".to_string(),
+        };
+        assert_eq!(info.end_time, Some(2000));
+    }
+
+    // ========================================================================
+    // Run Tests
+    // ========================================================================
+
+    #[test]
+    fn test_run_creation() {
+        let run = Run {
+            info: RunInfo {
+                run_id: "test-run".to_string(),
+                experiment_id: "test-exp".to_string(),
+                status: RunStatus::Running,
+                start_time: 0,
+                end_time: None,
+                artifact_uri: None,
+                lifecycle_stage: "active".to_string(),
+            },
+            data: RunData::default(),
+        };
+        assert_eq!(run.info.run_id, "test-run");
+    }
+
+    // ========================================================================
+    // Client Tests
+    // ========================================================================
+
+    #[test]
     fn test_client_url_normalization() {
         let client = MlflowClient::new("http://localhost:5000/");
         assert_eq!(client.base_url, "http://localhost:5000");
+    }
+
+    #[test]
+    fn test_client_url_no_trailing_slash() {
+        let client = MlflowClient::new("http://mlflow.example.com");
+        assert_eq!(client.base_url, "http://mlflow.example.com");
+    }
+
+    #[test]
+    fn test_client_endpoint() {
+        let client = MlflowClient::new("http://localhost:5000");
+        let endpoint = client.endpoint("experiments/create");
+        assert_eq!(endpoint, "http://localhost:5000/api/2.0/mlflow/experiments/create");
+    }
+
+    // ========================================================================
+    // Error Tests
+    // ========================================================================
+
+    #[test]
+    fn test_error_display_api() {
+        let err = MlflowError::Api {
+            message: "Not found".to_string(),
+        };
+        assert!(err.to_string().contains("Not found"));
+    }
+
+    #[test]
+    fn test_error_display_serialization() {
+        let json_err = serde_json::from_str::<Metric>("invalid").unwrap_err();
+        let err = MlflowError::Serialization(json_err);
+        assert!(err.to_string().contains("Serialization"));
+    }
+
+    #[test]
+    fn test_error_debug() {
+        let err = MlflowError::Api {
+            message: "test".to_string(),
+        };
+        let debug = format!("{:?}", err);
+        assert!(debug.contains("Api"));
     }
 }
