@@ -65,6 +65,39 @@ jobs:
             fi
           done
 
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit
+
+      - name: Install cargo-deny
+        run: cargo install cargo-deny
+
+      - name: Security audit
+        run: |
+          for dir in demos/course*/week*/*/; do
+            if [ -f "${dir}Cargo.toml" ]; then
+              echo "Auditing: $dir"
+              (cd "$dir" && cargo audit) || true
+            fi
+          done
+
+      - name: License check
+        run: |
+          for dir in demos/course*/week*/*/; do
+            if [ -f "${dir}Cargo.toml" ]; then
+              echo "Checking licenses: $dir"
+              (cd "$dir" && cargo deny check licenses 2>/dev/null) || true
+            fi
+          done
+        continue-on-error: true
+
   quality:
     runs-on: ubuntu-latest
     steps:
