@@ -43,9 +43,8 @@ impl Dataset {
     pub fn generate_classification(n_samples: usize, n_features: usize, _seed: u64) -> Self {
         let mut rng = rand::thread_rng();
 
-        let feature_names: Vec<String> = (0..n_features)
-            .map(|i| format!("feature_{}", i))
-            .collect();
+        let feature_names: Vec<String> =
+            (0..n_features).map(|i| format!("feature_{}", i)).collect();
 
         let mut features = Vec::with_capacity(n_samples);
         let mut labels = Vec::with_capacity(n_samples);
@@ -76,9 +75,8 @@ impl Dataset {
     pub fn generate_regression(n_samples: usize, n_features: usize, _seed: u64) -> Self {
         let mut rng = rand::thread_rng();
 
-        let feature_names: Vec<String> = (0..n_features)
-            .map(|i| format!("feature_{}", i))
-            .collect();
+        let feature_names: Vec<String> =
+            (0..n_features).map(|i| format!("feature_{}", i)).collect();
 
         let mut features = Vec::with_capacity(n_samples);
         let mut labels = Vec::with_capacity(n_samples);
@@ -379,10 +377,13 @@ impl ModelCard {
 
 fn chrono_lite_now() -> String {
     // Simple timestamp without chrono dependency
-    format!("{}", std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap()
-        .as_secs())
+    format!(
+        "{}",
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_secs()
+    )
 }
 
 // ============================================================================
@@ -455,7 +456,10 @@ fn main() {
     let test_acc = tree.accuracy(&test.features, &test.labels);
 
     println!("   Training time: {:?}", train_time);
-    println!("   Split: feature_{} <= {:.4}", tree.feature_index, tree.threshold);
+    println!(
+        "   Split: feature_{} <= {:.4}",
+        tree.feature_index, tree.threshold
+    );
     println!("   Train accuracy: {:.4}", train_acc);
     println!("   Test accuracy:  {:.4}", test_acc);
 
@@ -547,7 +551,10 @@ mod tests {
     #[test]
     fn test_dataset_feature_names() {
         let dataset = Dataset::generate_regression(10, 3, 42);
-        assert_eq!(dataset.feature_names, vec!["feature_0", "feature_1", "feature_2"]);
+        assert_eq!(
+            dataset.feature_names,
+            vec!["feature_0", "feature_1", "feature_2"]
+        );
     }
 
     #[test]
@@ -656,7 +663,11 @@ mod tests {
         let tree = DecisionStump::fit(&dataset.features, &dataset.labels);
 
         let accuracy = tree.accuracy(&dataset.features, &dataset.labels);
-        assert!(accuracy > 0.5, "Accuracy should be better than random: {}", accuracy);
+        assert!(
+            accuracy > 0.5,
+            "Accuracy should be better than random: {}",
+            accuracy
+        );
     }
 
     #[test]
@@ -727,7 +738,10 @@ mod tests {
         card.add_param("learning_rate", "0.01");
 
         assert_eq!(card.metrics.get("accuracy"), Some(&0.95));
-        assert_eq!(card.parameters.get("learning_rate"), Some(&"0.01".to_string()));
+        assert_eq!(
+            card.parameters.get("learning_rate"),
+            Some(&"0.01".to_string())
+        );
     }
 
     #[test]

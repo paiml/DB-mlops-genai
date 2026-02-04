@@ -53,14 +53,12 @@ impl SimpleTokenizer {
 
         // Common tokens (simplified vocabulary)
         let common_tokens = [
-            "the", "a", "an", "is", "are", "was", "were", "be", "been",
-            "have", "has", "had", "do", "does", "did", "will", "would",
-            "could", "should", "may", "might", "must", "shall", "can",
-            "hello", "world", "how", "what", "when", "where", "why", "who",
-            "capital", "france", "paris", "of", "in", "on", "at", "to",
-            "and", "or", "but", "not", "this", "that", "it", "for", "with",
-            "AI", "machine", "learning", "model", "data", "train", "test",
-            " ", ".", ",", "?", "!", ":", ";", "'", "\"", "-", "_",
+            "the", "a", "an", "is", "are", "was", "were", "be", "been", "have", "has", "had", "do",
+            "does", "did", "will", "would", "could", "should", "may", "might", "must", "shall",
+            "can", "hello", "world", "how", "what", "when", "where", "why", "who", "capital",
+            "france", "paris", "of", "in", "on", "at", "to", "and", "or", "but", "not", "this",
+            "that", "it", "for", "with", "AI", "machine", "learning", "model", "data", "train",
+            "test", " ", ".", ",", "?", "!", ":", ";", "'", "\"", "-", "_",
         ];
 
         for (i, token) in common_tokens.iter().enumerate() {
@@ -287,10 +285,13 @@ impl LlmServer {
             "Paris is the capital of France.".to_string()
         } else if prompt_lower.contains("hello") {
             "Hello! How can I assist you today?".to_string()
-        } else if prompt_lower.contains("what is ai") || prompt_lower.contains("what is artificial intelligence") {
+        } else if prompt_lower.contains("what is ai")
+            || prompt_lower.contains("what is artificial intelligence")
+        {
             "AI is the simulation of human intelligence by machines.".to_string()
         } else if prompt_lower.contains("machine learning") {
-            "Machine learning is a subset of AI that enables systems to learn from data.".to_string()
+            "Machine learning is a subset of AI that enables systems to learn from data."
+                .to_string()
         } else {
             "I understand your query. Let me provide a helpful response.".to_string()
         }
@@ -446,8 +447,7 @@ fn main() {
 
     // Step 2: Model Info
     println!("🤖 Step 2: Model Configuration");
-    let model_info = ModelInfo::new("llama-7b", 7_000_000_000)
-        .with_quantization("Q4_K_M");
+    let model_info = ModelInfo::new("llama-7b", 7_000_000_000).with_quantization("Q4_K_M");
 
     println!("   Name: {}", model_info.name);
     println!("   Parameters: {}B", model_info.parameters / 1_000_000_000);
@@ -476,9 +476,10 @@ fn main() {
             Ok(response) => {
                 println!("   Prompt: \"{}\"", prompt);
                 println!("   Response: \"{}\"", response.choices[0].text);
-                println!("   Tokens: {} prompt + {} completion\n",
-                    response.usage.prompt_tokens,
-                    response.usage.completion_tokens);
+                println!(
+                    "   Tokens: {} prompt + {} completion\n",
+                    response.usage.prompt_tokens, response.usage.completion_tokens
+                );
             }
             Err(e) => println!("   Error: {}\n", e),
         }
@@ -518,10 +519,18 @@ fn main() {
     let q4 = QuantizationInfo::gguf_q4();
     let q8 = QuantizationInfo::gguf_q8();
 
-    println!("   {} ({}-bit): {:.0}% of original size",
-        q4.method, q4.bits, q4.size_reduction * 100.0);
-    println!("   {} ({}-bit): {:.0}% of original size\n",
-        q8.method, q8.bits, q8.size_reduction * 100.0);
+    println!(
+        "   {} ({}-bit): {:.0}% of original size",
+        q4.method,
+        q4.bits,
+        q4.size_reduction * 100.0
+    );
+    println!(
+        "   {} ({}-bit): {:.0}% of original size\n",
+        q8.method,
+        q8.bits,
+        q8.size_reduction * 100.0
+    );
 
     // Summary
     println!("═══════════════════════════════════════════════════════════════");

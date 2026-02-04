@@ -74,9 +74,9 @@ impl PromptTemplate {
 
         for var in &self.variables {
             let placeholder = format!("{{{}}}", var);
-            let value = values.get(var).ok_or_else(|| {
-                PromptError::Template(format!("Missing variable: {}", var))
-            })?;
+            let value = values
+                .get(var)
+                .ok_or_else(|| PromptError::Template(format!("Missing variable: {}", var)))?;
             result = result.replace(&placeholder, value);
         }
 
@@ -109,9 +109,10 @@ impl PromptLibrary {
         ).with_description("Zero-shot sentiment classification"));
 
         // Few-shot classification
-        self.add(PromptTemplate::new(
-            "classify_sentiment_few_shot",
-            r#"Classify the sentiment of texts as positive, negative, or neutral.
+        self.add(
+            PromptTemplate::new(
+                "classify_sentiment_few_shot",
+                r#"Classify the sentiment of texts as positive, negative, or neutral.
 
 Text: "I love this product! It's amazing."
 Sentiment: positive
@@ -123,24 +124,30 @@ Text: "The product arrived on time."
 Sentiment: neutral
 
 Text: "{text}"
-Sentiment:"#
-        ).with_description("Few-shot sentiment classification with examples"));
+Sentiment:"#,
+            )
+            .with_description("Few-shot sentiment classification with examples"),
+        );
 
         // Chain of thought
-        self.add(PromptTemplate::new(
-            "math_cot",
-            r#"Solve the following problem step by step.
+        self.add(
+            PromptTemplate::new(
+                "math_cot",
+                r#"Solve the following problem step by step.
 
 Problem: {problem}
 
 Let me think through this step by step:
-1."#
-        ).with_description("Chain-of-thought math reasoning"));
+1."#,
+            )
+            .with_description("Chain-of-thought math reasoning"),
+        );
 
         // Structured output
-        self.add(PromptTemplate::new(
-            "extract_entities",
-            r#"Extract entities from the text and return as JSON.
+        self.add(
+            PromptTemplate::new(
+                "extract_entities",
+                r#"Extract entities from the text and return as JSON.
 
 Text: {text}
 
@@ -149,13 +156,16 @@ Return a JSON object with these fields:
 - organizations: list of organization names
 - locations: list of location names
 
-JSON:"#
-        ).with_description("Named entity extraction with JSON output"));
+JSON:"#,
+            )
+            .with_description("Named entity extraction with JSON output"),
+        );
 
         // Role-based
-        self.add(PromptTemplate::new(
-            "code_review",
-            r#"You are an expert code reviewer. Review the following code for:
+        self.add(
+            PromptTemplate::new(
+                "code_review",
+                r#"You are an expert code reviewer. Review the following code for:
 1. Bugs and errors
 2. Security vulnerabilities
 3. Performance issues
@@ -166,14 +176,19 @@ Code:
 {code}
 ```
 
-Review:"#
-        ).with_description("Code review with specific criteria"));
+Review:"#,
+            )
+            .with_description("Code review with specific criteria"),
+        );
 
         // Summarization
-        self.add(PromptTemplate::new(
-            "summarize",
-            "Summarize the following text in {length} sentences.\n\nText: {text}\n\nSummary:"
-        ).with_description("Controllable length summarization"));
+        self.add(
+            PromptTemplate::new(
+                "summarize",
+                "Summarize the following text in {length} sentences.\n\nText: {text}\n\nSummary:",
+            )
+            .with_description("Controllable length summarization"),
+        );
     }
 
     pub fn add(&mut self, template: PromptTemplate) {
@@ -323,7 +338,9 @@ impl JsonOutputParser {
                 serde_json::from_str(json_str)
                     .map_err(|e| PromptError::Validation(format!("JSON parse error: {}", e)))
             }
-            _ => Err(PromptError::Validation("No valid JSON found in output".to_string())),
+            _ => Err(PromptError::Validation(
+                "No valid JSON found in output".to_string(),
+            )),
         }
     }
 }
@@ -401,7 +418,10 @@ fn main() {
     // Format a template
     if let Some(template) = library.get("classify_sentiment") {
         let mut values = HashMap::new();
-        values.insert("text".to_string(), "This product exceeded my expectations!".to_string());
+        values.insert(
+            "text".to_string(),
+            "This product exceeded my expectations!".to_string(),
+        );
 
         match template.format(&values) {
             Ok(prompt) => {
@@ -455,7 +475,10 @@ fn main() {
     println!("💭 Step 4: Chain of Thought");
     if let Some(template) = library.get("math_cot") {
         let mut values = HashMap::new();
-        values.insert("problem".to_string(), "If a train travels 60 mph for 2.5 hours, how far does it go?".to_string());
+        values.insert(
+            "problem".to_string(),
+            "If a train travels 60 mph for 2.5 hours, how far does it go?".to_string(),
+        );
 
         match template.format(&values) {
             Ok(prompt) => {
@@ -552,15 +575,14 @@ mod tests {
 
     #[test]
     fn test_template_with_description() {
-        let template = PromptTemplate::new("test", "Hello {name}!")
-            .with_description("A greeting template");
+        let template =
+            PromptTemplate::new("test", "Hello {name}!").with_description("A greeting template");
         assert_eq!(template.description, "A greeting template");
     }
 
     #[test]
     fn test_template_serialization() {
-        let template = PromptTemplate::new("test", "Hello {name}!")
-            .with_description("Greeting");
+        let template = PromptTemplate::new("test", "Hello {name}!").with_description("Greeting");
         let json = serde_json::to_string(&template).unwrap();
         let restored: PromptTemplate = serde_json::from_str(&json).unwrap();
         assert_eq!(template.name, restored.name);
@@ -662,8 +684,8 @@ mod tests {
 
     #[test]
     fn test_prompt_builder_with_output_format() {
-        let builder = PromptBuilder::new("Classify")
-            .output_format("JSON object with 'label' field");
+        let builder =
+            PromptBuilder::new("Classify").output_format("JSON object with 'label' field");
         let prompt = builder.build();
         assert!(prompt.contains("Output format:"));
     }
@@ -729,7 +751,8 @@ mod tests {
     #[test]
     fn test_json_parser_nested() {
         let output = r#"{"outer": {"inner": "value"}}"#;
-        let parsed: HashMap<String, HashMap<String, String>> = JsonOutputParser::parse(output).unwrap();
+        let parsed: HashMap<String, HashMap<String, String>> =
+            JsonOutputParser::parse(output).unwrap();
         assert_eq!(
             parsed.get("outer").unwrap().get("inner"),
             Some(&"value".to_string())
@@ -777,8 +800,7 @@ mod tests {
 
     #[test]
     fn test_prompt_metrics_role_based() {
-        let builder = PromptBuilder::new("Classify")
-            .system("You are an expert classifier");
+        let builder = PromptBuilder::new("Classify").system("You are an expert classifier");
         let prompt = builder.build();
         let metrics = PromptMetrics::analyze(&prompt, &builder);
 
@@ -788,8 +810,8 @@ mod tests {
 
     #[test]
     fn test_prompt_metrics_structured() {
-        let builder = PromptBuilder::new("Extract entities")
-            .output_format("JSON with people, places, orgs");
+        let builder =
+            PromptBuilder::new("Extract entities").output_format("JSON with people, places, orgs");
         let prompt = builder.build();
         let metrics = PromptMetrics::analyze(&prompt, &builder);
 

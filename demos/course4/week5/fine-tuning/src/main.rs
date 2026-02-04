@@ -145,10 +145,7 @@ impl Default for LoraConfig {
             r: 8,
             alpha: 16,
             dropout: 0.05,
-            target_modules: vec![
-                "q_proj".to_string(),
-                "v_proj".to_string(),
-            ],
+            target_modules: vec!["q_proj".to_string(), "v_proj".to_string()],
             bias: "none".to_string(),
         }
     }
@@ -287,7 +284,9 @@ pub struct TrainingHistory {
 
 impl TrainingHistory {
     pub fn new() -> Self {
-        Self { metrics: Vec::new() }
+        Self {
+            metrics: Vec::new(),
+        }
     }
 
     pub fn add(&mut self, metrics: TrainingMetrics) {
@@ -450,9 +449,11 @@ fn main() {
 
     let model_params = 7_000_000_000u64;
     let trainable = lora.trainable_params(model_params);
-    println!("   Trainable params: {} ({:.4}%)\n",
+    println!(
+        "   Trainable params: {} ({:.4}%)\n",
         trainable,
-        trainable as f64 / model_params as f64 * 100.0);
+        trainable as f64 / model_params as f64 * 100.0
+    );
 
     // Step 3: QLoRA Configuration
     println!("💾 Step 3: QLoRA (Quantized LoRA)");
@@ -461,7 +462,10 @@ fn main() {
     println!("   Bits: {}", qlora.bits);
     println!("   Double quantization: {}", qlora.double_quant);
     println!("   Quant type: {}", qlora.quant_type);
-    println!("   Memory reduction: {:.0}%\n", (1.0 - qlora.memory_reduction()) * 100.0);
+    println!(
+        "   Memory reduction: {:.0}%\n",
+        (1.0 - qlora.memory_reduction()) * 100.0
+    );
 
     // Step 4: Training Configuration
     println!("⚙️  Step 4: Training Configuration");
@@ -469,7 +473,10 @@ fn main() {
     let config = TrainingConfig::default();
     println!("   Learning rate: {:.0e}", config.learning_rate);
     println!("   Batch size: {}", config.batch_size);
-    println!("   Gradient accumulation: {}", config.gradient_accumulation_steps);
+    println!(
+        "   Gradient accumulation: {}",
+        config.gradient_accumulation_steps
+    );
     println!("   Effective batch size: {}", config.effective_batch_size());
     println!("   Epochs: {}", config.epochs);
     println!("   Max sequence length: {}\n", config.max_seq_length);

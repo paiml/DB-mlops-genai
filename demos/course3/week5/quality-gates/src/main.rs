@@ -409,11 +409,18 @@ fn main() {
     );
 
     println!("   TDG Score: {:?}", tdg.overall_grade);
-    println!("   Complexity: avg={:.1}, max={}", tdg.complexity.cyclomatic_avg, tdg.complexity.cyclomatic_max);
-    println!("   Coverage: line={:.1}%, branch={:.1}%, mutation={:.1}%",
-        tdg.coverage.line_coverage, tdg.coverage.branch_coverage, tdg.coverage.mutation_score);
-    println!("   Security: {} vulnerabilities, {} advisories",
-        tdg.security.vulnerabilities, tdg.security.advisories);
+    println!(
+        "   Complexity: avg={:.1}, max={}",
+        tdg.complexity.cyclomatic_avg, tdg.complexity.cyclomatic_max
+    );
+    println!(
+        "   Coverage: line={:.1}%, branch={:.1}%, mutation={:.1}%",
+        tdg.coverage.line_coverage, tdg.coverage.branch_coverage, tdg.coverage.mutation_score
+    );
+    println!(
+        "   Security: {} vulnerabilities, {} advisories",
+        tdg.security.vulnerabilities, tdg.security.advisories
+    );
 
     // -------------------------------------------------------------------------
     // Demo 2: Quality Gate Evaluation
@@ -432,7 +439,11 @@ fn main() {
     metrics.insert("error_rate".to_string(), 0.005);
 
     let result = gate.evaluate(&metrics);
-    println!("   Gate: {} - {}", result.name, if result.passed { "PASSED" } else { "FAILED" });
+    println!(
+        "   Gate: {} - {}",
+        result.name,
+        if result.passed { "PASSED" } else { "FAILED" }
+    );
     for check in &result.check_results {
         let status = if check.passed { "✓" } else { "✗" };
         println!("   {} {}", status, check.message);
@@ -474,8 +485,14 @@ fn main() {
     let drift_bad = DriftMetrics::calculate("amount", &baseline, &current_drift);
 
     println!("   Feature: amount");
-    println!("   No drift:   PSI={:.4}, drift={}", drift_ok.psi, drift_ok.drift_detected);
-    println!("   With drift: PSI={:.4}, drift={}", drift_bad.psi, drift_bad.drift_detected);
+    println!(
+        "   No drift:   PSI={:.4}, drift={}",
+        drift_ok.psi, drift_ok.drift_detected
+    );
+    println!(
+        "   With drift: PSI={:.4}, drift={}",
+        drift_bad.psi, drift_bad.drift_detected
+    );
 
     // -------------------------------------------------------------------------
     // Summary

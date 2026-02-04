@@ -78,7 +78,10 @@ impl LinearModel {
 
     /// Batch prediction
     pub fn predict_batch(&self, batch: &[Vec<f64>]) -> Result<Vec<f64>, InferenceError> {
-        batch.iter().map(|features| self.predict(features)).collect()
+        batch
+            .iter()
+            .map(|features| self.predict(features))
+            .collect()
     }
 }
 
@@ -251,9 +254,7 @@ async fn predict(
     let latency_ms = start.elapsed().as_secs_f64() * 1000.0;
 
     // Update metrics
-    state
-        .metrics
-        .record_request(predictions.len(), latency_ms);
+    state.metrics.record_request(predictions.len(), latency_ms);
 
     info!(
         "Predicted {} samples in {:.2}ms",
@@ -302,7 +303,7 @@ fn create_demo_model() -> LinearModel {
     LinearModel::new(
         "fraud-detector",
         vec![0.5, -0.3, 0.8, -0.2, 0.4], // 5 features
-        0.1,                              // bias
+        0.1,                             // bias
     )
 }
 

@@ -329,12 +329,20 @@ fn main() {
     println!("📊 Step 1: Vector Embeddings");
     let embedder = SimpleEmbedder::new(128);
 
-    let texts = ["machine learning", "deep learning", "artificial intelligence"];
+    let texts = [
+        "machine learning",
+        "deep learning",
+        "artificial intelligence",
+    ];
     let embeddings: Vec<_> = texts.iter().map(|t| embedder.embed(t)).collect();
 
     for (text, emb) in texts.iter().zip(embeddings.iter()) {
-        println!("   \"{}\": dim={}, norm={:.4}",
-            text, emb.dimension, emb.l2_norm());
+        println!(
+            "   \"{}\": dim={}, norm={:.4}",
+            text,
+            emb.dimension,
+            emb.l2_norm()
+        );
     }
     println!();
 
@@ -357,8 +365,7 @@ fn main() {
     let documents = vec![
         Document::new("doc1", "Machine learning algorithms learn from data")
             .with_metadata("category", "ml"),
-        Document::new("doc2", "Deep learning uses neural networks")
-            .with_metadata("category", "dl"),
+        Document::new("doc2", "Deep learning uses neural networks").with_metadata("category", "dl"),
         Document::new("doc3", "Natural language processing handles text")
             .with_metadata("category", "nlp"),
         Document::new("doc4", "Computer vision analyzes images and video")
@@ -381,11 +388,13 @@ fn main() {
         println!("   Query: \"{}\"", query);
         let results = index.search(query, 3);
         for result in &results {
-            println!("     #{} [score={:.4}] {}: {}",
+            println!(
+                "     #{} [score={:.4}] {}: {}",
                 result.rank,
                 result.score,
                 result.document.id,
-                &result.document.content[..40.min(result.document.content.len())]);
+                &result.document.content[..40.min(result.document.content.len())]
+            );
         }
         println!();
     }
@@ -396,12 +405,18 @@ fn main() {
     let long_text = "This is a longer document that needs to be split into smaller chunks for embedding. Each chunk should have some overlap with adjacent chunks to preserve context.";
 
     let chunks = chunker.chunk(long_text);
-    println!("   Original: {} words", long_text.split_whitespace().count());
+    println!(
+        "   Original: {} words",
+        long_text.split_whitespace().count()
+    );
     println!("   Chunks: {}", chunks.len());
     for (i, chunk) in chunks.iter().enumerate() {
-        println!("     [{}] {} words: \"{}...\"",
-            i, chunk.split_whitespace().count(),
-            &chunk[..30.min(chunk.len())]);
+        println!(
+            "     [{}] {} words: \"{}...\"",
+            i,
+            chunk.split_whitespace().count(),
+            &chunk[..30.min(chunk.len())]
+        );
     }
     println!();
 
@@ -645,7 +660,12 @@ mod tests {
     fn test_vector_search_top_k() {
         let mut index = VectorIndex::new(32);
         for i in 0..10 {
-            index.add(Document::new(&format!("doc{}", i), &format!("content {}", i))).unwrap();
+            index
+                .add(Document::new(
+                    &format!("doc{}", i),
+                    &format!("content {}", i),
+                ))
+                .unwrap();
         }
 
         let results = index.search("content", 3);
@@ -681,8 +701,7 @@ mod tests {
 
     #[test]
     fn test_index_config() {
-        let config = IndexConfig::new("test", 512)
-            .with_metric(SimilarityMetric::DotProduct);
+        let config = IndexConfig::new("test", 512).with_metric(SimilarityMetric::DotProduct);
         assert_eq!(config.dimension, 512);
         assert!(matches!(config.metric, SimilarityMetric::DotProduct));
     }
@@ -777,7 +796,10 @@ mod tests {
 
     #[test]
     fn test_vector_error_dimension_mismatch() {
-        let err = VectorError::DimensionMismatch { expected: 128, got: 64 };
+        let err = VectorError::DimensionMismatch {
+            expected: 128,
+            got: 64,
+        };
         let msg = err.to_string();
         assert!(msg.contains("128"));
         assert!(msg.contains("64"));

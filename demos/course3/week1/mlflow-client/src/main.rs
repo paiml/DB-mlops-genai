@@ -207,7 +207,13 @@ impl MlflowClient {
 
     /// Execute GET request and deserialize response
     async fn get<T: serde::de::DeserializeOwned>(&self, url: &str) -> Result<T, MlflowError> {
-        self.client.get(url).send().await?.json().await.map_err(Into::into)
+        self.client
+            .get(url)
+            .send()
+            .await?
+            .json()
+            .await
+            .map_err(Into::into)
     }
 
     /// Create a new experiment
@@ -223,7 +229,11 @@ impl MlflowClient {
     ///
     /// Maps to: GET /api/2.0/mlflow/experiments/get
     pub async fn get_experiment(&self, experiment_id: &str) -> Result<Experiment, MlflowError> {
-        let url = format!("{}?experiment_id={}", self.endpoint("experiments/get"), experiment_id);
+        let url = format!(
+            "{}?experiment_id={}",
+            self.endpoint("experiments/get"),
+            experiment_id
+        );
         let response: GetExperimentResponse = self.get(&url).await?;
         Ok(response.experiment)
     }
@@ -251,7 +261,13 @@ impl MlflowClient {
     /// Log a metric to a run
     ///
     /// Maps to: POST /api/2.0/mlflow/runs/log-metric
-    pub async fn log_metric(&self, run_id: &str, key: &str, value: f64, step: Option<i64>) -> Result<(), MlflowError> {
+    pub async fn log_metric(
+        &self,
+        run_id: &str,
+        key: &str,
+        value: f64,
+        step: Option<i64>,
+    ) -> Result<(), MlflowError> {
         let body = serde_json::json!({
             "run_id": run_id,
             "key": key,
@@ -265,7 +281,12 @@ impl MlflowClient {
     /// Log multiple metrics in a batch
     ///
     /// Maps to: POST /api/2.0/mlflow/runs/log-batch
-    pub async fn log_batch(&self, run_id: &str, metrics: Vec<Metric>, params: Vec<Param>) -> Result<(), MlflowError> {
+    pub async fn log_batch(
+        &self,
+        run_id: &str,
+        metrics: Vec<Metric>,
+        params: Vec<Param>,
+    ) -> Result<(), MlflowError> {
         let body = serde_json::json!({ "run_id": run_id, "metrics": metrics, "params": params });
         self.post_void("runs/log-batch", &body).await
     }
@@ -285,7 +306,11 @@ impl MlflowClient {
     /// Search runs in an experiment
     ///
     /// Maps to: POST /api/2.0/mlflow/runs/search
-    pub async fn search_runs(&self, experiment_ids: &[&str], filter: Option<&str>) -> Result<Vec<Run>, MlflowError> {
+    pub async fn search_runs(
+        &self,
+        experiment_ids: &[&str],
+        filter: Option<&str>,
+    ) -> Result<Vec<Run>, MlflowError> {
         let body = serde_json::json!({
             "experiment_ids": experiment_ids,
             "filter": filter.unwrap_or("")
@@ -322,9 +347,7 @@ async fn demo_training_run(client: &MlflowClient, experiment_id: &str) -> Result
         let loss = 1.0 / (epoch as f64 + 1.0) + 0.1;
         let accuracy = 1.0 - loss + 0.05;
 
-        client
-            .log_metric(run_id, "loss", loss, Some(epoch))
-            .await?;
+        client.log_metric(run_id, "loss", loss, Some(epoch)).await?;
         client
             .log_metric(run_id, "accuracy", accuracy.min(0.99), Some(epoch))
             .await?;
@@ -702,7 +725,10 @@ mod tests {
     fn test_client_endpoint() {
         let client = MlflowClient::new("http://localhost:5000");
         let endpoint = client.endpoint("experiments/create");
-        assert_eq!(endpoint, "http://localhost:5000/api/2.0/mlflow/experiments/create");
+        assert_eq!(
+            endpoint,
+            "http://localhost:5000/api/2.0/mlflow/experiments/create"
+        );
     }
 
     // ========================================================================

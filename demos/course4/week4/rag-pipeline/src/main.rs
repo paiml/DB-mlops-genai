@@ -271,7 +271,9 @@ Answer:"#.to_string()
         let retrieved = self.vector_store.search(question, self.top_k);
 
         if retrieved.is_empty() {
-            return Err(RagError::Retrieval("No relevant documents found".to_string()));
+            return Err(RagError::Retrieval(
+                "No relevant documents found".to_string(),
+            ));
         }
 
         // 2. Build context
@@ -318,7 +320,10 @@ Answer:"#.to_string()
         } else if q_lower.contains("how") {
             "According to the retrieved documents, the process involves multiple steps as described in the context.".to_string()
         } else if c_lower.contains(&q_lower.split_whitespace().next().unwrap_or("")) {
-            format!("Based on the retrieved context, I found relevant information about your query: {}", &context[..100.min(context.len())])
+            format!(
+                "Based on the retrieved context, I found relevant information about your query: {}",
+                &context[..100.min(context.len())]
+            )
         } else {
             "Based on the provided context, I can answer your question using the retrieved information.".to_string()
         }
@@ -349,7 +354,10 @@ impl RagMetrics {
             0.0
         };
 
-        let context_relevance = if response.context_used.contains(&response.query.split_whitespace().next().unwrap_or("")) {
+        let context_relevance = if response
+            .context_used
+            .contains(&response.query.split_whitespace().next().unwrap_or(""))
+        {
             0.8
         } else {
             0.5
@@ -359,7 +367,8 @@ impl RagMetrics {
             Some(gt) => {
                 let answer_lower = response.answer.to_lowercase();
                 let gt_lower = gt.to_lowercase();
-                let answer_words: std::collections::HashSet<_> = answer_lower.split_whitespace().collect();
+                let answer_words: std::collections::HashSet<_> =
+                    answer_lower.split_whitespace().collect();
                 let gt_words: std::collections::HashSet<_> = gt_lower.split_whitespace().collect();
                 let overlap = answer_words.intersection(&gt_words).count();
                 overlap as f32 / gt_words.len().max(1) as f32
@@ -440,9 +449,15 @@ fn main() {
         let metrics = RagMetrics::evaluate(&response, Some(ground_truth));
 
         println!("   Metrics:");
-        println!("     Retrieval Precision: {:.2}", metrics.retrieval_precision);
+        println!(
+            "     Retrieval Precision: {:.2}",
+            metrics.retrieval_precision
+        );
         println!("     Context Relevance: {:.2}", metrics.context_relevance);
-        println!("     Answer Faithfulness: {:.2}", metrics.answer_faithfulness);
+        println!(
+            "     Answer Faithfulness: {:.2}",
+            metrics.answer_faithfulness
+        );
     }
     println!();
 
@@ -482,8 +497,7 @@ mod tests {
 
     #[test]
     fn test_document_with_metadata() {
-        let doc = Document::new("doc1", "content")
-            .with_metadata("key", "value");
+        let doc = Document::new("doc1", "content").with_metadata("key", "value");
         assert_eq!(doc.metadata.get("key"), Some(&"value".to_string()));
     }
 
@@ -508,7 +522,7 @@ mod tests {
     #[test]
     fn test_document_chunk_ids() {
         let mut doc = Document::new("doc1", "hello world this is a test document");
-        doc.chunk(10, 0);  // Single chunk
+        doc.chunk(10, 0); // Single chunk
         assert!(doc.chunks[0].id.contains("doc1-chunk-0"));
     }
 
@@ -651,7 +665,10 @@ mod tests {
     fn test_rag_pipeline() {
         let mut rag = RagPipeline::new(64).with_top_k(2);
 
-        let mut doc = Document::new("test", "Machine learning enables pattern recognition in data");
+        let mut doc = Document::new(
+            "test",
+            "Machine learning enables pattern recognition in data",
+        );
         doc.chunk(10, 2);
         rag.ingest(doc);
 
@@ -661,8 +678,7 @@ mod tests {
 
     #[test]
     fn test_rag_pipeline_with_template() {
-        let rag = RagPipeline::new(64)
-            .with_template("Custom template: {context} - {question}");
+        let rag = RagPipeline::new(64).with_template("Custom template: {context} - {question}");
         // Template should be updated
         assert!(rag.document_count() == 0);
     }

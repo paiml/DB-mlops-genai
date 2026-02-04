@@ -377,8 +377,14 @@ fn main() {
     let mut feature_engine = FeatureEngine::new();
     feature_engine.fit(&train_tx);
 
-    let train_features: Vec<Features> = train_tx.iter().map(|tx| feature_engine.transform(tx)).collect();
-    let _test_features: Vec<Features> = test_tx.iter().map(|tx| feature_engine.transform(tx)).collect();
+    let train_features: Vec<Features> = train_tx
+        .iter()
+        .map(|tx| feature_engine.transform(tx))
+        .collect();
+    let _test_features: Vec<Features> = test_tx
+        .iter()
+        .map(|tx| feature_engine.transform(tx))
+        .collect();
 
     println!("   Amount mean: {:.2}", feature_engine.amount_mean);
     println!("   Amount std: {:.2}", feature_engine.amount_std);
@@ -436,7 +442,11 @@ fn main() {
     println!("   Latency:   {:.3}ms", report.latency_avg_ms);
     println!(
         "   Quality Gate: {}",
-        if report.passed { "PASSED ✓" } else { "FAILED ✗" }
+        if report.passed {
+            "PASSED ✓"
+        } else {
+            "FAILED ✗"
+        }
     );
 
     // -------------------------------------------------------------------------
@@ -571,9 +581,30 @@ mod tests {
     fn test_feature_engine_fit() {
         let mut engine = FeatureEngine::new();
         let transactions = vec![
-            Transaction { id: 0, amount: 100.0, merchant_category: 1, hour_of_day: 12, day_of_week: 1, is_online: false },
-            Transaction { id: 1, amount: 200.0, merchant_category: 2, hour_of_day: 14, day_of_week: 2, is_online: true },
-            Transaction { id: 2, amount: 300.0, merchant_category: 3, hour_of_day: 16, day_of_week: 3, is_online: false },
+            Transaction {
+                id: 0,
+                amount: 100.0,
+                merchant_category: 1,
+                hour_of_day: 12,
+                day_of_week: 1,
+                is_online: false,
+            },
+            Transaction {
+                id: 1,
+                amount: 200.0,
+                merchant_category: 2,
+                hour_of_day: 14,
+                day_of_week: 2,
+                is_online: true,
+            },
+            Transaction {
+                id: 2,
+                amount: 300.0,
+                merchant_category: 3,
+                hour_of_day: 16,
+                day_of_week: 3,
+                is_online: false,
+            },
         ];
         engine.fit(&transactions);
         assert!((engine.amount_mean - 200.0).abs() < 0.001);
@@ -781,8 +812,22 @@ mod tests {
         let mut server = InferenceServer::new(model, engine);
 
         let transactions = vec![
-            Transaction { id: 1, amount: 100.0, merchant_category: 1, hour_of_day: 12, day_of_week: 2, is_online: false },
-            Transaction { id: 2, amount: 200.0, merchant_category: 5, hour_of_day: 3, day_of_week: 6, is_online: true },
+            Transaction {
+                id: 1,
+                amount: 100.0,
+                merchant_category: 1,
+                hour_of_day: 12,
+                day_of_week: 2,
+                is_online: false,
+            },
+            Transaction {
+                id: 2,
+                amount: 200.0,
+                merchant_category: 5,
+                hour_of_day: 3,
+                day_of_week: 6,
+                is_online: true,
+            },
         ];
 
         let predictions = server.predict_batch(&transactions);
@@ -817,8 +862,18 @@ mod tests {
     #[test]
     fn test_quality_evaluation() {
         let predictions = vec![
-            Prediction { transaction_id: 0, fraud_probability: 0.9, is_fraud: true, confidence: 0.8 },
-            Prediction { transaction_id: 1, fraud_probability: 0.1, is_fraud: false, confidence: 0.8 },
+            Prediction {
+                transaction_id: 0,
+                fraud_probability: 0.9,
+                is_fraud: true,
+                confidence: 0.8,
+            },
+            Prediction {
+                transaction_id: 1,
+                fraud_probability: 0.1,
+                is_fraud: false,
+                confidence: 0.8,
+            },
         ];
         let labels = vec![true, false];
 
@@ -830,8 +885,18 @@ mod tests {
     #[test]
     fn test_quality_evaluation_all_wrong() {
         let predictions = vec![
-            Prediction { transaction_id: 0, fraud_probability: 0.9, is_fraud: true, confidence: 0.8 },
-            Prediction { transaction_id: 1, fraud_probability: 0.9, is_fraud: true, confidence: 0.8 },
+            Prediction {
+                transaction_id: 0,
+                fraud_probability: 0.9,
+                is_fraud: true,
+                confidence: 0.8,
+            },
+            Prediction {
+                transaction_id: 1,
+                fraud_probability: 0.9,
+                is_fraud: true,
+                confidence: 0.8,
+            },
         ];
         let labels = vec![false, false]; // All wrong
 
@@ -842,9 +907,12 @@ mod tests {
 
     #[test]
     fn test_quality_evaluation_latency_gate() {
-        let predictions = vec![
-            Prediction { transaction_id: 0, fraud_probability: 0.9, is_fraud: true, confidence: 0.8 },
-        ];
+        let predictions = vec![Prediction {
+            transaction_id: 0,
+            fraud_probability: 0.9,
+            is_fraud: true,
+            confidence: 0.8,
+        }];
         let labels = vec![true];
 
         let report = evaluate_model(&predictions, &labels, 100.0); // High latency
@@ -883,8 +951,18 @@ mod tests {
     #[test]
     fn test_evaluate_model_no_positives() {
         let predictions = vec![
-            Prediction { transaction_id: 0, fraud_probability: 0.1, is_fraud: false, confidence: 0.8 },
-            Prediction { transaction_id: 1, fraud_probability: 0.1, is_fraud: false, confidence: 0.8 },
+            Prediction {
+                transaction_id: 0,
+                fraud_probability: 0.1,
+                is_fraud: false,
+                confidence: 0.8,
+            },
+            Prediction {
+                transaction_id: 1,
+                fraud_probability: 0.1,
+                is_fraud: false,
+                confidence: 0.8,
+            },
         ];
         let labels = vec![false, false];
 

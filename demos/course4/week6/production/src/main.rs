@@ -339,7 +339,9 @@ impl ProductionServer {
         let input_check = self.guardrails.check_input(&request.prompt);
         if !input_check.passed {
             self.metrics.record_guardrail_violation();
-            return Err(ProductionError::Guardrail(input_check.violations.join("; ")));
+            return Err(ProductionError::Guardrail(
+                input_check.violations.join("; "),
+            ));
         }
 
         // 3. Generate response (simulated)
@@ -350,7 +352,9 @@ impl ProductionServer {
         let output_check = self.guardrails.check_output(&content);
         if !output_check.passed {
             self.metrics.record_guardrail_violation();
-            return Err(ProductionError::Guardrail(output_check.violations.join("; ")));
+            return Err(ProductionError::Guardrail(
+                output_check.violations.join("; "),
+            ));
         }
 
         // 5. Calculate usage
@@ -423,7 +427,11 @@ fn main() {
 
     for input in &test_inputs {
         let result = guardrails.check_input(input);
-        let status = if result.passed { "✓ PASS" } else { "✗ FAIL" };
+        let status = if result.passed {
+            "✓ PASS"
+        } else {
+            "✗ FAIL"
+        };
         println!("   {} \"{}...\"", status, &input[..input.len().min(30)]);
         if !result.passed {
             for v in &result.violations {
@@ -511,7 +519,10 @@ fn main() {
         print!("   {} ", request.id);
         match server.process(request.clone()) {
             Ok(response) => {
-                println!("✓ {}ms, {} tokens", response.latency_ms, response.usage.total_tokens);
+                println!(
+                    "✓ {}ms, {} tokens",
+                    response.latency_ms, response.usage.total_tokens
+                );
             }
             Err(e) => println!("✗ {}", e),
         }
@@ -524,7 +535,10 @@ fn main() {
     println!("   Total requests: {}", metrics.total_requests);
     println!("   Success rate: {:.1}%", metrics.success_rate() * 100.0);
     println!("   Avg latency: {:.1}ms", metrics.avg_latency_ms);
-    println!("   Guardrail violations: {}\n", metrics.guardrail_violations);
+    println!(
+        "   Guardrail violations: {}\n",
+        metrics.guardrail_violations
+    );
 
     // Summary
     println!("═══════════════════════════════════════════════════════════════");

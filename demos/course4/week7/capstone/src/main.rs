@@ -192,7 +192,11 @@ impl Default for Guardrails {
 impl Guardrails {
     pub fn check(&self, text: &str) -> Result<(), String> {
         if text.len() > self.max_input_length {
-            return Err(format!("Input too long: {} > {}", text.len(), self.max_input_length));
+            return Err(format!(
+                "Input too long: {} > {}",
+                text.len(),
+                self.max_input_length
+            ));
         }
 
         let text_lower = text.to_lowercase();
@@ -471,10 +475,16 @@ fn main() {
         match assistant.query(query.clone()) {
             Ok(response) => {
                 metrics.record_query(response.latency_ms, true);
-                println!("   A: {}", &response.answer[..response.answer.len().min(80)]);
+                println!(
+                    "   A: {}",
+                    &response.answer[..response.answer.len().min(80)]
+                );
                 println!("   Sources:");
                 for source in &response.sources {
-                    println!("     - {} [score={:.3}]", source.doc_title, source.relevance_score);
+                    println!(
+                        "     - {} [score={:.3}]",
+                        source.doc_title, source.relevance_score
+                    );
                 }
             }
             Err(e) => {
