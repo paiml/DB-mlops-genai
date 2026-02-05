@@ -72,6 +72,23 @@ uv sync --all-extras
 | `alimentar` | Data loading | 3, 4 |
 | `pmat` | Quality gates | 3, 4 |
 
+## Code Search
+
+NEVER use grep or find for code search. Use `pmat query` instead:
+
+```bash
+# Search for functions by intent
+pmat query "chunking overlap" --limit 10
+
+# Include fault pattern detection (batuta integration)
+pmat query "error handling" --faults
+
+# Full analysis with churn and faults
+pmat query "validation" --faults --churn
+```
+
+The `--faults` flag runs batuta bug-hunter to detect mutation targets and boundary conditions inline with results.
+
 ## Code Quality
 
 - Python: `ruff` for linting, `uv` for package management
