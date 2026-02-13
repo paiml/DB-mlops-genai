@@ -55,6 +55,9 @@ coverage.xml
 .pmat/
 .pmat-work/
 
+# --- Claude Code ---
+.claude/skills/
+
 # --- IDE ---
 .idea/
 .vscode/

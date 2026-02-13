@@ -1,0 +1,1442 @@
+<!DOCTYPE HTML>
+<html lang="en" class="navy sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>MLOps &amp; GenAI Engineering on Databricks</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="Courses 3 &amp; 4 of the Databricks Specialization on Coursera">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "ayu" : "navy";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">MLOps &amp; GenAI Engineering on Databricks</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/noahgift/DB-mlops-genai" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="mlops--genai-engineering-on-databricks"><a class="header" href="#mlops--genai-engineering-on-databricks">MLOps &amp; GenAI Engineering on Databricks</a></h1>
+<p><strong>Courses 3 &amp; 4 of the Databricks Specialization on Coursera</strong></p>
+<p>Platform: Databricks Free Edition | Comparison Layer: Sovereign AI Stack (Rust)</p>
+<h2 id="design-philosophy"><a class="header" href="#design-philosophy">Design Philosophy</a></h2>
+<p><strong>Dual-layer pedagogy:</strong></p>
+<ol>
+<li><strong>Databricks layer</strong> — Hands-on with MLflow, Feature Store, Model Serving, Vector Search, Foundation Models</li>
+<li><strong>Sovereign AI Stack layer</strong> — Build the same concepts from scratch in Rust to understand what platforms abstract</li>
+</ol>
+<p><strong>Why both?</strong></p>
+<ul>
+<li>Practitioners need to <em>use</em> Databricks effectively</li>
+<li>Engineers need to <em>understand</em> what's underneath</li>
+<li>"Understand by building" creates deeper retention</li>
+</ul>
+<h2 id="course-overview"><a class="header" href="#course-overview">Course Overview</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Course</th><th>Title</th><th>Duration</th></tr></thead><tbody>
+<tr><td><strong>3</strong></td><td><strong>MLOps Engineering</strong></td><td>~30 hours</td></tr>
+<tr><td><strong>4</strong></td><td><strong>GenAI Engineering</strong></td><td>~34 hours</td></tr>
+</tbody></table>
+</div>
+<h2 id="sovereign-ai-stack"><a class="header" href="#sovereign-ai-stack">Sovereign AI Stack</a></h2>
+<pre><code>┌──────────────────────────────────────────────────────────────────┐
+│                   batuta (Orchestration)                         │
+│              Privacy Tiers · CLI · Stack Coordination            │
+├───────────────────┬──────────────────┬───────────────────────────┤
+│  realizar         │  entrenar        │      pacha                │
+│  (Inference)      │  (Training)      │   (Model Registry)        │
+│  GGUF/SafeTensors │  autograd/LoRA   │  Sign/Encrypt/Lineage     │
+├───────────────────┴──────────────────┴───────────────────────────┤
+│                    aprender                                       │
+│         ML Algorithms: regression, trees, clustering              │
+├──────────────────────────────────────────────────────────────────┤
+│                     trueno                                        │
+│         SIMD/GPU Compute (AVX2/AVX-512/NEON, wgpu)               │
+├──────────────────────────────────────────────────────────────────┤
+│  trueno-rag      │ trueno-db       │ alimentar     │ pmat        │
+│  BM25 + Vector   │ GPU Analytics   │ Arrow/Parquet │ Quality     │
+└──────────────────┴─────────────────┴───────────────┴─────────────┘
+</code></pre>
+<h2 id="prerequisites"><a class="header" href="#prerequisites">Prerequisites</a></h2>
+<h3 id="databricks"><a class="header" href="#databricks">Databricks</a></h3>
+<ul>
+<li>Create a free account at <a href="https://www.databricks.com/">databricks.com</a></li>
+<li>No paid features required</li>
+</ul>
+<h3 id="sovereign-ai-stack-rust"><a class="header" href="#sovereign-ai-stack-rust">Sovereign AI Stack (Rust)</a></h3>
+<pre><code class="language-bash"># Install Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# Key crates
+cargo install batuta realizar pmat
+</code></pre>
+<h2 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h2>
+<p>Begin with <a href="./course3/overview.html">Course 3: MLOps Engineering</a> or jump directly to <a href="./course4/overview.html">Course 4: GenAI Engineering</a> if you're already familiar with MLOps concepts.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="course-3-mlops-engineering-on-databricks"><a class="header" href="#course-3-mlops-engineering-on-databricks">Course 3: MLOps Engineering on Databricks</a></h1>
+<h2 id="subtitle"><a class="header" href="#subtitle">Subtitle</a></h2>
+<p>Build and Deploy ML Systems with MLflow, Feature Store, and Model Serving</p>
+<h2 id="description"><a class="header" href="#description">Description</a></h2>
+<p>Master the complete MLOps lifecycle on Databricks: experiment tracking with MLflow, feature engineering with Feature Store, model management with Unity Catalog, and deployment with Model Serving. Understand each component deeply by building equivalent systems from scratch with the Sovereign AI Stack.</p>
+<h2 id="learning-outcomes"><a class="header" href="#learning-outcomes">Learning Outcomes</a></h2>
+<ol>
+<li>Track experiments and manage model lifecycle with MLflow on Databricks</li>
+<li>Build and serve features using Databricks Feature Store and SQL Warehouses</li>
+<li>Register, version, and govern models with Unity Catalog</li>
+<li>Deploy models for batch and real-time inference</li>
+<li>Implement quality gates and monitoring for production ML</li>
+</ol>
+<h2 id="duration"><a class="header" href="#duration">Duration</a></h2>
+<p>~30 hours | 38 videos | 12 labs | 5 quizzes | 1 capstone</p>
+<h2 id="weeks"><a class="header" href="#weeks">Weeks</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Week</th><th>Topic</th><th>Sovereign AI Stack</th></tr></thead><tbody>
+<tr><td>1</td><td>Experiment Tracking with MLflow</td><td><code>reqwest</code>, <code>serde</code>, <code>pacha</code></td></tr>
+<tr><td>2</td><td>Feature Engineering</td><td><code>alimentar</code>, <code>trueno</code>, <code>delta-rs</code></td></tr>
+<tr><td>3</td><td>Model Training and Registry</td><td><code>aprender</code>, <code>pacha</code></td></tr>
+<tr><td>4</td><td>Model Serving and Inference</td><td><code>realizar</code></td></tr>
+<tr><td>5</td><td>Production Quality and Orchestration</td><td><code>pmat</code>, <code>batuta</code></td></tr>
+<tr><td>6</td><td>Capstone: Fraud Detection Platform</td><td>Full stack</td></tr>
+</tbody></table>
+</div>
+<h2 id="databricks-free-edition-features-used"><a class="header" href="#databricks-free-edition-features-used">Databricks Free Edition Features Used</a></h2>
+<ul>
+<li>Experiments (MLflow Tracking)</li>
+<li>Catalog (Unity Catalog for model registry)</li>
+<li>Jobs &amp; Pipelines (orchestration)</li>
+<li>SQL Warehouses (feature computation)</li>
+<li>Playground (model testing)</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="week-1-experiment-tracking-with-mlflow"><a class="header" href="#week-1-experiment-tracking-with-mlflow">Week 1: Experiment Tracking with MLflow</a></h1>
+<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
+<p>Understand experiment tracking by implementing an MLflow REST client in Rust.</p>
+<h2 id="topics"><a class="header" href="#topics">Topics</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>#</th><th>Type</th><th>Title</th><th>Platform</th><th>Duration</th></tr></thead><tbody>
+<tr><td>1.1</td><td>Video</td><td>The Reproducibility Crisis</td><td>Concept</td><td>8 min</td></tr>
+<tr><td>1.2</td><td>Video</td><td>MLflow Architecture: Tracking, Registry, Projects</td><td>Databricks</td><td>10 min</td></tr>
+<tr><td>1.3</td><td>Lab</td><td>Create Experiments in Databricks</td><td>Databricks</td><td>30 min</td></tr>
+<tr><td>1.4</td><td>Video</td><td>MLflow REST Protocol Deep Dive</td><td>Concept</td><td>10 min</td></tr>
+<tr><td>1.5</td><td>Lab</td><td>Build MLflow Client in Rust</td><td>Sovereign</td><td>40 min</td></tr>
+<tr><td>1.6</td><td>Video</td><td>Autologging and Framework Integration</td><td>Databricks</td><td>8 min</td></tr>
+<tr><td>1.7</td><td>Video</td><td>Artifact Storage: DBFS, S3, Unity Catalog</td><td>Databricks</td><td>8 min</td></tr>
+<tr><td>1.8</td><td>Lab</td><td>Compare: Databricks MLflow vs Rust Client</td><td>Both</td><td>25 min</td></tr>
+<tr><td>1.9</td><td>Quiz</td><td>Experiment Tracking Fundamentals</td><td>—</td><td>15 min</td></tr>
+</tbody></table>
+</div>
+<h2 id="sovereign-ai-stack-components"><a class="header" href="#sovereign-ai-stack-components">Sovereign AI Stack Components</a></h2>
+<ul>
+<li><code>reqwest</code> for HTTP client</li>
+<li><code>serde</code> for JSON serialization</li>
+<li><code>pacha</code> concepts for artifact storage</li>
+</ul>
+<h2 id="key-concepts"><a class="header" href="#key-concepts">Key Concepts</a></h2>
+<h3 id="mlflow-tracking"><a class="header" href="#mlflow-tracking">MLflow Tracking</a></h3>
+<ul>
+<li>Experiments organize related runs</li>
+<li>Runs contain parameters, metrics, and artifacts</li>
+<li>Metrics can be logged at each training step</li>
+</ul>
+<h3 id="rest-api"><a class="header" href="#rest-api">REST API</a></h3>
+<ul>
+<li><code>POST /api/2.0/mlflow/experiments/create</code></li>
+<li><code>POST /api/2.0/mlflow/runs/create</code></li>
+<li><code>POST /api/2.0/mlflow/runs/log-metric</code></li>
+<li><code>POST /api/2.0/mlflow/runs/log-batch</code></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-mlflow-client"><a class="header" href="#lab-mlflow-client">Lab: MLflow Client</a></h1>
+<p>Build an MLflow REST client in Rust to understand experiment tracking internals.</p>
+<h2 id="objectives"><a class="header" href="#objectives">Objectives</a></h2>
+<ul>
+<li>Implement HTTP client for MLflow REST API</li>
+<li>Create experiments and runs</li>
+<li>Log parameters and metrics</li>
+<li>Search and retrieve runs</li>
+</ul>
+<h2 id="demo-code"><a class="header" href="#demo-code">Demo Code</a></h2>
+<p>See <a href="https://github.com/noahgift/DB-mlops-genai/tree/main/demos/course3/week1/mlflow-client"><code>demos/course3/week1/mlflow-client/</code></a></p>
+<h2 id="lab-exercise"><a class="header" href="#lab-exercise">Lab Exercise</a></h2>
+<p>See <a href="https://github.com/noahgift/DB-mlops-genai/tree/main/labs/course3/week1"><code>labs/course3/week1/lab_1_5_mlflow_client.py</code></a></p>
+<h2 id="key-implementation"><a class="header" href="#key-implementation">Key Implementation</a></h2>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct MlflowClient {
+    base_url: String,
+    client: reqwest::Client,
+}
+
+impl MlflowClient {
+    pub async fn log_metric(
+        &amp;self,
+        run_id: &amp;str,
+        key: &amp;str,
+        value: f64,
+    ) -&gt; Result&lt;(), MlflowError&gt; {
+        let body = json!({
+            "run_id": run_id,
+            "key": key,
+            "value": value,
+            "timestamp": Utc::now().timestamp_millis(),
+        });
+        self.post_void("runs/log-metric", &amp;body).await
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="validation"><a class="header" href="#validation">Validation</a></h2>
+<p>Run tests:</p>
+<pre><code class="language-bash">cd demos/course3/week1/mlflow-client
+cargo test
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="week-2-feature-engineering"><a class="header" href="#week-2-feature-engineering">Week 2: Feature Engineering</a></h1>
+<h2 id="overview-1"><a class="header" href="#overview-1">Overview</a></h2>
+<p>Build a feature computation engine with SIMD acceleration and zero-copy data loading.</p>
+<h2 id="topics-1"><a class="header" href="#topics-1">Topics</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>#</th><th>Type</th><th>Title</th><th>Platform</th><th>Duration</th></tr></thead><tbody>
+<tr><td>2.1</td><td>Video</td><td>What is a Feature Store?</td><td>Concept</td><td>10 min</td></tr>
+<tr><td>2.2</td><td>Video</td><td>Databricks Feature Store Architecture</td><td>Databricks</td><td>10 min</td></tr>
+<tr><td>2.3</td><td>Lab</td><td>Create Feature Tables in Unity Catalog</td><td>Databricks</td><td>35 min</td></tr>
+<tr><td>2.4</td><td>Video</td><td>SIMD-Accelerated Feature Computation</td><td>Sovereign</td><td>10 min</td></tr>
+<tr><td>2.5</td><td>Lab</td><td>Build Feature Pipeline with trueno</td><td>Sovereign</td><td>40 min</td></tr>
+<tr><td>2.6</td><td>Video</td><td>Point-in-Time Joins and Data Leakage</td><td>Concept</td><td>8 min</td></tr>
+<tr><td>2.7</td><td>Lab</td><td>Feature Lookup and Online Serving</td><td>Databricks</td><td>30 min</td></tr>
+<tr><td>2.8</td><td>Video</td><td>Delta Lake for Feature Versioning</td><td>Databricks</td><td>8 min</td></tr>
+<tr><td>2.9</td><td>Quiz</td><td>Feature Engineering Systems</td><td>—</td><td>15 min</td></tr>
+</tbody></table>
+</div>
+<h2 id="sovereign-ai-stack-components-1"><a class="header" href="#sovereign-ai-stack-components-1">Sovereign AI Stack Components</a></h2>
+<ul>
+<li><code>alimentar</code> for zero-copy Parquet loading</li>
+<li><code>trueno</code> for SIMD computation</li>
+<li><code>delta-rs</code> for Delta Lake integration</li>
+</ul>
+<h2 id="key-concepts-1"><a class="header" href="#key-concepts-1">Key Concepts</a></h2>
+<h3 id="feature-transformations"><a class="header" href="#feature-transformations">Feature Transformations</a></h3>
+<ul>
+<li>Z-score normalization: <code>(x - mean) / stddev</code></li>
+<li>Min-max scaling: <code>(x - min) / (max - min)</code></li>
+<li>Log transform: <code>ln(x + 1)</code></li>
+<li>Binning: discretize continuous values</li>
+</ul>
+<h3 id="simd-acceleration"><a class="header" href="#simd-acceleration">SIMD Acceleration</a></h3>
+<ul>
+<li>Process 8 floats simultaneously with AVX2</li>
+<li>4-8x speedup over scalar operations</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-feature-pipeline"><a class="header" href="#lab-feature-pipeline">Lab: Feature Pipeline</a></h1>
+<p>Build a SIMD-accelerated feature computation pipeline.</p>
+<h2 id="objectives-1"><a class="header" href="#objectives-1">Objectives</a></h2>
+<ul>
+<li>Compute feature statistics</li>
+<li>Implement normalization transforms</li>
+<li>Build a composable pipeline</li>
+</ul>
+<h2 id="demo-code-1"><a class="header" href="#demo-code-1">Demo Code</a></h2>
+<p>See <a href="https://github.com/noahgift/DB-mlops-genai/tree/main/demos/course3/week2/feature-pipeline"><code>demos/course3/week2/feature-pipeline/</code></a></p>
+<h2 id="lab-exercise-1"><a class="header" href="#lab-exercise-1">Lab Exercise</a></h2>
+<p>See <a href="https://github.com/noahgift/DB-mlops-genai/tree/main/labs/course3/week2"><code>labs/course3/week2/lab_2_5_feature_pipeline.py</code></a></p>
+<h2 id="key-transforms"><a class="header" href="#key-transforms">Key Transforms</a></h2>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn normalize_zscore(values: &amp;[f32]) -&gt; Result&lt;Vec&lt;f32&gt;, FeatureError&gt; {
+    let stats = compute_statistics(values)?;
+    Ok(values.iter()
+        .map(|v| (v - stats.mean) / stats.std_dev)
+        .collect())
+}
+
+pub fn normalize_minmax(values: &amp;[f32]) -&gt; Result&lt;Vec&lt;f32&gt;, FeatureError&gt; {
+    let stats = compute_statistics(values)?;
+    let range = stats.max - stats.min;
+    Ok(values.iter()
+        .map(|v| (v - stats.min) / range)
+        .collect())
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="validation-1"><a class="header" href="#validation-1">Validation</a></h2>
+<p>Run tests:</p>
+<pre><code class="language-bash">cd demos/course3/week2/feature-pipeline
+cargo test
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="week-3-model-training-and-registry"><a class="header" href="#week-3-model-training-and-registry">Week 3: Model Training and Registry</a></h1>
+<h2 id="overview-2"><a class="header" href="#overview-2">Overview</a></h2>
+<p>Train models with aprender and manage them with pacha's signed registry.</p>
+<h2 id="topics-2"><a class="header" href="#topics-2">Topics</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>#</th><th>Type</th><th>Title</th><th>Platform</th><th>Duration</th></tr></thead><tbody>
+<tr><td>3.1</td><td>Video</td><td>ML Algorithms: From Scratch to AutoML</td><td>Concept</td><td>10 min</td></tr>
+<tr><td>3.2</td><td>Lab</td><td>Train Models with aprender</td><td>Sovereign</td><td>40 min</td></tr>
+<tr><td>3.3</td><td>Video</td><td>Databricks AutoML</td><td>Databricks</td><td>10 min</td></tr>
+<tr><td>3.4</td><td>Lab</td><td>AutoML Experiment in Databricks</td><td>Databricks</td><td>30 min</td></tr>
+<tr><td>3.5</td><td>Video</td><td>Model Registry with Unity Catalog</td><td>Databricks</td><td>10 min</td></tr>
+<tr><td>3.6</td><td>Video</td><td>Model Signing and Security</td><td>Sovereign</td><td>8 min</td></tr>
+<tr><td>3.7</td><td>Lab</td><td>Register and Sign Models with pacha</td><td>Sovereign</td><td>35 min</td></tr>
+<tr><td>3.8</td><td>Video</td><td>Model Lineage and Governance</td><td>Databricks</td><td>8 min</td></tr>
+<tr><td>3.9</td><td>Quiz</td><td>Training and Registry</td><td>—</td><td>15 min</td></tr>
+</tbody></table>
+</div>
+<h2 id="sovereign-ai-stack-components-2"><a class="header" href="#sovereign-ai-stack-components-2">Sovereign AI Stack Components</a></h2>
+<ul>
+<li><code>aprender</code> for ML algorithms</li>
+<li><code>pacha</code> for Ed25519 signing and BLAKE3 hashing</li>
+</ul>
+<h2 id="key-concepts-2"><a class="header" href="#key-concepts-2">Key Concepts</a></h2>
+<h3 id="model-training"><a class="header" href="#model-training">Model Training</a></h3>
+<ul>
+<li>Linear regression with gradient descent</li>
+<li>Random forest ensemble methods</li>
+<li>Cross-validation for model selection</li>
+</ul>
+<h3 id="model-registry"><a class="header" href="#model-registry">Model Registry</a></h3>
+<ul>
+<li>Version control for models</li>
+<li>Stage transitions (staging → production)</li>
+<li>Cryptographic signing for integrity</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-model-training"><a class="header" href="#lab-model-training">Lab: Model Training</a></h1>
+<p>Train ML models with gradient descent and evaluate performance.</p>
+<h2 id="objectives-2"><a class="header" href="#objectives-2">Objectives</a></h2>
+<ul>
+<li>Implement linear regression</li>
+<li>Train on synthetic datasets</li>
+<li>Calculate evaluation metrics</li>
+</ul>
+<h2 id="demo-code-2"><a class="header" href="#demo-code-2">Demo Code</a></h2>
+<p>See <a href="https://github.com/noahgift/DB-mlops-genai/tree/main/demos/course3/week3/model-training"><code>demos/course3/week3/model-training/</code></a></p>
+<h2 id="lab-exercise-2"><a class="header" href="#lab-exercise-2">Lab Exercise</a></h2>
+<p>See <a href="https://github.com/noahgift/DB-mlops-genai/tree/main/labs/course3/week3"><code>labs/course3/week3/lab_3_4_automl.py</code></a></p>
+<h2 id="key-implementation-1"><a class="header" href="#key-implementation-1">Key Implementation</a></h2>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>impl LinearRegression {
+    pub fn fit(&amp;mut self, features: &amp;[Vec&lt;f64&gt;], labels: &amp;[f64]) {
+        for _ in 0..self.n_iterations {
+            let mut weight_gradients = vec![0.0; self.weights.len()];
+            let mut bias_gradient = 0.0;
+
+            for (x, &amp;y) in features.iter().zip(labels.iter()) {
+                let pred = self.predict_single(x);
+                let error = pred - y;
+                for (j, &amp;xj) in x.iter().enumerate() {
+                    weight_gradients[j] += error * xj;
+                }
+                bias_gradient += error;
+            }
+
+            // Update weights
+            for (w, grad) in self.weights.iter_mut().zip(&amp;weight_gradients) {
+                *w -= self.learning_rate * grad / n_samples;
+            }
+            self.bias -= self.learning_rate * bias_gradient / n_samples;
+        }
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="week-4-model-serving-and-inference"><a class="header" href="#week-4-model-serving-and-inference">Week 4: Model Serving and Inference</a></h1>
+<h2 id="overview-3"><a class="header" href="#overview-3">Overview</a></h2>
+<p>Deploy inference services with realizar and benchmark against Databricks Model Serving.</p>
+<h2 id="topics-3"><a class="header" href="#topics-3">Topics</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>#</th><th>Type</th><th>Title</th><th>Platform</th><th>Duration</th></tr></thead><tbody>
+<tr><td>4.1</td><td>Video</td><td>Inference Patterns: Batch vs Real-time</td><td>Concept</td><td>10 min</td></tr>
+<tr><td>4.2</td><td>Video</td><td>Databricks Model Serving</td><td>Databricks</td><td>10 min</td></tr>
+<tr><td>4.3</td><td>Lab</td><td>Deploy Endpoint in Databricks</td><td>Databricks</td><td>35 min</td></tr>
+<tr><td>4.4</td><td>Video</td><td>Build Inference Server from Scratch</td><td>Sovereign</td><td>10 min</td></tr>
+<tr><td>4.5</td><td>Lab</td><td>Serve Models with realizar</td><td>Sovereign</td><td>35 min</td></tr>
+<tr><td>4.6</td><td>Video</td><td>Batch Inference with Spark</td><td>Databricks</td><td>8 min</td></tr>
+<tr><td>4.7</td><td>Lab</td><td>Batch Scoring Pipeline</td><td>Databricks</td><td>30 min</td></tr>
+<tr><td>4.8</td><td>Video</td><td>Latency Benchmarking</td><td>Both</td><td>8 min</td></tr>
+<tr><td>4.9</td><td>Quiz</td><td>Inference Systems</td><td>—</td><td>15 min</td></tr>
+</tbody></table>
+</div>
+<h2 id="sovereign-ai-stack-components-3"><a class="header" href="#sovereign-ai-stack-components-3">Sovereign AI Stack Components</a></h2>
+<ul>
+<li><code>realizar</code> for inference server</li>
+<li><code>repartir</code> for distributed batch processing</li>
+</ul>
+<h2 id="key-concepts-3"><a class="header" href="#key-concepts-3">Key Concepts</a></h2>
+<h3 id="inference-patterns"><a class="header" href="#inference-patterns">Inference Patterns</a></h3>
+<ul>
+<li>Real-time: sub-100ms latency requirements</li>
+<li>Batch: throughput-optimized processing</li>
+<li>Streaming: continuous prediction on data flows</li>
+</ul>
+<h3 id="server-architecture"><a class="header" href="#server-architecture">Server Architecture</a></h3>
+<ul>
+<li>Request queuing and batching</li>
+<li>Model loading and caching</li>
+<li>Health checks and metrics</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-inference-server"><a class="header" href="#lab-inference-server">Lab: Inference Server</a></h1>
+<p>Build a model serving infrastructure with batching and health checks.</p>
+<h2 id="objectives-3"><a class="header" href="#objectives-3">Objectives</a></h2>
+<ul>
+<li>Implement prediction endpoint</li>
+<li>Add request batching</li>
+<li>Configure health monitoring</li>
+</ul>
+<h2 id="demo-code-3"><a class="header" href="#demo-code-3">Demo Code</a></h2>
+<p>See <a href="https://github.com/noahgift/DB-mlops-genai/tree/main/demos/course3/week4/inference-server"><code>demos/course3/week4/inference-server/</code></a></p>
+<h2 id="lab-exercise-3"><a class="header" href="#lab-exercise-3">Lab Exercise</a></h2>
+<p>See <a href="https://github.com/noahgift/DB-mlops-genai/tree/main/labs/course3/week4"><code>labs/course3/week4/lab_4_5_serving.py</code></a></p>
+<h2 id="key-components"><a class="header" href="#key-components">Key Components</a></h2>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct InferenceServer {
+    model: Box&lt;dyn Model&gt;,
+    batcher: RequestBatcher,
+    metrics: ServerMetrics,
+}
+
+impl InferenceServer {
+    pub async fn predict(&amp;self, request: PredictRequest) -&gt; PredictResponse {
+        let start = Instant::now();
+
+        let result = self.batcher.add(request).await;
+
+        self.metrics.record_request(start.elapsed());
+        result
+    }
+
+    pub fn health(&amp;self) -&gt; HealthResponse {
+        HealthResponse {
+            status: "healthy",
+            model_loaded: self.model.is_loaded(),
+            requests_processed: self.metrics.total_requests(),
+        }
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="week-5-production-quality-and-orchestration"><a class="header" href="#week-5-production-quality-and-orchestration">Week 5: Production Quality and Orchestration</a></h1>
+<h2 id="overview-4"><a class="header" href="#overview-4">Overview</a></h2>
+<p>Implement quality gates with pmat and orchestration with batuta.</p>
+<h2 id="topics-4"><a class="header" href="#topics-4">Topics</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>#</th><th>Type</th><th>Title</th><th>Platform</th><th>Duration</th></tr></thead><tbody>
+<tr><td>5.1</td><td>Video</td><td>MLOps Maturity Model</td><td>Concept</td><td>8 min</td></tr>
+<tr><td>5.2</td><td>Video</td><td>Databricks Workflows for ML</td><td>Databricks</td><td>10 min</td></tr>
+<tr><td>5.3</td><td>Lab</td><td>Build ML Pipeline with Jobs</td><td>Databricks</td><td>35 min</td></tr>
+<tr><td>5.4</td><td>Video</td><td>Quality Gates with pmat</td><td>Sovereign</td><td>8 min</td></tr>
+<tr><td>5.5</td><td>Lab</td><td>Enforce TDG Quality Score</td><td>Sovereign</td><td>25 min</td></tr>
+<tr><td>5.6</td><td>Video</td><td>Monitoring and Drift Detection</td><td>Databricks</td><td>10 min</td></tr>
+<tr><td>5.7</td><td>Video</td><td>batuta Orchestration</td><td>Sovereign</td><td>8 min</td></tr>
+<tr><td>5.8</td><td>Quiz</td><td>Production MLOps</td><td>—</td><td>15 min</td></tr>
+</tbody></table>
+</div>
+<h2 id="sovereign-ai-stack-components-4"><a class="header" href="#sovereign-ai-stack-components-4">Sovereign AI Stack Components</a></h2>
+<ul>
+<li><code>batuta</code> for orchestration</li>
+<li><code>pmat</code> for quality gates</li>
+<li><code>renacer</code> for syscall tracing</li>
+</ul>
+<h2 id="key-concepts-4"><a class="header" href="#key-concepts-4">Key Concepts</a></h2>
+<h3 id="quality-gates"><a class="header" href="#quality-gates">Quality Gates</a></h3>
+<ul>
+<li>TDG (Technical Debt Gauge) scoring</li>
+<li>Complexity thresholds</li>
+<li>Test coverage requirements</li>
+</ul>
+<h3 id="orchestration"><a class="header" href="#orchestration">Orchestration</a></h3>
+<ul>
+<li>DAG-based workflow execution</li>
+<li>Privacy tier enforcement</li>
+<li>Retry and failure handling</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-quality-gates"><a class="header" href="#lab-quality-gates">Lab: Quality Gates</a></h1>
+<p>Implement production quality enforcement with pmat.</p>
+<h2 id="objectives-4"><a class="header" href="#objectives-4">Objectives</a></h2>
+<ul>
+<li>Configure quality thresholds</li>
+<li>Implement pre-commit hooks</li>
+<li>Enforce TDG scoring</li>
+</ul>
+<h2 id="demo-code-4"><a class="header" href="#demo-code-4">Demo Code</a></h2>
+<p>See <a href="https://github.com/noahgift/DB-mlops-genai/tree/main/demos/course3/week5/quality-gates"><code>demos/course3/week5/quality-gates/</code></a></p>
+<h2 id="lab-exercise-4"><a class="header" href="#lab-exercise-4">Lab Exercise</a></h2>
+<p>See <a href="https://github.com/noahgift/DB-mlops-genai/tree/main/labs/course3/week5"><code>labs/course3/week5/lab_5_5_quality_gates.py</code></a></p>
+<h2 id="configuration"><a class="header" href="#configuration">Configuration</a></h2>
+<pre><code class="language-toml"># .pmat-gates.toml
+[gates]
+min_tdg_score = "B"
+max_cyclomatic = 30
+max_cognitive = 25
+min_line_coverage = 80
+min_branch_coverage = 70
+
+[pre_commit_checks]
+checks = ["complexity", "dead-code", "security", "duplicates"]
+</code></pre>
+<h2 id="commands"><a class="header" href="#commands">Commands</a></h2>
+<pre><code class="language-bash"># Repository health score
+pmat repo-score
+
+# Quality gate check
+pmat quality-gate
+
+# Rust project score
+pmat rust-project-score
+
+# Analyze complexity
+pmat analyze complexity --path .
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="week-6-capstone--fraud-detection-platform"><a class="header" href="#week-6-capstone--fraud-detection-platform">Week 6: Capstone — Fraud Detection Platform</a></h1>
+<h2 id="duration-1"><a class="header" href="#duration-1">Duration</a></h2>
+<p>~15 hours</p>
+<h2 id="overview-5"><a class="header" href="#overview-5">Overview</a></h2>
+<p>Build an end-to-end ML system for fraud detection using both Databricks and the Sovereign AI Stack.</p>
+<h2 id="architecture"><a class="header" href="#architecture">Architecture</a></h2>
+<pre><code>alimentar (Parquet) → trueno (SIMD features) → aprender (train)
+         ↓                                           ↓
+    Delta tables ←── pacha (sign + register) ←── .apr model
+         ↓
+    realizar (serve) → renacer (validate) → pmat (quality gate)
+         ↓
+    batuta (orchestrate + privacy tier = Sovereign)
+</code></pre>
+<h2 id="deliverables"><a class="header" href="#deliverables">Deliverables</a></h2>
+<ol>
+<li>
+<p><strong>Feature Pipeline</strong></p>
+<ul>
+<li>Databricks Feature Store implementation</li>
+<li>trueno SIMD comparison</li>
+</ul>
+</li>
+<li>
+<p><strong>Training Pipeline</strong></p>
+<ul>
+<li>AutoML experiment</li>
+<li>aprender model comparison</li>
+</ul>
+</li>
+<li>
+<p><strong>Model Registry</strong></p>
+<ul>
+<li>Unity Catalog registration</li>
+<li>pacha signing and verification</li>
+</ul>
+</li>
+<li>
+<p><strong>Inference Endpoint</strong></p>
+<ul>
+<li>Model Serving deployment</li>
+<li>realizar server comparison</li>
+</ul>
+</li>
+<li>
+<p><strong>Quality Gates</strong></p>
+<ul>
+<li>Lakehouse Monitoring setup</li>
+<li>pmat TDG enforcement</li>
+</ul>
+</li>
+<li>
+<p><strong>Orchestrated Workflow</strong></p>
+<ul>
+<li>Databricks Jobs pipeline</li>
+<li>batuta orchestration</li>
+</ul>
+</li>
+</ol>
+<h2 id="evaluation-criteria"><a class="header" href="#evaluation-criteria">Evaluation Criteria</a></h2>
+<ul>
+<li>Functionality: All components working end-to-end</li>
+<li>Performance: Latency and throughput benchmarks</li>
+<li>Quality: pmat score ≥ B</li>
+<li>Documentation: Clear README and API docs</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="course-4-genai-engineering-on-databricks"><a class="header" href="#course-4-genai-engineering-on-databricks">Course 4: GenAI Engineering on Databricks</a></h1>
+<h2 id="subtitle-1"><a class="header" href="#subtitle-1">Subtitle</a></h2>
+<p>Build LLM Applications with Foundation Models, Vector Search, and RAG</p>
+<h2 id="description-1"><a class="header" href="#description-1">Description</a></h2>
+<p>Construct production GenAI systems on Databricks: serve foundation models, implement vector search for semantic retrieval, build RAG pipelines, and fine-tune models for domain adaptation. Understand the internals by building equivalent systems with the Sovereign AI Stack.</p>
+<h2 id="learning-outcomes-1"><a class="header" href="#learning-outcomes-1">Learning Outcomes</a></h2>
+<ol>
+<li>Serve and query foundation models on Databricks</li>
+<li>Generate embeddings and build vector search indexes</li>
+<li>Implement production RAG pipelines with hybrid retrieval</li>
+<li>Fine-tune models with LoRA/QLoRA for domain adaptation</li>
+<li>Deploy privacy-aware GenAI systems with proper governance</li>
+</ol>
+<h2 id="duration-2"><a class="header" href="#duration-2">Duration</a></h2>
+<p>~34 hours | 40 videos | 12 labs | 5 quizzes | 1 capstone</p>
+<h2 id="weeks-1"><a class="header" href="#weeks-1">Weeks</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Week</th><th>Topic</th><th>Sovereign AI Stack</th></tr></thead><tbody>
+<tr><td>1</td><td>Foundation Models and LLM Serving</td><td><code>realizar</code>, <code>tokenizers</code></td></tr>
+<tr><td>2</td><td>Prompt Engineering and Structured Output</td><td><code>batuta</code>, <code>serde</code></td></tr>
+<tr><td>3</td><td>Embeddings and Vector Search</td><td><code>trueno</code>, <code>trueno-rag</code></td></tr>
+<tr><td>4</td><td>RAG Pipelines</td><td><code>trueno-rag</code>, <code>alimentar</code></td></tr>
+<tr><td>5</td><td>Fine-Tuning and Model Security</td><td><code>entrenar</code>, <code>pacha</code></td></tr>
+<tr><td>6</td><td>Production Deployment</td><td><code>batuta</code>, <code>renacer</code></td></tr>
+<tr><td>7</td><td>Capstone: Enterprise Knowledge Assistant</td><td>Full stack</td></tr>
+</tbody></table>
+</div>
+<h2 id="databricks-free-edition-features-used-1"><a class="header" href="#databricks-free-edition-features-used-1">Databricks Free Edition Features Used</a></h2>
+<ul>
+<li>Playground (Foundation Models)</li>
+<li>Vector Search (via Catalog)</li>
+<li>Genie (AI/BI demo)</li>
+<li>Experiments (evaluation tracking)</li>
+<li>Jobs &amp; Pipelines (RAG orchestration)</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="week-1-foundation-models-and-llm-serving"><a class="header" href="#week-1-foundation-models-and-llm-serving">Week 1: Foundation Models and LLM Serving</a></h1>
+<h2 id="overview-6"><a class="header" href="#overview-6">Overview</a></h2>
+<p>Understand LLM serving by building a tokenizer and inference server in Rust.</p>
+<h2 id="topics-5"><a class="header" href="#topics-5">Topics</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>#</th><th>Type</th><th>Title</th><th>Platform</th><th>Duration</th></tr></thead><tbody>
+<tr><td>1.1</td><td>Video</td><td>The GenAI Landscape</td><td>Concept</td><td>10 min</td></tr>
+<tr><td>1.2</td><td>Video</td><td>Databricks Foundation Model APIs</td><td>Databricks</td><td>10 min</td></tr>
+<tr><td>1.3</td><td>Lab</td><td>Query Models in Playground</td><td>Databricks</td><td>25 min</td></tr>
+<tr><td>1.4</td><td>Video</td><td>GGUF Format and Quantization</td><td>Sovereign</td><td>10 min</td></tr>
+<tr><td>1.5</td><td>Lab</td><td>Serve Local Model with realizar</td><td>Sovereign</td><td>35 min</td></tr>
+<tr><td>1.6</td><td>Video</td><td>Tokenization Deep Dive</td><td>Concept</td><td>10 min</td></tr>
+<tr><td>1.7</td><td>Lab</td><td>Build BPE Tokenizer</td><td>Sovereign</td><td>30 min</td></tr>
+<tr><td>1.8</td><td>Video</td><td>External Models and AI Gateway</td><td>Databricks</td><td>8 min</td></tr>
+<tr><td>1.9</td><td>Quiz</td><td>LLM Serving Fundamentals</td><td>—</td><td>15 min</td></tr>
+</tbody></table>
+</div>
+<h2 id="sovereign-ai-stack-components-5"><a class="header" href="#sovereign-ai-stack-components-5">Sovereign AI Stack Components</a></h2>
+<ul>
+<li><code>realizar</code> for GGUF inference</li>
+<li><code>tokenizers</code> crate for BPE</li>
+</ul>
+<h2 id="key-concepts-5"><a class="header" href="#key-concepts-5">Key Concepts</a></h2>
+<h3 id="tokenization"><a class="header" href="#tokenization">Tokenization</a></h3>
+<ul>
+<li>BPE (Byte-Pair Encoding) algorithm</li>
+<li>Vocabulary and merge rules</li>
+<li>Special tokens: <code>&lt;|endoftext|&gt;</code>, <code>&lt;|pad|&gt;</code></li>
+</ul>
+<h3 id="model-quantization"><a class="header" href="#model-quantization">Model Quantization</a></h3>
+<ul>
+<li>FP16, INT8, INT4 representations</li>
+<li>GGUF format: Q4_K_M, Q5_K_M, Q8_0</li>
+<li>Memory vs accuracy trade-offs</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-tokenizer"><a class="header" href="#lab-tokenizer">Lab: Tokenizer</a></h1>
+<p>Build a BPE tokenizer to understand LLM text processing.</p>
+<h2 id="objectives-5"><a class="header" href="#objectives-5">Objectives</a></h2>
+<ul>
+<li>Implement byte-pair encoding</li>
+<li>Handle special tokens</li>
+<li>Encode and decode text</li>
+</ul>
+<h2 id="demo-code-5"><a class="header" href="#demo-code-5">Demo Code</a></h2>
+<p>See <a href="https://github.com/noahgift/DB-mlops-genai/tree/main/demos/course4/week1/llm-serving"><code>demos/course4/week1/llm-serving/</code></a></p>
+<h2 id="lab-exercise-5"><a class="header" href="#lab-exercise-5">Lab Exercise</a></h2>
+<p>See <a href="https://github.com/noahgift/DB-mlops-genai/tree/main/labs/course4/week1"><code>labs/course4/week1/lab_1_7_tokenizer.py</code></a></p>
+<h2 id="key-implementation-2"><a class="header" href="#key-implementation-2">Key Implementation</a></h2>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct BpeTokenizer {
+    vocab: HashMap&lt;String, u32&gt;,
+    merges: Vec&lt;(String, String)&gt;,
+    special_tokens: HashMap&lt;String, u32&gt;,
+}
+
+impl BpeTokenizer {
+    pub fn encode(&amp;self, text: &amp;str) -&gt; Vec&lt;u32&gt; {
+        let mut tokens: Vec&lt;String&gt; = text.chars()
+            .map(|c| c.to_string())
+            .collect();
+
+        // Apply merge rules
+        for (a, b) in &amp;self.merges {
+            tokens = self.apply_merge(&amp;tokens, a, b);
+        }
+
+        tokens.iter()
+            .filter_map(|t| self.vocab.get(t).copied())
+            .collect()
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="week-2-prompt-engineering-and-structured-output"><a class="header" href="#week-2-prompt-engineering-and-structured-output">Week 2: Prompt Engineering and Structured Output</a></h1>
+<h2 id="overview-7"><a class="header" href="#overview-7">Overview</a></h2>
+<p>Master prompt engineering patterns and build type-safe prompt templates.</p>
+<h2 id="topics-6"><a class="header" href="#topics-6">Topics</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>#</th><th>Type</th><th>Title</th><th>Platform</th><th>Duration</th></tr></thead><tbody>
+<tr><td>2.1</td><td>Video</td><td>Prompt Engineering Patterns</td><td>Concept</td><td>10 min</td></tr>
+<tr><td>2.2</td><td>Lab</td><td>Effective Prompts in Databricks</td><td>Databricks</td><td>30 min</td></tr>
+<tr><td>2.3</td><td>Video</td><td>Structured Output Extraction</td><td>Concept</td><td>8 min</td></tr>
+<tr><td>2.4</td><td>Lab</td><td>JSON Mode and Schema Enforcement</td><td>Databricks</td><td>30 min</td></tr>
+<tr><td>2.5</td><td>Video</td><td>Build Type-Safe Prompt Templates</td><td>Sovereign</td><td>10 min</td></tr>
+<tr><td>2.6</td><td>Lab</td><td>Rust Prompt Template Engine</td><td>Sovereign</td><td>35 min</td></tr>
+<tr><td>2.7</td><td>Video</td><td>Privacy Tiers: Sovereign/Private/Standard</td><td>Sovereign</td><td>10 min</td></tr>
+<tr><td>2.8</td><td>Lab</td><td>Multi-Backend Gateway with batuta</td><td>Sovereign</td><td>35 min</td></tr>
+<tr><td>2.9</td><td>Quiz</td><td>Prompt Engineering</td><td>—</td><td>15 min</td></tr>
+</tbody></table>
+</div>
+<h2 id="sovereign-ai-stack-components-6"><a class="header" href="#sovereign-ai-stack-components-6">Sovereign AI Stack Components</a></h2>
+<ul>
+<li><code>batuta</code> for privacy tiers and backend routing</li>
+<li><code>serde</code> for JSON serialization</li>
+</ul>
+<h2 id="key-concepts-6"><a class="header" href="#key-concepts-6">Key Concepts</a></h2>
+<h3 id="prompt-patterns"><a class="header" href="#prompt-patterns">Prompt Patterns</a></h3>
+<ul>
+<li>Zero-shot: direct instruction</li>
+<li>Few-shot: examples in prompt</li>
+<li>Chain-of-thought: step-by-step reasoning</li>
+<li>Role-based: system/user/assistant</li>
+</ul>
+<h3 id="structured-output"><a class="header" href="#structured-output">Structured Output</a></h3>
+<ul>
+<li>JSON mode for parseable responses</li>
+<li>Schema validation</li>
+<li>Type-safe deserialization</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-prompt-templates"><a class="header" href="#lab-prompt-templates">Lab: Prompt Templates</a></h1>
+<p>Build type-safe prompt templates with variable substitution.</p>
+<h2 id="objectives-6"><a class="header" href="#objectives-6">Objectives</a></h2>
+<ul>
+<li>Create reusable templates</li>
+<li>Implement variable validation</li>
+<li>Build a prompt library</li>
+</ul>
+<h2 id="demo-code-6"><a class="header" href="#demo-code-6">Demo Code</a></h2>
+<p>See <a href="https://github.com/noahgift/DB-mlops-genai/tree/main/demos/course4/week2/prompt-engineering"><code>demos/course4/week2/prompt-engineering/</code></a></p>
+<h2 id="lab-exercise-6"><a class="header" href="#lab-exercise-6">Lab Exercise</a></h2>
+<p>See <a href="https://github.com/noahgift/DB-mlops-genai/tree/main/labs/course4/week2"><code>labs/course4/week2/lab_2_6_prompt_templates.py</code></a></p>
+<h2 id="key-implementation-3"><a class="header" href="#key-implementation-3">Key Implementation</a></h2>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct PromptTemplate {
+    template: String,
+    variables: Vec&lt;String&gt;,
+}
+
+impl PromptTemplate {
+    pub fn render(&amp;self, vars: &amp;HashMap&lt;String, String&gt;) -&gt; Result&lt;String, PromptError&gt; {
+        let mut result = self.template.clone();
+        for var in &amp;self.variables {
+            let value = vars.get(var)
+                .ok_or(PromptError::MissingVariable(var.clone()))?;
+            result = result.replace(&amp;format!("{{{}}}", var), value);
+        }
+        Ok(result)
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="week-3-embeddings-and-vector-search"><a class="header" href="#week-3-embeddings-and-vector-search">Week 3: Embeddings and Vector Search</a></h1>
+<h2 id="overview-8"><a class="header" href="#overview-8">Overview</a></h2>
+<p>Build SIMD-accelerated vector search with trueno and implement HNSW indexing.</p>
+<h2 id="topics-7"><a class="header" href="#topics-7">Topics</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>#</th><th>Type</th><th>Title</th><th>Platform</th><th>Duration</th></tr></thead><tbody>
+<tr><td>3.1</td><td>Video</td><td>What Are Embeddings?</td><td>Concept</td><td>10 min</td></tr>
+<tr><td>3.2</td><td>Video</td><td>Databricks Vector Search</td><td>Databricks</td><td>10 min</td></tr>
+<tr><td>3.3</td><td>Lab</td><td>Create Vector Search Index</td><td>Databricks</td><td>35 min</td></tr>
+<tr><td>3.4</td><td>Video</td><td>SIMD Similarity: Cosine, Dot Product</td><td>Sovereign</td><td>10 min</td></tr>
+<tr><td>3.5</td><td>Lab</td><td>Build SIMD Vector Search with trueno</td><td>Sovereign</td><td>35 min</td></tr>
+<tr><td>3.6</td><td>Video</td><td>HNSW: Approximate Nearest Neighbors</td><td>Concept</td><td>10 min</td></tr>
+<tr><td>3.7</td><td>Lab</td><td>Implement HNSW Index</td><td>Sovereign</td><td>40 min</td></tr>
+<tr><td>3.8</td><td>Video</td><td>Hybrid Search: BM25 + Vector</td><td>Sovereign</td><td>8 min</td></tr>
+<tr><td>3.9</td><td>Lab</td><td>Hybrid Retrieval with trueno-rag</td><td>Sovereign</td><td>35 min</td></tr>
+<tr><td>3.10</td><td>Quiz</td><td>Vector Search</td><td>—</td><td>15 min</td></tr>
+</tbody></table>
+</div>
+<h2 id="sovereign-ai-stack-components-7"><a class="header" href="#sovereign-ai-stack-components-7">Sovereign AI Stack Components</a></h2>
+<ul>
+<li><code>trueno</code> for SIMD computation</li>
+<li><code>trueno-rag</code> for BM25 + HNSW</li>
+<li><code>trueno-db</code> for GPU analytics</li>
+</ul>
+<h2 id="key-concepts-7"><a class="header" href="#key-concepts-7">Key Concepts</a></h2>
+<h3 id="similarity-metrics"><a class="header" href="#similarity-metrics">Similarity Metrics</a></h3>
+<ul>
+<li>Cosine similarity: <code>dot(a, b) / (||a|| * ||b||)</code></li>
+<li>Euclidean distance: <code>sqrt(sum((a - b)^2))</code></li>
+<li>Dot product: <code>sum(a * b)</code></li>
+</ul>
+<h3 id="hnsw-algorithm"><a class="header" href="#hnsw-algorithm">HNSW Algorithm</a></h3>
+<ul>
+<li>Hierarchical navigable small world graphs</li>
+<li>O(log n) search complexity</li>
+<li>Configurable M and ef parameters</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-embeddings"><a class="header" href="#lab-embeddings">Lab: Embeddings</a></h1>
+<p>Build a vector search index with SIMD-accelerated similarity.</p>
+<h2 id="objectives-7"><a class="header" href="#objectives-7">Objectives</a></h2>
+<ul>
+<li>Generate text embeddings</li>
+<li>Implement similarity metrics</li>
+<li>Build a searchable index</li>
+</ul>
+<h2 id="demo-code-7"><a class="header" href="#demo-code-7">Demo Code</a></h2>
+<p>See <a href="https://github.com/noahgift/DB-mlops-genai/tree/main/demos/course4/week3/vector-search"><code>demos/course4/week3/vector-search/</code></a></p>
+<h2 id="lab-exercise-7"><a class="header" href="#lab-exercise-7">Lab Exercise</a></h2>
+<p>See <a href="https://github.com/noahgift/DB-mlops-genai/tree/main/labs/course4/week3"><code>labs/course4/week3/lab_3_5_embeddings.py</code></a></p>
+<h2 id="key-implementation-4"><a class="header" href="#key-implementation-4">Key Implementation</a></h2>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn cosine_similarity(a: &amp;[f32], b: &amp;[f32]) -&gt; f32 {
+    let dot: f32 = a.iter().zip(b).map(|(x, y)| x * y).sum();
+    let norm_a: f32 = a.iter().map(|x| x * x).sum::&lt;f32&gt;().sqrt();
+    let norm_b: f32 = b.iter().map(|x| x * x).sum::&lt;f32&gt;().sqrt();
+    dot / (norm_a * norm_b)
+}
+
+pub struct VectorIndex {
+    embeddings: Vec&lt;Embedding&gt;,
+}
+
+impl VectorIndex {
+    pub fn search(&amp;self, query: &amp;[f32], k: usize) -&gt; Vec&lt;SearchResult&gt; {
+        let mut results: Vec&lt;_&gt; = self.embeddings.iter()
+            .map(|e| (e.id.clone(), cosine_similarity(query, &amp;e.vector)))
+            .collect();
+        results.sort_by(|a, b| b.1.partial_cmp(&amp;a.1).unwrap());
+        results.into_iter().take(k).collect()
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="week-4-rag-pipelines"><a class="header" href="#week-4-rag-pipelines">Week 4: RAG Pipelines</a></h1>
+<h2 id="overview-9"><a class="header" href="#overview-9">Overview</a></h2>
+<p>Build production RAG systems with document chunking, retrieval, and generation.</p>
+<h2 id="topics-8"><a class="header" href="#topics-8">Topics</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>#</th><th>Type</th><th>Title</th><th>Platform</th><th>Duration</th></tr></thead><tbody>
+<tr><td>4.1</td><td>Video</td><td>RAG Architecture</td><td>Concept</td><td>10 min</td></tr>
+<tr><td>4.2</td><td>Video</td><td>Databricks RAG Components</td><td>Databricks</td><td>10 min</td></tr>
+<tr><td>4.3</td><td>Lab</td><td>Build RAG Pipeline in Databricks</td><td>Databricks</td><td>45 min</td></tr>
+<tr><td>4.4</td><td>Video</td><td>Document Chunking Strategies</td><td>Concept</td><td>10 min</td></tr>
+<tr><td>4.5</td><td>Lab</td><td>Chunking Pipeline with alimentar</td><td>Sovereign</td><td>35 min</td></tr>
+<tr><td>4.6</td><td>Video</td><td>Context Window Management</td><td>Sovereign</td><td>8 min</td></tr>
+<tr><td>4.7</td><td>Lab</td><td>End-to-End RAG with trueno-rag</td><td>Sovereign</td><td>45 min</td></tr>
+<tr><td>4.8</td><td>Video</td><td>RAG Evaluation Metrics</td><td>Concept</td><td>10 min</td></tr>
+<tr><td>4.9</td><td>Lab</td><td>Evaluate RAG Quality</td><td>Both</td><td>35 min</td></tr>
+<tr><td>4.10</td><td>Quiz</td><td>RAG Systems</td><td>—</td><td>15 min</td></tr>
+</tbody></table>
+</div>
+<h2 id="sovereign-ai-stack-components-8"><a class="header" href="#sovereign-ai-stack-components-8">Sovereign AI Stack Components</a></h2>
+<ul>
+<li><code>trueno-rag</code> for full RAG pipeline</li>
+<li><code>alimentar</code> for document chunking</li>
+<li><code>pmat</code> for evaluation metrics</li>
+</ul>
+<h2 id="key-concepts-8"><a class="header" href="#key-concepts-8">Key Concepts</a></h2>
+<h3 id="rag-pipeline"><a class="header" href="#rag-pipeline">RAG Pipeline</a></h3>
+<ol>
+<li><strong>Chunk</strong>: Split documents into retrievable segments</li>
+<li><strong>Embed</strong>: Convert chunks to vector representations</li>
+<li><strong>Index</strong>: Store in vector database</li>
+<li><strong>Retrieve</strong>: Find relevant chunks for query</li>
+<li><strong>Generate</strong>: Synthesize answer with LLM</li>
+</ol>
+<h3 id="chunking-strategies"><a class="header" href="#chunking-strategies">Chunking Strategies</a></h3>
+<ul>
+<li>Fixed size with overlap</li>
+<li>Sentence-based splitting</li>
+<li>Semantic chunking</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-rag-pipeline"><a class="header" href="#lab-rag-pipeline">Lab: RAG Pipeline</a></h1>
+<p>Build an end-to-end RAG system with chunking, retrieval, and generation.</p>
+<h2 id="objectives-8"><a class="header" href="#objectives-8">Objectives</a></h2>
+<ul>
+<li>Implement document chunking</li>
+<li>Build retrieval pipeline</li>
+<li>Generate contextual answers</li>
+</ul>
+<h2 id="demo-code-8"><a class="header" href="#demo-code-8">Demo Code</a></h2>
+<p>See <a href="https://github.com/noahgift/DB-mlops-genai/tree/main/demos/course4/week4/rag-pipeline"><code>demos/course4/week4/rag-pipeline/</code></a></p>
+<h2 id="lab-exercise-8"><a class="header" href="#lab-exercise-8">Lab Exercise</a></h2>
+<p>See <a href="https://github.com/noahgift/DB-mlops-genai/tree/main/labs/course4/week4"><code>labs/course4/week4/lab_4_7_rag.py</code></a></p>
+<h2 id="key-implementation-5"><a class="header" href="#key-implementation-5">Key Implementation</a></h2>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct RagPipeline {
+    chunker: TextChunker,
+    vector_store: VectorStore,
+    generator: Generator,
+}
+
+impl RagPipeline {
+    pub fn query(&amp;self, question: &amp;str) -&gt; RagResponse {
+        // 1. Embed query
+        let query_embedding = self.embed(question);
+
+        // 2. Retrieve relevant chunks
+        let results = self.vector_store.search(&amp;query_embedding, 3);
+
+        // 3. Build context
+        let context = results.iter()
+            .map(|r| r.chunk.text.as_str())
+            .collect::&lt;Vec&lt;_&gt;&gt;()
+            .join("\n\n");
+
+        // 4. Generate answer
+        let prompt = format!(
+            "Context:\n{}\n\nQuestion: {}\n\nAnswer:",
+            context, question
+        );
+        let answer = self.generator.generate(&amp;prompt);
+
+        RagResponse { answer, sources: results }
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="week-5-fine-tuning-and-model-security"><a class="header" href="#week-5-fine-tuning-and-model-security">Week 5: Fine-Tuning and Model Security</a></h1>
+<h2 id="overview-10"><a class="header" href="#overview-10">Overview</a></h2>
+<p>Fine-tune models with LoRA/QLoRA and implement secure model distribution.</p>
+<h2 id="topics-9"><a class="header" href="#topics-9">Topics</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>#</th><th>Type</th><th>Title</th><th>Platform</th><th>Duration</th></tr></thead><tbody>
+<tr><td>5.1</td><td>Video</td><td>When to Fine-Tune vs RAG</td><td>Concept</td><td>10 min</td></tr>
+<tr><td>5.2</td><td>Video</td><td>Databricks Fine-Tuning</td><td>Databricks</td><td>10 min</td></tr>
+<tr><td>5.3</td><td>Lab</td><td>Fine-Tune in Databricks</td><td>Databricks</td><td>40 min</td></tr>
+<tr><td>5.4</td><td>Video</td><td>LoRA/QLoRA from Scratch</td><td>Sovereign</td><td>10 min</td></tr>
+<tr><td>5.5</td><td>Lab</td><td>Fine-Tune with entrenar</td><td>Sovereign</td><td>45 min</td></tr>
+<tr><td>5.6</td><td>Video</td><td>Model Encryption and Signing</td><td>Sovereign</td><td>10 min</td></tr>
+<tr><td>5.7</td><td>Lab</td><td>Secure Model Pipeline with pacha</td><td>Sovereign</td><td>35 min</td></tr>
+<tr><td>5.8</td><td>Video</td><td>EU AI Act and Governance</td><td>Concept</td><td>8 min</td></tr>
+<tr><td>5.9</td><td>Quiz</td><td>Fine-Tuning and Security</td><td>—</td><td>15 min</td></tr>
+</tbody></table>
+</div>
+<h2 id="sovereign-ai-stack-components-9"><a class="header" href="#sovereign-ai-stack-components-9">Sovereign AI Stack Components</a></h2>
+<ul>
+<li><code>entrenar</code> for LoRA/QLoRA training</li>
+<li><code>pacha</code> for ChaCha20-Poly1305 encryption</li>
+</ul>
+<h2 id="key-concepts-9"><a class="header" href="#key-concepts-9">Key Concepts</a></h2>
+<h3 id="lora-low-rank-adaptation"><a class="header" href="#lora-low-rank-adaptation">LoRA (Low-Rank Adaptation)</a></h3>
+<ul>
+<li>Freeze base model weights</li>
+<li>Add trainable low-rank matrices</li>
+<li>Scaling factor: <code>alpha / r</code></li>
+<li>Target modules: q_proj, v_proj, k_proj</li>
+</ul>
+<h3 id="qlora"><a class="header" href="#qlora">QLoRA</a></h3>
+<ul>
+<li>Quantized base model (4-bit)</li>
+<li>Double quantization for memory efficiency</li>
+<li>Paged optimizers for large batches</li>
+</ul>
+<h3 id="fine-tuning-vs-rag"><a class="header" href="#fine-tuning-vs-rag">Fine-Tuning vs RAG</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Aspect</th><th>Fine-Tuning</th><th>RAG</th></tr></thead><tbody>
+<tr><td>Knowledge</td><td>Baked into weights</td><td>Retrieved at runtime</td></tr>
+<tr><td>Updates</td><td>Requires retraining</td><td>Update index only</td></tr>
+<tr><td>Cost</td><td>Higher compute</td><td>Lower compute</td></tr>
+<tr><td>Use case</td><td>Style/behavior change</td><td>Knowledge access</td></tr>
+</tbody></table>
+</div><div style="break-before: page; page-break-before: always;"></div><h1 id="lab-fine-tuning"><a class="header" href="#lab-fine-tuning">Lab: Fine-Tuning</a></h1>
+<p>Configure LoRA fine-tuning for domain adaptation.</p>
+<h2 id="objectives-9"><a class="header" href="#objectives-9">Objectives</a></h2>
+<ul>
+<li>Configure LoRA parameters</li>
+<li>Prepare training data</li>
+<li>Calculate training metrics</li>
+</ul>
+<h2 id="demo-code-9"><a class="header" href="#demo-code-9">Demo Code</a></h2>
+<p>See <a href="https://github.com/noahgift/DB-mlops-genai/tree/main/demos/course4/week5/fine-tuning"><code>demos/course4/week5/fine-tuning/</code></a></p>
+<h2 id="lab-exercise-9"><a class="header" href="#lab-exercise-9">Lab Exercise</a></h2>
+<p>See <a href="https://github.com/noahgift/DB-mlops-genai/tree/main/labs/course4/week5"><code>labs/course4/week5/lab_5_3_fine_tuning.py</code></a></p>
+<h2 id="key-implementation-6"><a class="header" href="#key-implementation-6">Key Implementation</a></h2>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct LoraConfig {
+    pub r: usize,           // Rank (4, 8, 16)
+    pub alpha: usize,       // Scaling (16, 32)
+    pub dropout: f32,       // Dropout rate
+    pub target_modules: Vec&lt;String&gt;,
+}
+
+impl LoraConfig {
+    pub fn scaling_factor(&amp;self) -&gt; f32 {
+        self.alpha as f32 / self.r as f32
+    }
+
+    pub fn estimated_params(&amp;self, hidden: usize, layers: usize) -&gt; usize {
+        self.r * hidden * 2 * self.target_modules.len() * layers
+    }
+}
+
+// Example: 7B model with r=8
+// Params: 8 * 4096 * 2 * 2 * 32 = 4.2M (0.06% of 7B)
+<span class="boring">}</span></code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="week-6-production-deployment"><a class="header" href="#week-6-production-deployment">Week 6: Production Deployment</a></h1>
+<h2 id="overview-11"><a class="header" href="#overview-11">Overview</a></h2>
+<p>Deploy GenAI systems with guardrails, rate limiting, and monitoring.</p>
+<h2 id="topics-10"><a class="header" href="#topics-10">Topics</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>#</th><th>Type</th><th>Title</th><th>Platform</th><th>Duration</th></tr></thead><tbody>
+<tr><td>6.1</td><td>Video</td><td>GenAI Production Patterns</td><td>Concept</td><td>10 min</td></tr>
+<tr><td>6.2</td><td>Video</td><td>Databricks Model Serving for LLMs</td><td>Databricks</td><td>10 min</td></tr>
+<tr><td>6.3</td><td>Lab</td><td>Deploy GenAI Endpoint</td><td>Databricks</td><td>35 min</td></tr>
+<tr><td>6.4</td><td>Video</td><td>Cost Control and Circuit Breakers</td><td>Sovereign</td><td>8 min</td></tr>
+<tr><td>6.5</td><td>Lab</td><td>Production Config with batuta</td><td>Sovereign</td><td>30 min</td></tr>
+<tr><td>6.6</td><td>Quiz</td><td>Production Deployment</td><td>—</td><td>15 min</td></tr>
+</tbody></table>
+</div>
+<h2 id="sovereign-ai-stack-components-10"><a class="header" href="#sovereign-ai-stack-components-10">Sovereign AI Stack Components</a></h2>
+<ul>
+<li><code>batuta</code> for cost limits and observability</li>
+<li><code>renacer</code> for audit trails</li>
+</ul>
+<h2 id="key-concepts-10"><a class="header" href="#key-concepts-10">Key Concepts</a></h2>
+<h3 id="guardrails"><a class="header" href="#guardrails">Guardrails</a></h3>
+<ul>
+<li>Input validation (length, blocked patterns)</li>
+<li>Output filtering (PII, harmful content)</li>
+<li>Fail-safe defaults</li>
+</ul>
+<h3 id="rate-limiting"><a class="header" href="#rate-limiting">Rate Limiting</a></h3>
+<ul>
+<li>Requests per minute</li>
+<li>Tokens per minute</li>
+<li>Per-user quotas</li>
+</ul>
+<h3 id="monitoring"><a class="header" href="#monitoring">Monitoring</a></h3>
+<ul>
+<li>Latency percentiles (p50, p95, p99)</li>
+<li>Error rates and types</li>
+<li>Token usage and costs</li>
+<li>Guardrail trigger rates</li>
+</ul>
+<h3 id="ab-testing"><a class="header" href="#ab-testing">A/B Testing</a></h3>
+<ul>
+<li>Traffic splitting</li>
+<li>Metric collection</li>
+<li>Statistical significance</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lab-production-deployment"><a class="header" href="#lab-production-deployment">Lab: Production Deployment</a></h1>
+<p>Deploy GenAI systems with guardrails and monitoring.</p>
+<h2 id="objectives-10"><a class="header" href="#objectives-10">Objectives</a></h2>
+<ul>
+<li>Implement input/output guardrails</li>
+<li>Configure rate limiting</li>
+<li>Track production metrics</li>
+</ul>
+<h2 id="demo-code-10"><a class="header" href="#demo-code-10">Demo Code</a></h2>
+<p>See <a href="https://github.com/noahgift/DB-mlops-genai/tree/main/demos/course4/week6/production"><code>demos/course4/week6/production/</code></a></p>
+<h2 id="lab-exercise-10"><a class="header" href="#lab-exercise-10">Lab Exercise</a></h2>
+<p>See <a href="https://github.com/noahgift/DB-mlops-genai/tree/main/labs/course4/week6"><code>labs/course4/week6/lab_6_3_production.py</code></a></p>
+<h2 id="key-implementation-7"><a class="header" href="#key-implementation-7">Key Implementation</a></h2>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct ProductionServer {
+    guardrails: Guardrails,
+    rate_limiter: RateLimiter,
+    metrics: Metrics,
+    router: ABRouter,
+}
+
+impl ProductionServer {
+    pub fn process(&amp;mut self, request: Request) -&gt; Response {
+        // 1. Check rate limit
+        if !self.rate_limiter.check() {
+            return Response::error("Rate limited");
+        }
+
+        // 2. Check guardrails
+        let check = self.guardrails.check_input(&amp;request.prompt);
+        if !check.passed {
+            self.metrics.record_guardrail_block();
+            return Response::error("Blocked by guardrails");
+        }
+
+        // 3. Route to model variant
+        let model = self.router.select();
+
+        // 4. Generate and record metrics
+        let start = Instant::now();
+        let response = model.generate(&amp;request.prompt);
+        self.metrics.record(start.elapsed(), response.tokens);
+
+        response
+    }
+}
+<span class="boring">}</span></code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="week-7-capstone--enterprise-knowledge-assistant"><a class="header" href="#week-7-capstone--enterprise-knowledge-assistant">Week 7: Capstone — Enterprise Knowledge Assistant</a></h1>
+<h2 id="duration-3"><a class="header" href="#duration-3">Duration</a></h2>
+<p>~18 hours</p>
+<h2 id="overview-12"><a class="header" href="#overview-12">Overview</a></h2>
+<p>Build a complete enterprise knowledge assistant with RAG, fine-tuning, and production deployment.</p>
+<h2 id="architecture-1"><a class="header" href="#architecture-1">Architecture</a></h2>
+<pre><code>Documents → alimentar (chunk) → trueno (embed) → trueno-rag (index)
+                                                        ↓
+User Query → trueno-rag (retrieve) → realizar (generate) → Response
+                     ↑                      ↑
+              Hybrid BM25+Vector    Fine-tuned Model
+                                          ↓
+                                    pacha (signed)
+                                          ↓
+                                    batuta (deploy)
+</code></pre>
+<h2 id="deliverables-1"><a class="header" href="#deliverables-1">Deliverables</a></h2>
+<ol>
+<li>
+<p><strong>Document Ingestion</strong></p>
+<ul>
+<li>Databricks pipeline</li>
+<li>alimentar chunking comparison</li>
+</ul>
+</li>
+<li>
+<p><strong>Embedding Pipeline</strong></p>
+<ul>
+<li>Vector Search index</li>
+<li>trueno SIMD embeddings</li>
+</ul>
+</li>
+<li>
+<p><strong>Hybrid Retrieval</strong></p>
+<ul>
+<li>Databricks RAG</li>
+<li>trueno-rag BM25 + vector</li>
+</ul>
+</li>
+<li>
+<p><strong>Generation Layer</strong></p>
+<ul>
+<li>Foundation Models API</li>
+<li>realizar inference</li>
+</ul>
+</li>
+<li>
+<p><strong>Fine-Tuned Model</strong></p>
+<ul>
+<li>Databricks fine-tuning</li>
+<li>entrenar LoRA</li>
+</ul>
+</li>
+<li>
+<p><strong>Security Package</strong></p>
+<ul>
+<li>Unity Catalog governance</li>
+<li>pacha encryption and signing</li>
+</ul>
+</li>
+<li>
+<p><strong>Production Deployment</strong></p>
+<ul>
+<li>Model Serving endpoint</li>
+<li>batuta orchestration</li>
+</ul>
+</li>
+<li>
+<p><strong>Evaluation Suite</strong></p>
+<ul>
+<li>pmat quality gates</li>
+<li>RAG evaluation metrics</li>
+</ul>
+</li>
+</ol>
+<h2 id="evaluation-criteria-1"><a class="header" href="#evaluation-criteria-1">Evaluation Criteria</a></h2>
+<ul>
+<li>Retrieval quality: MRR@10 ≥ 0.7</li>
+<li>Answer quality: Human evaluation ≥ 4/5</li>
+<li>Latency: p95 &lt; 2 seconds</li>
+<li>Security: All models signed, PII filtered</li>
+<li>Quality: pmat score ≥ B</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="sovereign-ai-stack-1"><a class="header" href="#sovereign-ai-stack-1">Sovereign AI Stack</a></h1>
+<p>The Sovereign AI Stack is a collection of Rust crates for building ML and GenAI systems from first principles.</p>
+<h2 id="architecture-2"><a class="header" href="#architecture-2">Architecture</a></h2>
+<pre><code>┌──────────────────────────────────────────────────────────────────┐
+│                   batuta (Orchestration)                         │
+│              Privacy Tiers · CLI · Stack Coordination            │
+├───────────────────┬──────────────────┬───────────────────────────┤
+│  realizar         │  entrenar        │      pacha                │
+│  (Inference)      │  (Training)      │   (Model Registry)        │
+│  GGUF/SafeTensors │  autograd/LoRA   │  Sign/Encrypt/Lineage     │
+├───────────────────┴──────────────────┴───────────────────────────┤
+│                    aprender                                       │
+│         ML Algorithms: regression, trees, clustering              │
+├──────────────────────────────────────────────────────────────────┤
+│                     trueno                                        │
+│         SIMD/GPU Compute (AVX2/AVX-512/NEON, wgpu)               │
+├──────────────────────────────────────────────────────────────────┤
+│  trueno-rag      │ trueno-db       │ alimentar     │ pmat        │
+│  BM25 + Vector   │ GPU Analytics   │ Arrow/Parquet │ Quality     │
+└──────────────────┴─────────────────┴───────────────┴─────────────┘
+</code></pre>
+<h2 id="component-reference"><a class="header" href="#component-reference">Component Reference</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Component</th><th>Purpose</th><th>Course Usage</th></tr></thead><tbody>
+<tr><td><strong>trueno</strong></td><td>SIMD tensor operations</td><td>Feature computation, embeddings</td></tr>
+<tr><td><strong>aprender</strong></td><td>ML algorithms</td><td>Model training</td></tr>
+<tr><td><strong>realizar</strong></td><td>Inference serving</td><td>Model deployment</td></tr>
+<tr><td><strong>entrenar</strong></td><td>LoRA/QLoRA training</td><td>Fine-tuning</td></tr>
+<tr><td><strong>pacha</strong></td><td>Model registry</td><td>Signing, encryption</td></tr>
+<tr><td><strong>batuta</strong></td><td>Orchestration</td><td>Pipeline coordination</td></tr>
+<tr><td><strong>trueno-rag</strong></td><td>RAG pipeline</td><td>Retrieval + generation</td></tr>
+<tr><td><strong>alimentar</strong></td><td>Data loading</td><td>Parquet, chunking</td></tr>
+<tr><td><strong>pmat</strong></td><td>Quality gates</td><td>TDG scoring</td></tr>
+</tbody></table>
+</div>
+<h2 id="installation"><a class="header" href="#installation">Installation</a></h2>
+<pre><code class="language-bash"># Install from crates.io
+cargo install batuta realizar pmat
+
+# Or add to Cargo.toml
+[dependencies]
+trueno = "0.11"
+aprender = "0.24"
+realizar = "0.5"
+pacha = "0.2"
+batuta = "0.4"
+alimentar = "0.2"
+pmat = "2.213"
+</code></pre>
+<h2 id="privacy-tiers"><a class="header" href="#privacy-tiers">Privacy Tiers</a></h2>
+<p>The Sovereign AI Stack supports three privacy tiers:</p>
+<div class="table-wrapper"><table><thead><tr><th>Tier</th><th>Description</th><th>Data Location</th></tr></thead><tbody>
+<tr><td><strong>Sovereign</strong></td><td>Air-gapped, on-premises</td><td>Never leaves local infrastructure</td></tr>
+<tr><td><strong>Private</strong></td><td>Cloud but encrypted</td><td>Your cloud account, E2E encrypted</td></tr>
+<tr><td><strong>Standard</strong></td><td>Managed services</td><td>Third-party APIs allowed</td></tr>
+</tbody></table>
+</div>
+<p>Configure in <code>batuta.toml</code>:</p>
+<pre><code class="language-toml">[privacy]
+tier = "sovereign"  # or "private", "standard"
+allowed_endpoints = ["localhost", "*.internal.corp"]
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="databricks-setup"><a class="header" href="#databricks-setup">Databricks Setup</a></h1>
+<p>This guide covers setting up Databricks Free Edition for the courses.</p>
+<h2 id="create-account"><a class="header" href="#create-account">Create Account</a></h2>
+<ol>
+<li>Go to <a href="https://www.databricks.com/">databricks.com</a></li>
+<li>Click "Try Databricks Free"</li>
+<li>Sign up with your email</li>
+<li>Verify your account</li>
+</ol>
+<h2 id="workspace-setup"><a class="header" href="#workspace-setup">Workspace Setup</a></h2>
+<h3 id="create-cluster"><a class="header" href="#create-cluster">Create Cluster</a></h3>
+<ol>
+<li>Navigate to <strong>Compute</strong> in the sidebar</li>
+<li>Click <strong>Create Cluster</strong></li>
+<li>Select the smallest instance type</li>
+<li>Enable auto-termination (15 minutes)</li>
+</ol>
+<h3 id="install-libraries"><a class="header" href="#install-libraries">Install Libraries</a></h3>
+<p>For Python notebooks:</p>
+<pre><code class="language-python">%pip install mlflow databricks-feature-store
+</code></pre>
+<h2 id="features-used"><a class="header" href="#features-used">Features Used</a></h2>
+<h3 id="course-3-mlops"><a class="header" href="#course-3-mlops">Course 3: MLOps</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Feature</th><th>Purpose</th></tr></thead><tbody>
+<tr><td>Experiments</td><td>MLflow tracking</td></tr>
+<tr><td>Catalog</td><td>Model registry</td></tr>
+<tr><td>Jobs</td><td>Pipeline orchestration</td></tr>
+<tr><td>SQL Warehouses</td><td>Feature computation</td></tr>
+<tr><td>Playground</td><td>Model testing</td></tr>
+</tbody></table>
+</div>
+<h3 id="course-4-genai"><a class="header" href="#course-4-genai">Course 4: GenAI</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Feature</th><th>Purpose</th></tr></thead><tbody>
+<tr><td>Playground</td><td>Foundation Models</td></tr>
+<tr><td>Vector Search</td><td>Semantic retrieval</td></tr>
+<tr><td>Genie</td><td>AI/BI demo</td></tr>
+<tr><td>Experiments</td><td>Evaluation tracking</td></tr>
+<tr><td>Jobs</td><td>RAG orchestration</td></tr>
+</tbody></table>
+</div>
+<h2 id="notebook-conventions"><a class="header" href="#notebook-conventions">Notebook Conventions</a></h2>
+<p>All Databricks notebooks in this repository use:</p>
+<pre><code class="language-python"># Databricks notebook source
+# MAGIC %md
+# MAGIC # Notebook Title
+
+# COMMAND ----------
+# Code cell
+</code></pre>
+<h2 id="running-labs"><a class="header" href="#running-labs">Running Labs</a></h2>
+<ol>
+<li>Import notebook into Databricks workspace</li>
+<li>Attach to running cluster</li>
+<li>Run cells sequentially</li>
+<li>Complete TODO sections</li>
+</ol>
+<h2 id="troubleshooting"><a class="header" href="#troubleshooting">Troubleshooting</a></h2>
+<h3 id="cluster-wont-start"><a class="header" href="#cluster-wont-start">Cluster won't start</a></h3>
+<ul>
+<li>Check your free tier limits</li>
+<li>Ensure auto-termination is enabled</li>
+<li>Try a smaller instance type</li>
+</ul>
+<h3 id="mlflow-not-found"><a class="header" href="#mlflow-not-found">MLflow not found</a></h3>
+<pre><code class="language-python">%pip install mlflow --quiet
+dbutils.library.restartPython()
+</code></pre>
+<h3 id="feature-store-issues"><a class="header" href="#feature-store-issues">Feature Store issues</a></h3>
+<pre><code class="language-python">%pip install databricks-feature-store --quiet
+dbutils.library.restartPython()
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+        <script src="ace.js"></script>
+        <script src="editor.js"></script>
+        <script src="mode-rust.js"></script>
+        <script src="theme-dawn.js"></script>
+        <script src="theme-tomorrow_night.js"></script>
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+    </div>
+    </body>
+</html>
