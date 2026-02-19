@@ -1,4 +1,4 @@
-.PHONY: all check lint format test test-fast test-course3 test-course4 demos clean setup help
+.PHONY: all check lint format test test-fast test-course1 test-course3 test-course4 demos clean setup help
 
 # Default target
 all: check
@@ -19,8 +19,11 @@ check: lint test
 
 # Lint code
 lint:
-	@echo "Linting Python..."
+	@echo "Linting Python (ruff)..."
 	uvx ruff check demos/ labs/ examples/ --ignore E501,E722,E402,F821,F541,F811,F401,F841,I001
+	@echo "Type checking Python (ty)..."
+	uvx ty check demos/course1/ labs/course1/ tests/
+	uvx ty check demos/course3/ demos/course4/ labs/course3/ labs/course4/ || echo "  (pre-existing type issues in courses 3-4, non-blocking)"
 	@echo "Linting Rust..."
 	@for dir in demos/*/week*/; do \
 		if [ -f "$$dir/Cargo.toml" ]; then \
@@ -65,6 +68,23 @@ test-fast:
 	@echo "Syntax check complete."
 
 # Course-specific tests
+test-course1:
+	@echo "Running Course 1 tests..."
+	@echo "Course 1 is Databricks-only (no Rust demos)"
+	python3 -m py_compile demos/course1/week1/databricks-lakehouse/lakehouse_architecture.py
+	python3 -m py_compile demos/course1/week1/databricks-workspace/workspace_catalog.py
+	python3 -m py_compile demos/course1/week2/databricks-notebooks/spark_notebooks.py
+	python3 -m py_compile demos/course1/week2/databricks-spark/spark_operations.py
+	python3 -m py_compile demos/course1/week3/databricks-delta/delta_tables.py
+	python3 -m py_compile demos/course1/week3/databricks-workflows/jobs_workflows.py
+	python3 -m py_compile labs/course1/week1/lab_lakehouse.py
+	python3 -m py_compile labs/course1/week1/lab_workspace.py
+	python3 -m py_compile labs/course1/week2/lab_notebooks.py
+	python3 -m py_compile labs/course1/week2/lab_spark.py
+	python3 -m py_compile labs/course1/week3/lab_delta.py
+	python3 -m py_compile labs/course1/week3/lab_workflows.py
+	@echo "Course 1 syntax validation passed."
+
 test-course3:
 	@echo "Running Course 3 tests..."
 	@for dir in demos/course3/week*/; do \
@@ -84,7 +104,7 @@ test-course4:
 # Validate demos
 demos:
 	@echo "Validating demo structure..."
-	@for course in course3 course4; do \
+	@for course in course1 course3 course4; do \
 		echo "Checking $$course demos..."; \
 		ls -d demos/$$course/week*/ 2>/dev/null || echo "No demos yet for $$course"; \
 	done
@@ -108,6 +128,7 @@ help:
 	@echo "  format       - Auto-format code"
 	@echo "  test         - Run full test suite"
 	@echo "  test-fast    - Quick syntax validation"
+	@echo "  test-course1 - Run Course 1 tests only (syntax)"
 	@echo "  test-course3 - Run Course 3 tests only"
 	@echo "  test-course4 - Run Course 4 tests only"
 	@echo "  demos        - Validate demo structure"

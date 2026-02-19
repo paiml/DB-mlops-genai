@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Week 6: Capstone - MLOps &amp; GenAI Engineering on Databricks</title>
+        <title>Lab: Workspace &amp; Catalog - MLOps &amp; GenAI Engineering on Databricks</title>
 
 
         <!-- Custom HTML head -->
@@ -126,10 +126,10 @@
                         <a href="../print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
-                        <a href="https://github.com/noahgift/DB-mlops-genai" title="Git repository" aria-label="Git repository">
+                        <a href="https://github.com/paiml/DB-mlops-genai" title="Git repository" aria-label="Git repository">
                             <i id="git-repository-button" class="fa fa-github"></i>
                         </a>
-                        <a href="https://github.com/noahgift/DB-mlops-genai/edit/main/book/src/course3/week6.md" title="Suggest an edit" aria-label="Suggest an edit">
+                        <a href="https://github.com/paiml/DB-mlops-genai/edit/main/book/src/course1/lab-workspace.md" title="Suggest an edit" aria-label="Suggest an edit">
                             <i id="git-edit-button" class="fa fa-edit"></i>
                         </a>
 
@@ -158,82 +158,40 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="week-6-capstone--fraud-detection-platform"><a class="header" href="#week-6-capstone--fraud-detection-platform">Week 6: Capstone — Fraud Detection Platform</a></h1>
-<h2 id="duration"><a class="header" href="#duration">Duration</a></h2>
-<p>~15 hours</p>
-<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
-<p>Build an end-to-end ML system for fraud detection using both Databricks and the Sovereign AI Stack.</p>
-<h2 id="architecture"><a class="header" href="#architecture">Architecture</a></h2>
-<pre><code>alimentar (Parquet) → trueno (SIMD features) → aprender (train)
-         ↓                                           ↓
-    Delta tables ←── pacha (sign + register) ←── .apr model
-         ↓
-    realizar (serve) → renacer (validate) → pmat (quality gate)
-         ↓
-    batuta (orchestrate + privacy tier = Sovereign)
-</code></pre>
-<h2 id="deliverables"><a class="header" href="#deliverables">Deliverables</a></h2>
+                        <h1 id="lab-workspace--catalog"><a class="header" href="#lab-workspace--catalog">Lab: Workspace &amp; Catalog</a></h1>
+<p>Navigate the Databricks workspace, explore the Unity Catalog hierarchy, browse DBFS, and inspect compute resources.</p>
+<h2 id="objectives"><a class="header" href="#objectives">Objectives</a></h2>
+<ul>
+<li>Navigate the Databricks Workspace UI</li>
+<li>Explore Unity Catalog (Metastore &gt; Catalog &gt; Schema &gt; Table)</li>
+<li>Use DBFS to browse files and sample datasets</li>
+<li>Inspect cluster configuration</li>
+</ul>
+<h2 id="lab-exercise"><a class="header" href="#lab-exercise">Lab Exercise</a></h2>
+<p>See <a href="https://github.com/paiml/DB-mlops-genai/tree/main/labs/course1/week1"><code>labs/course1/week1/lab_workspace.py</code></a></p>
+<h2 id="key-tasks"><a class="header" href="#key-tasks">Key Tasks</a></h2>
 <ol>
-<li>
-<p><strong>Feature Pipeline</strong></p>
-<ul>
-<li>Databricks Feature Store implementation</li>
-<li>trueno SIMD comparison</li>
-</ul>
-</li>
-<li>
-<p><strong>Training Pipeline</strong></p>
-<ul>
-<li>AutoML experiment</li>
-<li>aprender model comparison</li>
-</ul>
-</li>
-<li>
-<p><strong>Model Registry</strong></p>
-<ul>
-<li>Unity Catalog registration</li>
-<li>pacha signing and verification</li>
-</ul>
-</li>
-<li>
-<p><strong>Inference Endpoint</strong></p>
-<ul>
-<li>Model Serving deployment</li>
-<li>realizar server comparison</li>
-</ul>
-</li>
-<li>
-<p><strong>Quality Gates</strong></p>
-<ul>
-<li>Lakehouse Monitoring setup</li>
-<li>pmat TDG enforcement</li>
-</ul>
-</li>
-<li>
-<p><strong>Orchestrated Workflow</strong></p>
-<ul>
-<li>Databricks Jobs pipeline</li>
-<li>batuta orchestration</li>
-</ul>
-</li>
+<li><strong>Catalog exploration</strong> — List catalogs and schemas using SQL</li>
+<li><strong>Create schema and table</strong> — Build a <code>lab_workspace.cities</code> table with data</li>
+<li><strong>File system exploration</strong> — Browse <code>/databricks-datasets/</code> with dbutils</li>
+<li><strong>Compute inspection</strong> — Print cluster and runtime configuration</li>
 </ol>
-<h2 id="evaluation-criteria"><a class="header" href="#evaluation-criteria">Evaluation Criteria</a></h2>
+<h2 id="validation"><a class="header" href="#validation">Validation</a></h2>
+<p>The lab includes a <code>validate_lab()</code> function that checks:</p>
 <ul>
-<li>Functionality: All components working end-to-end</li>
-<li>Performance: Latency and throughput benchmarks</li>
-<li>Quality: pmat score ≥ B</li>
-<li>Documentation: Clear README and API docs</li>
+<li>Schema <code>lab_workspace</code> was created</li>
+<li>Cities table exists with at least 3 rows</li>
 </ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../course3/lab-quality.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../course1/lab-lakehouse.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../course4/overview.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../course1/week2.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -243,11 +201,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../course3/lab-quality.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../course1/lab-lakehouse.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../course4/overview.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../course1/week2.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Week 4: Model Serving - MLOps &amp; GenAI Engineering on Databricks</title>
+        <title>Lab: Lakehouse Concepts - MLOps &amp; GenAI Engineering on Databricks</title>
 
 
         <!-- Custom HTML head -->
@@ -126,10 +126,10 @@
                         <a href="../print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
-                        <a href="https://github.com/noahgift/DB-mlops-genai" title="Git repository" aria-label="Git repository">
+                        <a href="https://github.com/paiml/DB-mlops-genai" title="Git repository" aria-label="Git repository">
                             <i id="git-repository-button" class="fa fa-github"></i>
                         </a>
-                        <a href="https://github.com/noahgift/DB-mlops-genai/edit/main/book/src/course3/week4.md" title="Suggest an edit" aria-label="Suggest an edit">
+                        <a href="https://github.com/paiml/DB-mlops-genai/edit/main/book/src/course1/lab-lakehouse.md" title="Suggest an edit" aria-label="Suggest an edit">
                             <i id="git-edit-button" class="fa fa-edit"></i>
                         </a>
 
@@ -158,50 +158,41 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="week-4-model-serving-and-inference"><a class="header" href="#week-4-model-serving-and-inference">Week 4: Model Serving and Inference</a></h1>
-<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
-<p>Deploy inference services with realizar and benchmark against Databricks Model Serving.</p>
-<h2 id="topics"><a class="header" href="#topics">Topics</a></h2>
-<div class="table-wrapper"><table><thead><tr><th>#</th><th>Type</th><th>Title</th><th>Platform</th><th>Duration</th></tr></thead><tbody>
-<tr><td>4.1</td><td>Video</td><td>Inference Patterns: Batch vs Real-time</td><td>Concept</td><td>10 min</td></tr>
-<tr><td>4.2</td><td>Video</td><td>Databricks Model Serving</td><td>Databricks</td><td>10 min</td></tr>
-<tr><td>4.3</td><td>Lab</td><td>Deploy Endpoint in Databricks</td><td>Databricks</td><td>35 min</td></tr>
-<tr><td>4.4</td><td>Video</td><td>Build Inference Server from Scratch</td><td>Sovereign</td><td>10 min</td></tr>
-<tr><td>4.5</td><td>Lab</td><td>Serve Models with realizar</td><td>Sovereign</td><td>35 min</td></tr>
-<tr><td>4.6</td><td>Video</td><td>Batch Inference with Spark</td><td>Databricks</td><td>8 min</td></tr>
-<tr><td>4.7</td><td>Lab</td><td>Batch Scoring Pipeline</td><td>Databricks</td><td>30 min</td></tr>
-<tr><td>4.8</td><td>Video</td><td>Latency Benchmarking</td><td>Both</td><td>8 min</td></tr>
-<tr><td>4.9</td><td>Quiz</td><td>Inference Systems</td><td>—</td><td>15 min</td></tr>
-</tbody></table>
-</div>
-<h2 id="sovereign-ai-stack-components"><a class="header" href="#sovereign-ai-stack-components">Sovereign AI Stack Components</a></h2>
+                        <h1 id="lab-lakehouse-concepts"><a class="header" href="#lab-lakehouse-concepts">Lab: Lakehouse Concepts</a></h1>
+<p>Explore the data lakehouse architecture hands-on: compare architectures, inspect platform components, and create your first Delta table.</p>
+<h2 id="objectives"><a class="header" href="#objectives">Objectives</a></h2>
 <ul>
-<li><code>realizar</code> for inference server</li>
-<li><code>repartir</code> for distributed batch processing</li>
+<li>Identify key properties of a data lakehouse</li>
+<li>Compare lakehouse vs data warehouse vs data lake</li>
+<li>Create a Delta table and inspect the transaction log</li>
+<li>Verify the Databricks environment</li>
 </ul>
-<h2 id="key-concepts"><a class="header" href="#key-concepts">Key Concepts</a></h2>
-<h3 id="inference-patterns"><a class="header" href="#inference-patterns">Inference Patterns</a></h3>
+<h2 id="lab-exercise"><a class="header" href="#lab-exercise">Lab Exercise</a></h2>
+<p>See <a href="https://github.com/paiml/DB-mlops-genai/tree/main/labs/course1/week1"><code>labs/course1/week1/lab_lakehouse.py</code></a></p>
+<h2 id="key-tasks"><a class="header" href="#key-tasks">Key Tasks</a></h2>
+<ol>
+<li><strong>Verify environment</strong> — Print Spark version and runtime info</li>
+<li><strong>Architecture comparison</strong> — Build a DataFrame comparing warehouse/lake/lakehouse features</li>
+<li><strong>Create Delta table</strong> — Write sample data as a Delta table</li>
+<li><strong>Inspect history</strong> — Use <code>DESCRIBE HISTORY</code> to view the transaction log</li>
+</ol>
+<h2 id="validation"><a class="header" href="#validation">Validation</a></h2>
+<p>The lab includes a <code>validate_lab()</code> function that checks:</p>
 <ul>
-<li>Real-time: sub-100ms latency requirements</li>
-<li>Batch: throughput-optimized processing</li>
-<li>Streaming: continuous prediction on data flows</li>
-</ul>
-<h3 id="server-architecture"><a class="header" href="#server-architecture">Server Architecture</a></h3>
-<ul>
-<li>Request queuing and batching</li>
-<li>Model loading and caching</li>
-<li>Health checks and metrics</li>
+<li>Spark environment is running</li>
+<li>Delta table was created with at least 5 rows</li>
+<li>Architecture comparison DataFrame has all 3 architectures</li>
 </ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../course3/lab-training.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../course1/week1.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../course3/lab-serving.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../course1/lab-workspace.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -211,11 +202,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../course3/lab-training.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../course1/week1.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../course3/lab-serving.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../course1/lab-workspace.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

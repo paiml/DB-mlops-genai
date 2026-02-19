@@ -1,12 +1,14 @@
-# MLOps & GenAI Engineering on Databricks
+# Databricks Specialization on Coursera
 
-**Courses 3 & 4 of the Databricks Specialization on Coursera**
+**Courses 1, 3 & 4 of the Databricks Specialization on Coursera**
 
 Platform: Databricks Free Edition | Comparison Layer: Sovereign AI Stack (Rust)
 
 ## Design Philosophy
 
-**Dual-layer pedagogy:**
+**Course 1** is Databricks-only, building the foundation for the specialization.
+
+**Courses 3 & 4** use a dual-layer pedagogy:
 
 1. **Databricks layer** — Hands-on with MLflow, Feature Store, Model Serving, Vector Search, Foundation Models
 2. **Sovereign AI Stack layer** — Build the same concepts from scratch in Rust to understand what platforms abstract
@@ -21,6 +23,7 @@ Platform: Databricks Free Edition | Comparison Layer: Sovereign AI Stack (Rust)
 
 | Course | Title | Duration |
 |--------|-------|----------|
+| **1** | **Lakehouse Fundamentals** | ~15 hours |
 | **3** | **MLOps Engineering** | ~30 hours |
 | **4** | **GenAI Engineering** | ~34 hours |
 
@@ -63,4 +66,4 @@ cargo install batuta realizar pmat
 
 ## Getting Started
 
-Begin with [Course 3: MLOps Engineering](./course3/overview.md) or jump directly to [Course 4: GenAI Engineering](./course4/overview.md) if you're already familiar with MLOps concepts.
+Begin with [Course 1: Lakehouse Fundamentals](./course1/overview.md) for the foundational concepts, then continue to [Course 3: MLOps Engineering](./course3/overview.md) or jump directly to [Course 4: GenAI Engineering](./course4/overview.md) if you're already familiar with MLOps concepts.

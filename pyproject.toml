@@ -41,6 +41,12 @@ target-version = "py311"
 select = ["E", "F", "W", "I"]
 ignore = ["E501", "E722"]
 
+[tool.ty.rules]
+# Databricks notebooks use runtime globals (spark, dbutils, display)
+# and imports (pyspark, databricks) not available locally
+unresolved-reference = "ignore"
+unresolved-import = "ignore"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"

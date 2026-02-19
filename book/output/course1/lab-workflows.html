@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Week 7: Capstone - MLOps &amp; GenAI Engineering on Databricks</title>
+        <title>Lab: Jobs &amp; Workflows - MLOps &amp; GenAI Engineering on Databricks</title>
 
 
         <!-- Custom HTML head -->
@@ -126,10 +126,10 @@
                         <a href="../print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
-                        <a href="https://github.com/noahgift/DB-mlops-genai" title="Git repository" aria-label="Git repository">
+                        <a href="https://github.com/paiml/DB-mlops-genai" title="Git repository" aria-label="Git repository">
                             <i id="git-repository-button" class="fa fa-github"></i>
                         </a>
-                        <a href="https://github.com/noahgift/DB-mlops-genai/edit/main/book/src/course4/week7.md" title="Suggest an edit" aria-label="Suggest an edit">
+                        <a href="https://github.com/paiml/DB-mlops-genai/edit/main/book/src/course1/lab-workflows.md" title="Suggest an edit" aria-label="Suggest an edit">
                             <i id="git-edit-button" class="fa fa-edit"></i>
                         </a>
 
@@ -158,99 +158,49 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="week-7-capstone--enterprise-knowledge-assistant"><a class="header" href="#week-7-capstone--enterprise-knowledge-assistant">Week 7: Capstone — Enterprise Knowledge Assistant</a></h1>
-<h2 id="duration"><a class="header" href="#duration">Duration</a></h2>
-<p>~18 hours</p>
-<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
-<p>Build a complete enterprise knowledge assistant with RAG, fine-tuning, and production deployment.</p>
-<h2 id="architecture"><a class="header" href="#architecture">Architecture</a></h2>
-<pre><code>Documents → alimentar (chunk) → trueno (embed) → trueno-rag (index)
-                                                        ↓
-User Query → trueno-rag (retrieve) → realizar (generate) → Response
-                     ↑                      ↑
-              Hybrid BM25+Vector    Fine-tuned Model
-                                          ↓
-                                    pacha (signed)
-                                          ↓
-                                    batuta (deploy)
-</code></pre>
-<h2 id="deliverables"><a class="header" href="#deliverables">Deliverables</a></h2>
+                        <h1 id="lab-jobs--workflows"><a class="header" href="#lab-jobs--workflows">Lab: Jobs &amp; Workflows</a></h1>
+<p>Build a parameterized ETL pipeline, create dashboard-ready queries, and understand Databricks job scheduling.</p>
+<h2 id="objectives"><a class="header" href="#objectives">Objectives</a></h2>
+<ul>
+<li>Create parameterized notebooks with widgets</li>
+<li>Build an Extract-Transform-Load pipeline</li>
+<li>Write dashboard-ready SQL queries</li>
+<li>Understand job scheduling and workflow orchestration</li>
+</ul>
+<h2 id="lab-exercise"><a class="header" href="#lab-exercise">Lab Exercise</a></h2>
+<p>See <a href="https://github.com/paiml/DB-mlops-genai/tree/main/labs/course1/week3"><code>labs/course1/week3/lab_workflows.py</code></a></p>
+<h2 id="key-tasks"><a class="header" href="#key-tasks">Key Tasks</a></h2>
 <ol>
-<li>
-<p><strong>Document Ingestion</strong></p>
-<ul>
-<li>Databricks pipeline</li>
-<li>alimentar chunking comparison</li>
-</ul>
-</li>
-<li>
-<p><strong>Embedding Pipeline</strong></p>
-<ul>
-<li>Vector Search index</li>
-<li>trueno SIMD embeddings</li>
-</ul>
-</li>
-<li>
-<p><strong>Hybrid Retrieval</strong></p>
-<ul>
-<li>Databricks RAG</li>
-<li>trueno-rag BM25 + vector</li>
-</ul>
-</li>
-<li>
-<p><strong>Generation Layer</strong></p>
-<ul>
-<li>Foundation Models API</li>
-<li>realizar inference</li>
-</ul>
-</li>
-<li>
-<p><strong>Fine-Tuned Model</strong></p>
-<ul>
-<li>Databricks fine-tuning</li>
-<li>entrenar LoRA</li>
-</ul>
-</li>
-<li>
-<p><strong>Security Package</strong></p>
-<ul>
-<li>Unity Catalog governance</li>
-<li>pacha encryption and signing</li>
-</ul>
-</li>
-<li>
-<p><strong>Production Deployment</strong></p>
-<ul>
-<li>Model Serving endpoint</li>
-<li>batuta orchestration</li>
-</ul>
-</li>
-<li>
-<p><strong>Evaluation Suite</strong></p>
-<ul>
-<li>pmat quality gates</li>
-<li>RAG evaluation metrics</li>
-</ul>
-</li>
+<li><strong>Widgets</strong> — Create text and dropdown widgets for runtime parameters</li>
+<li><strong>ETL pipeline</strong> — Extract raw orders, transform (filter + enrich), load to Delta</li>
+<li><strong>Dashboard queries</strong> — Revenue by category, daily trends, top products</li>
+<li><strong>Job concepts</strong> — Answer questions about cluster types, retries, and parameter passing</li>
 </ol>
-<h2 id="evaluation-criteria"><a class="header" href="#evaluation-criteria">Evaluation Criteria</a></h2>
+<h2 id="key-concepts"><a class="header" href="#key-concepts">Key Concepts</a></h2>
 <ul>
-<li>Retrieval quality: MRR@10 ≥ 0.7</li>
-<li>Answer quality: Human evaluation ≥ 4/5</li>
-<li>Latency: p95 &lt; 2 seconds</li>
-<li>Security: All models signed, PII filtered</li>
-<li>Quality: pmat score ≥ B</li>
+<li><strong>Widgets:</strong> <code>dbutils.widgets.text()</code>, <code>dbutils.widgets.dropdown()</code></li>
+<li><strong>Job clusters:</strong> Auto-created and terminated — best for scheduled workloads</li>
+<li><strong>Workflows:</strong> Multi-task DAG with dependency ordering</li>
+<li><strong>Dashboards:</strong> SQL queries connected to SQL Warehouses for visualization</li>
+</ul>
+<h2 id="validation"><a class="header" href="#validation">Validation</a></h2>
+<p>The lab includes a <code>validate_lab()</code> function that checks:</p>
+<ul>
+<li>Parameters are configured</li>
+<li>Gold Delta table was created with data</li>
+<li>Revenue column exists in output</li>
+<li>Only completed orders were loaded</li>
 </ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../course4/lab-production.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../course1/lab-delta.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../sovereign-ai-stack.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../course3/overview.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -260,11 +210,11 @@ User Query → trueno-rag (retrieve) → realizar (generate) → Response
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../course4/lab-production.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../course1/lab-delta.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../sovereign-ai-stack.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../course3/overview.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

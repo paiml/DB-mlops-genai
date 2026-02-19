@@ -3,6 +3,32 @@
 from pathlib import Path
 
 
+def test_course1_demos_exist():
+    """Course 1 demos directory should exist."""
+    demos = Path("demos/course1")
+    assert demos.exists(), "demos/course1 directory must exist"
+
+
+def test_course1_labs_exist():
+    """Course 1 labs directory should exist."""
+    labs = Path("labs/course1")
+    assert labs.exists(), "labs/course1 directory must exist"
+
+
+def test_course1_demo_weeks():
+    """Course 1 should have demos for weeks 1-3."""
+    for week in range(1, 4):
+        week_dir = Path(f"demos/course1/week{week}")
+        assert week_dir.exists(), f"demos/course1/week{week} must exist"
+
+
+def test_course1_lab_weeks():
+    """Course 1 should have labs for weeks 1-3."""
+    for week in range(1, 4):
+        week_dir = Path(f"labs/course1/week{week}")
+        assert week_dir.exists(), f"labs/course1/week{week} must exist"
+
+
 def test_course3_demos_exist():
     """Course 3 demos directory should exist."""
     demos = Path("demos/course3")

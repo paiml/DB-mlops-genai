@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Week 6: Production - MLOps &amp; GenAI Engineering on Databricks</title>
+        <title>Lab: Using Notebooks - MLOps &amp; GenAI Engineering on Databricks</title>
 
 
         <!-- Custom HTML head -->
@@ -126,10 +126,10 @@
                         <a href="../print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
-                        <a href="https://github.com/noahgift/DB-mlops-genai" title="Git repository" aria-label="Git repository">
+                        <a href="https://github.com/paiml/DB-mlops-genai" title="Git repository" aria-label="Git repository">
                             <i id="git-repository-button" class="fa fa-github"></i>
                         </a>
-                        <a href="https://github.com/noahgift/DB-mlops-genai/edit/main/book/src/course4/week6.md" title="Suggest an edit" aria-label="Suggest an edit">
+                        <a href="https://github.com/paiml/DB-mlops-genai/edit/main/book/src/course1/lab-notebooks.md" title="Suggest an edit" aria-label="Suggest an edit">
                             <i id="git-edit-button" class="fa fa-edit"></i>
                         </a>
 
@@ -158,60 +158,40 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="week-6-production-deployment"><a class="header" href="#week-6-production-deployment">Week 6: Production Deployment</a></h1>
-<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
-<p>Deploy GenAI systems with guardrails, rate limiting, and monitoring.</p>
-<h2 id="topics"><a class="header" href="#topics">Topics</a></h2>
-<div class="table-wrapper"><table><thead><tr><th>#</th><th>Type</th><th>Title</th><th>Platform</th><th>Duration</th></tr></thead><tbody>
-<tr><td>6.1</td><td>Video</td><td>GenAI Production Patterns</td><td>Concept</td><td>10 min</td></tr>
-<tr><td>6.2</td><td>Video</td><td>Databricks Model Serving for LLMs</td><td>Databricks</td><td>10 min</td></tr>
-<tr><td>6.3</td><td>Lab</td><td>Deploy GenAI Endpoint</td><td>Databricks</td><td>35 min</td></tr>
-<tr><td>6.4</td><td>Video</td><td>Cost Control and Circuit Breakers</td><td>Sovereign</td><td>8 min</td></tr>
-<tr><td>6.5</td><td>Lab</td><td>Production Config with batuta</td><td>Sovereign</td><td>30 min</td></tr>
-<tr><td>6.6</td><td>Quiz</td><td>Production Deployment</td><td>—</td><td>15 min</td></tr>
-</tbody></table>
-</div>
-<h2 id="sovereign-ai-stack-components"><a class="header" href="#sovereign-ai-stack-components">Sovereign AI Stack Components</a></h2>
+                        <h1 id="lab-using-notebooks"><a class="header" href="#lab-using-notebooks">Lab: Using Notebooks</a></h1>
+<p>Practice using Databricks notebooks: magic commands for multi-language cells, dbutils for file operations, loading data, and visualizations.</p>
+<h2 id="objectives"><a class="header" href="#objectives">Objectives</a></h2>
 <ul>
-<li><code>batuta</code> for cost limits and observability</li>
-<li><code>renacer</code> for audit trails</li>
+<li>Use magic commands to switch between Python, SQL, and Markdown</li>
+<li>Work with dbutils for file system operations</li>
+<li>Load data from CSV files</li>
+<li>Use display() for rich visualizations</li>
 </ul>
-<h2 id="key-concepts"><a class="header" href="#key-concepts">Key Concepts</a></h2>
-<h3 id="guardrails"><a class="header" href="#guardrails">Guardrails</a></h3>
+<h2 id="lab-exercise"><a class="header" href="#lab-exercise">Lab Exercise</a></h2>
+<p>See <a href="https://github.com/paiml/DB-mlops-genai/tree/main/labs/course1/week2"><code>labs/course1/week2/lab_notebooks.py</code></a></p>
+<h2 id="key-tasks"><a class="header" href="#key-tasks">Key Tasks</a></h2>
+<ol>
+<li><strong>Magic commands</strong> — Write Python and SQL cells in the same notebook</li>
+<li><strong>dbutils exploration</strong> — List sample datasets, preview file contents</li>
+<li><strong>Load data</strong> — Read a CSV file with schema inference</li>
+<li><strong>Visualization</strong> — Use display() to create charts from aggregated data</li>
+</ol>
+<h2 id="validation"><a class="header" href="#validation">Validation</a></h2>
+<p>The lab includes a <code>validate_lab()</code> function that checks:</p>
 <ul>
-<li>Input validation (length, blocked patterns)</li>
-<li>Output filtering (PII, harmful content)</li>
-<li>Fail-safe defaults</li>
-</ul>
-<h3 id="rate-limiting"><a class="header" href="#rate-limiting">Rate Limiting</a></h3>
-<ul>
-<li>Requests per minute</li>
-<li>Tokens per minute</li>
-<li>Per-user quotas</li>
-</ul>
-<h3 id="monitoring"><a class="header" href="#monitoring">Monitoring</a></h3>
-<ul>
-<li>Latency percentiles (p50, p95, p99)</li>
-<li>Error rates and types</li>
-<li>Token usage and costs</li>
-<li>Guardrail trigger rates</li>
-</ul>
-<h3 id="ab-testing"><a class="header" href="#ab-testing">A/B Testing</a></h3>
-<ul>
-<li>Traffic splitting</li>
-<li>Metric collection</li>
-<li>Statistical significance</li>
+<li>Python magic command executed correctly</li>
+<li>DataFrame was loaded with data</li>
 </ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../course4/lab-finetuning.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../course1/week2.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../course4/lab-production.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../course1/lab-spark.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -221,11 +201,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../course4/lab-finetuning.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../course1/week2.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../course4/lab-production.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../course1/lab-spark.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

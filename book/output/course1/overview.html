@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Week 4: RAG Pipelines - MLOps &amp; GenAI Engineering on Databricks</title>
+        <title>Overview - MLOps &amp; GenAI Engineering on Databricks</title>
 
 
         <!-- Custom HTML head -->
@@ -126,10 +126,10 @@
                         <a href="../print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
-                        <a href="https://github.com/noahgift/DB-mlops-genai" title="Git repository" aria-label="Git repository">
+                        <a href="https://github.com/paiml/DB-mlops-genai" title="Git repository" aria-label="Git repository">
                             <i id="git-repository-button" class="fa fa-github"></i>
                         </a>
-                        <a href="https://github.com/noahgift/DB-mlops-genai/edit/main/book/src/course4/week4.md" title="Suggest an edit" aria-label="Suggest an edit">
+                        <a href="https://github.com/paiml/DB-mlops-genai/edit/main/book/src/course1/overview.md" title="Suggest an edit" aria-label="Suggest an edit">
                             <i id="git-edit-button" class="fa fa-edit"></i>
                         </a>
 
@@ -158,54 +158,63 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="week-4-rag-pipelines"><a class="header" href="#week-4-rag-pipelines">Week 4: RAG Pipelines</a></h1>
-<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
-<p>Build production RAG systems with document chunking, retrieval, and generation.</p>
-<h2 id="topics"><a class="header" href="#topics">Topics</a></h2>
-<div class="table-wrapper"><table><thead><tr><th>#</th><th>Type</th><th>Title</th><th>Platform</th><th>Duration</th></tr></thead><tbody>
-<tr><td>4.1</td><td>Video</td><td>RAG Architecture</td><td>Concept</td><td>10 min</td></tr>
-<tr><td>4.2</td><td>Video</td><td>Databricks RAG Components</td><td>Databricks</td><td>10 min</td></tr>
-<tr><td>4.3</td><td>Lab</td><td>Build RAG Pipeline in Databricks</td><td>Databricks</td><td>45 min</td></tr>
-<tr><td>4.4</td><td>Video</td><td>Document Chunking Strategies</td><td>Concept</td><td>10 min</td></tr>
-<tr><td>4.5</td><td>Lab</td><td>Chunking Pipeline with alimentar</td><td>Sovereign</td><td>35 min</td></tr>
-<tr><td>4.6</td><td>Video</td><td>Context Window Management</td><td>Sovereign</td><td>8 min</td></tr>
-<tr><td>4.7</td><td>Lab</td><td>End-to-End RAG with trueno-rag</td><td>Sovereign</td><td>45 min</td></tr>
-<tr><td>4.8</td><td>Video</td><td>RAG Evaluation Metrics</td><td>Concept</td><td>10 min</td></tr>
-<tr><td>4.9</td><td>Lab</td><td>Evaluate RAG Quality</td><td>Both</td><td>35 min</td></tr>
-<tr><td>4.10</td><td>Quiz</td><td>RAG Systems</td><td>—</td><td>15 min</td></tr>
+                        <h1 id="course-1-databricks-lakehouse-fundamentals"><a class="header" href="#course-1-databricks-lakehouse-fundamentals">Course 1: Databricks Lakehouse Fundamentals</a></h1>
+<h2 id="subtitle"><a class="header" href="#subtitle">Subtitle</a></h2>
+<p>Master the Data Lakehouse Architecture with Databricks Free Edition</p>
+<h2 id="description"><a class="header" href="#description">Description</a></h2>
+<p>Build a solid foundation in the Databricks Lakehouse Platform: understand the evolution from data warehouses and data lakes to the lakehouse paradigm, navigate the Databricks workspace and Unity Catalog, write Spark DataFrames and SQL, and work with Delta Lake for reliable, versioned data storage. This is a Databricks-only course — no Sovereign AI Stack component.</p>
+<h2 id="certification-alignment"><a class="header" href="#certification-alignment">Certification Alignment</a></h2>
+<p>This course prepares you for the <strong>Databricks Accredited Lakehouse Platform Fundamentals</strong> accreditation:</p>
+<ul>
+<li>25 multiple-choice questions</li>
+<li>Tests conceptual understanding of the platform</li>
+<li>Covers architecture, components, governance, and workloads</li>
+<li>Free for Databricks customers and partners</li>
+</ul>
+<h2 id="learning-outcomes"><a class="header" href="#learning-outcomes">Learning Outcomes</a></h2>
+<ol>
+<li>Explain the data lakehouse architecture and how it combines warehouse reliability with lake flexibility</li>
+<li>Navigate the Databricks workspace, Unity Catalog, and compute resources</li>
+<li>Use Databricks notebooks with magic commands, dbutils, and multiple languages</li>
+<li>Write Spark transformations (select, filter, groupBy, join) and actions</li>
+<li>Create and manage Delta Lake tables with ACID transactions, MERGE, and time travel</li>
+<li>Build parameterized ETL pipelines and schedule them as Databricks Jobs</li>
+</ol>
+<h2 id="duration"><a class="header" href="#duration">Duration</a></h2>
+<p>~15 hours | 18 videos | 6 labs | 3 quizzes</p>
+<h2 id="weeks"><a class="header" href="#weeks">Weeks</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Week</th><th>Topic</th><th>Focus</th></tr></thead><tbody>
+<tr><td>1</td><td>Lakehouse Architecture &amp; Platform</td><td>Architecture, workspace, catalog, compute</td></tr>
+<tr><td>2</td><td>Spark Fundamentals</td><td>Notebooks, DataFrames, SQL, transformations</td></tr>
+<tr><td>3</td><td>Delta Lake &amp; Workflows</td><td>Delta tables, DML, time travel, jobs</td></tr>
 </tbody></table>
 </div>
-<h2 id="sovereign-ai-stack-components"><a class="header" href="#sovereign-ai-stack-components">Sovereign AI Stack Components</a></h2>
+<h2 id="databricks-free-edition-features-used"><a class="header" href="#databricks-free-edition-features-used">Databricks Free Edition Features Used</a></h2>
 <ul>
-<li><code>trueno-rag</code> for full RAG pipeline</li>
-<li><code>alimentar</code> for document chunking</li>
-<li><code>pmat</code> for evaluation metrics</li>
+<li>Workspace and Notebooks</li>
+<li>Unity Catalog (basic)</li>
+<li>Apache Spark DataFrames and SQL</li>
+<li>Delta Lake tables</li>
+<li>DBFS (Databricks File System)</li>
+<li>Jobs and Workflows</li>
+<li>Sample datasets (<code>/databricks-datasets/</code>)</li>
 </ul>
-<h2 id="key-concepts"><a class="header" href="#key-concepts">Key Concepts</a></h2>
-<h3 id="rag-pipeline"><a class="header" href="#rag-pipeline">RAG Pipeline</a></h3>
-<ol>
-<li><strong>Chunk</strong>: Split documents into retrievable segments</li>
-<li><strong>Embed</strong>: Convert chunks to vector representations</li>
-<li><strong>Index</strong>: Store in vector database</li>
-<li><strong>Retrieve</strong>: Find relevant chunks for query</li>
-<li><strong>Generate</strong>: Synthesize answer with LLM</li>
-</ol>
-<h3 id="chunking-strategies"><a class="header" href="#chunking-strategies">Chunking Strategies</a></h3>
+<h2 id="prerequisites"><a class="header" href="#prerequisites">Prerequisites</a></h2>
 <ul>
-<li>Fixed size with overlap</li>
-<li>Sentence-based splitting</li>
-<li>Semantic chunking</li>
+<li>Basic SQL knowledge</li>
+<li>Familiarity with Python</li>
+<li>Databricks Free Edition account (<a href="https://www.databricks.com/">sign up</a>)</li>
 </ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../course4/lab-embeddings.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../introduction.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../course4/lab-rag.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../course1/week1.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -215,11 +224,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../course4/lab-embeddings.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../introduction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../course4/lab-rag.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../course1/week1.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This repository contains course materials for **MLOps & GenAI Engineering on Databricks** (Courses 3 & 4 of the Databricks Specialization on Coursera).
+This repository contains course materials for the **Databricks Specialization on Coursera** (Courses 1, 3 & 4). Course 1 covers Lakehouse Fundamentals (Databricks-only). Courses 3 & 4 cover MLOps and GenAI Engineering with a dual-layer pedagogy (Databricks + Sovereign AI Stack).
 
 ## Build Commands
 
@@ -17,9 +17,11 @@ make demos      # Run demo validation
 
 ```
 demos/
+  course1/          # Lakehouse Fundamentals demos (weeks 1-3, Databricks-only)
   course3/          # MLOps Engineering demos (weeks 1-3)
   course4/          # GenAI Engineering demos (weeks 1-3)
 labs/
+  course1/          # Lakehouse hands-on labs
   course3/          # MLOps hands-on labs
   course4/          # GenAI hands-on labs
 examples/
@@ -91,15 +93,20 @@ The `--faults` flag runs batuta bug-hunter to detect mutation targets and bounda
 
 ## Code Quality
 
-- Python: `ruff` for linting, `uv` for package management
+- Python: `ruff` for linting/formatting, `ty` for type checking, `uv` for package management
 - Rust: `cargo clippy`, `cargo fmt`
 - Quality gates enforced via `pmat`
+- All Python tools run via `uvx` (uv toolchain)
 
 ## Demo Conventions
 
 Each demo follows the pattern:
 ```
-demos/course{3,4}/week{1-3}/
+demos/course1/week{1-3}/          # Databricks-only (no Cargo.toml)
+  databricks-{topic}/
+    {notebook}.py
+
+demos/course{3,4}/week{1-3}/     # Dual-layer (Databricks + Rust)
   {demo-name}/
     Cargo.toml          # Rust manifest
     src/main.rs         # Rust entry point
@@ -111,6 +118,7 @@ demos/course{3,4}/week{1-3}/
 
 ```bash
 make test           # Full test suite
+make test-course1   # Course 1 tests only (syntax)
 make test-course3   # Course 3 tests only
 make test-course4   # Course 4 tests only
 ```

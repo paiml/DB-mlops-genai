@@ -18,8 +18,15 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v4
 
-      - name: Lint Python
+      - name: Lint Python (ruff)
         run: uvx ruff check demos/ labs/ examples/ --ignore E501,E722,E402,F821,F541,F811,F401,F841,I001
+
+      - name: Type check Python (ty) — course1 + tests (strict)
+        run: uvx ty check demos/course1/ labs/course1/ tests/
+
+      - name: Type check Python (ty) — courses 3-4 (informational)
+        run: uvx ty check demos/course3/ demos/course4/ labs/course3/ labs/course4/ || true
+        continue-on-error: true
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -49,9 +56,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
       - name: Python syntax check
         run: |
-          python3 -m py_compile demos/**/*.py labs/**/*.py 2>/dev/null || true
+          find demos/ labs/ examples/ -name '*.py' -exec python3 -m py_compile {} +
+
+      - name: Python tests (pytest)
+        run: uvx pytest tests/ -v
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable

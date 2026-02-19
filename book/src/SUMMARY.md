@@ -2,6 +2,19 @@
 
 [Introduction](./introduction.md)
 
+# Course 1: Lakehouse Fundamentals
+
+- [Overview](./course1/overview.md)
+- [Week 1: Lakehouse Architecture](./course1/week1.md)
+  - [Lab: Lakehouse Concepts](./course1/lab-lakehouse.md)
+  - [Lab: Workspace & Catalog](./course1/lab-workspace.md)
+- [Week 2: Spark Fundamentals](./course1/week2.md)
+  - [Lab: Using Notebooks](./course1/lab-notebooks.md)
+  - [Lab: Spark Operations](./course1/lab-spark.md)
+- [Week 3: Delta Lake & Workflows](./course1/week3.md)
+  - [Lab: Delta Tables](./course1/lab-delta.md)
+  - [Lab: Jobs & Workflows](./course1/lab-workflows.md)
+
 # Course 3: MLOps Engineering
 
 - [Overview](./course3/overview.md)

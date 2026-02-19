@@ -1,8 +1,8 @@
-# MLOps & GenAI Engineering with Databricks
+# Databricks Specialization on Coursera
 
-**Courses 3 & 4 of the Databricks Specialization on Coursera**
+**Courses 1, 3 & 4 of the Databricks Specialization on Coursera**
 
-Platform: Databricks Free Edition | Comparison Layer: Sovereign AI Stack (Rust)
+Platform: Databricks Free Edition | Comparison Layer: Sovereign AI Stack (Rust, Courses 3 & 4)
 
 ---
 
@@ -10,7 +10,7 @@ Platform: Databricks Free Edition | Comparison Layer: Sovereign AI Stack (Rust)
 
 | Course | Title | Status |
 |--------|-------|--------|
-| 1 | Lakehouse Fundamentals | Prerequisite |
+| **1** | **Lakehouse Fundamentals** | This course |
 | 2 | Data Engineering on Databricks | Prerequisite |
 | **3** | **MLOps Engineering** | This course |
 | **4** | **GenAI Engineering** | This course |
@@ -52,6 +52,97 @@ Platform: Databricks Free Edition | Comparison Layer: Sovereign AI Stack (Rust)
 │  BM25 + Vector   │ GPU Analytics   │ Arrow/Parquet │ Quality     │
 └──────────────────┴─────────────────┴───────────────┴─────────────┘
 ```
+
+---
+
+# Course 1: Databricks Lakehouse Fundamentals (3 Weeks)
+
+## Subtitle
+Master the Data Lakehouse Architecture with Databricks Free Edition
+
+## Learning Outcomes
+1. Explain the data lakehouse architecture and how it combines warehouse reliability with lake flexibility
+2. Navigate the Databricks workspace, Unity Catalog, and compute resources
+3. Use Databricks notebooks with magic commands, dbutils, and multiple languages
+4. Write Spark transformations (select, filter, groupBy, join) and actions
+5. Create and manage Delta Lake tables with ACID transactions, MERGE, and time travel
+6. Build parameterized ETL pipelines and schedule them as Databricks Jobs
+
+## Duration
+~15 hours | 18 videos | 6 labs | 3 quizzes
+
+## Certification Alignment
+Databricks Accredited Lakehouse Platform Fundamentals (25 multiple-choice questions)
+
+**Note:** Course 1 is Databricks-only — no Sovereign AI Stack component.
+
+---
+
+### Week 1: Lakehouse Architecture & Platform
+
+**Topics:**
+- Data architecture evolution (warehouses → lakes → lakehouse)
+- Lakehouse properties (ACID, schema enforcement, open formats)
+- Databricks platform architecture (control plane, data plane)
+- Workspace, Unity Catalog hierarchy, compute resources
+
+| Type | Title | Platform |
+|------|-------|----------|
+| Video | Data Architecture Evolution | Concept |
+| Video | Lakehouse Architecture | Concept |
+| Video | Databricks and the Lakehouse | Databricks |
+| Video | Databricks Overview | Databricks |
+| Video | Workspace, Catalog & Data | Databricks |
+| Video | Compute Resources | Databricks |
+| Lab | Lakehouse Concepts | Databricks |
+| Lab | Workspace & Catalog | Databricks |
+| Quiz | Lakehouse Architecture | — |
+
+---
+
+### Week 2: Spark Fundamentals
+
+**Topics:**
+- Databricks notebooks and magic commands
+- dbutils for file operations and widgets
+- Loading and previewing data (CSV, JSON, Parquet, Delta)
+- Spark core concepts (lazy evaluation, Catalyst optimizer)
+- DataFrame operations (select, filter, groupBy, join)
+
+| Type | Title | Platform |
+|------|-------|----------|
+| Video | Using Notebooks | Databricks |
+| Video | Magic Commands & Utilities | Databricks |
+| Video | Loading & Previewing Data | Databricks |
+| Video | Spark Core Concepts | Concept |
+| Video | Select & Filter Operations | Databricks |
+| Video | GroupBy, Aggregations & Joins | Databricks |
+| Lab | Using Notebooks | Databricks |
+| Lab | Spark Operations | Databricks |
+| Quiz | Spark Fundamentals | — |
+
+---
+
+### Week 3: Delta Lake & Workflows
+
+**Topics:**
+- Delta Lake architecture and transaction log
+- Creating Delta tables
+- DML operations (INSERT, UPDATE, MERGE)
+- Time travel and schema enforcement/evolution
+- Databricks Jobs, Dashboards, and Workflows
+
+| Type | Title | Platform |
+|------|-------|----------|
+| Video | What Is Delta Lake | Concept |
+| Video | Delta Lake Concepts | Concept |
+| Video | Creating Delta Tables | Databricks |
+| Video | Insert, Update & Merge | Databricks |
+| Video | Time Travel | Databricks |
+| Video | Jobs, Dashboards & Workflows | Databricks |
+| Lab | Delta Tables | Databricks |
+| Lab | Jobs & Workflows | Databricks |
+| Quiz | Delta Lake & Workflows | — |
 
 ---
 
