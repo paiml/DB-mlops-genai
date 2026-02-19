@@ -97,14 +97,14 @@ fn cosine_sim(a: &[f32], b: &[f32]) -> f32 {
 #[derive(Debug)]
 pub struct VectorIndex {
     entries: Vec<(String, Vec<f32>)>,
-    dimension: usize,
+    _dimension: usize,
 }
 
 impl VectorIndex {
     pub fn new(dimension: usize) -> Self {
         Self {
             entries: Vec::new(),
-            dimension,
+            _dimension: dimension,
         }
     }
 
