@@ -47,10 +47,7 @@ impl Default for LoraConfig {
             rank: 8,
             alpha: 16.0,
             dropout: 0.05,
-            target_modules: vec![
-                "q_proj".to_string(),
-                "v_proj".to_string(),
-            ],
+            target_modules: vec!["q_proj".to_string(), "v_proj".to_string()],
             bias: BiasMode::None,
         }
     }
@@ -258,7 +255,9 @@ pub struct PromptTemplate {
 impl PromptTemplate {
     pub fn alpaca() -> Self {
         Self {
-            template: "### Instruction:\n{instruction}\n\n### Input:\n{input}\n\n### Response:\n{output}".to_string(),
+            template:
+                "### Instruction:\n{instruction}\n\n### Input:\n{input}\n\n### Response:\n{output}"
+                    .to_string(),
         }
     }
 
@@ -472,12 +471,21 @@ fn main() {
 
     println!("   Learning rate: {}", training_config.learning_rate);
     println!("   Batch size: {}", training_config.batch_size);
-    println!("   Effective batch: {}", training_config.effective_batch_size());
+    println!(
+        "   Effective batch: {}",
+        training_config.effective_batch_size()
+    );
     println!("   Epochs: {}", training_config.epochs);
 
     let dataset_size = 1000;
-    println!("   Total steps (1000 samples): {}", training_config.total_steps(dataset_size));
-    println!("   Warmup steps: {}", training_config.warmup_steps(dataset_size));
+    println!(
+        "   Total steps (1000 samples): {}",
+        training_config.total_steps(dataset_size)
+    );
+    println!(
+        "   Warmup steps: {}",
+        training_config.warmup_steps(dataset_size)
+    );
     println!();
 
     // Step 4: Training Data
@@ -586,16 +594,13 @@ mod tests {
 
     #[test]
     fn test_training_config_effective_batch() {
-        let config = TrainingConfig::default()
-            .with_batch_size(4);
+        let config = TrainingConfig::default().with_batch_size(4);
         assert_eq!(config.effective_batch_size(), 16); // 4 * 4 accumulation
     }
 
     #[test]
     fn test_training_config_total_steps() {
-        let config = TrainingConfig::default()
-            .with_batch_size(4)
-            .with_epochs(2);
+        let config = TrainingConfig::default().with_batch_size(4).with_epochs(2);
         let steps = config.total_steps(160); // 160 / 16 = 10 steps per epoch
         assert_eq!(steps, 20);
     }

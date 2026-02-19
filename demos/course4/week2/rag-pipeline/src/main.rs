@@ -122,7 +122,8 @@ impl TextChunker {
         let mut start_idx = 0;
 
         for para in paragraphs {
-            if current_chunk.len() + para.len() > self.config.chunk_size && !current_chunk.is_empty()
+            if current_chunk.len() + para.len() > self.config.chunk_size
+                && !current_chunk.is_empty()
             {
                 chunks.push(Chunk {
                     id: format!("{}-{}", source_id, chunk_num),
@@ -360,8 +361,7 @@ impl Reranker {
     /// Rerank results based on additional signals
     pub fn rerank(&self, query: &str, mut results: Vec<RetrievalResult>) -> Vec<RetrievalResult> {
         let query_lower = query.to_lowercase();
-        let query_words: std::collections::HashSet<&str> =
-            query_lower.split_whitespace().collect();
+        let query_words: std::collections::HashSet<&str> = query_lower.split_whitespace().collect();
 
         for result in &mut results {
             let content_lower = result.chunk.content.to_lowercase();
@@ -491,11 +491,26 @@ fn main() {
     let mut retriever = Retriever::new(64);
 
     let documents = [
-        ("MLFlow is an open-source platform for ML lifecycle management.", "mlops"),
-        ("Feature engineering transforms raw data into model inputs.", "mlops"),
-        ("RAG combines retrieval with generation for better answers.", "genai"),
-        ("Vector databases store embeddings for similarity search.", "genai"),
-        ("Fine-tuning adapts pre-trained models to specific tasks.", "genai"),
+        (
+            "MLFlow is an open-source platform for ML lifecycle management.",
+            "mlops",
+        ),
+        (
+            "Feature engineering transforms raw data into model inputs.",
+            "mlops",
+        ),
+        (
+            "RAG combines retrieval with generation for better answers.",
+            "genai",
+        ),
+        (
+            "Vector databases store embeddings for similarity search.",
+            "genai",
+        ),
+        (
+            "Fine-tuning adapts pre-trained models to specific tasks.",
+            "genai",
+        ),
     ];
 
     for (text, category) in &documents {
@@ -631,7 +646,9 @@ mod tests {
             end_idx: 4,
             metadata: HashMap::new(),
         };
-        chunk.metadata.insert("key".to_string(), "value".to_string());
+        chunk
+            .metadata
+            .insert("key".to_string(), "value".to_string());
         assert_eq!(chunk.metadata.get("key"), Some(&"value".to_string()));
     }
 

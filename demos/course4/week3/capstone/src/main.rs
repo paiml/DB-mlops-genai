@@ -290,7 +290,11 @@ impl QualityScore {
             response.sources.iter().map(|s| s.score).sum::<f32>() / response.sources.len() as f32
         };
 
-        let groundedness = if response.sources.len() >= 2 { 0.85 } else { 0.6 };
+        let groundedness = if response.sources.len() >= 2 {
+            0.85
+        } else {
+            0.6
+        };
         let coherence = 0.9; // Simulated
 
         let overall = (relevance + groundedness + coherence) / 3.0;

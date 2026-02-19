@@ -537,7 +537,11 @@ fn main() {
         .add_blocked_pattern("harmful")
         .add_sensitive_topic("politics");
 
-    let test_inputs = ["Hello world", "Harmful content here", "Let's discuss politics"];
+    let test_inputs = [
+        "Hello world",
+        "Harmful content here",
+        "Let's discuss politics",
+    ];
 
     for input in &test_inputs {
         let result = filter.should_filter(input);
@@ -728,8 +732,7 @@ mod tests {
 
     #[test]
     fn test_endpoint_config() {
-        let config = EndpointConfig::new("my-endpoint", "llama")
-            .with_scaling(2, 8);
+        let config = EndpointConfig::new("my-endpoint", "llama").with_scaling(2, 8);
         assert_eq!(config.min_replicas, 2);
         assert_eq!(config.max_replicas, 8);
     }

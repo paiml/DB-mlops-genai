@@ -428,10 +428,7 @@ fn main() {
     .with_description("Basic Q&A template");
 
     println!("   Template: {}", template.name());
-    println!(
-        "   Variables: {:?}",
-        template.required_variables()
-    );
+    println!("   Variables: {:?}", template.required_variables());
 
     let mut vars = HashMap::new();
     vars.insert("topic".to_string(), "machine learning".to_string());
@@ -450,7 +447,10 @@ fn main() {
     let few_shot = FewShotPrompt::new("Classify the sentiment of the following text.")
         .add_example(FewShotExample::new("I love this product!", "Positive"))
         .add_example(FewShotExample::new("This is terrible.", "Negative"))
-        .add_example(FewShotExample::new("It's okay, nothing special.", "Neutral"));
+        .add_example(FewShotExample::new(
+            "It's okay, nothing special.",
+            "Neutral",
+        ));
 
     let prompt = few_shot.build("The food was absolutely delicious!");
     println!("   Examples: {}", few_shot.example_count());
@@ -465,7 +465,10 @@ fn main() {
         .with_answer("42");
 
     println!("   Steps: {}", cot.step_count());
-    println!("   Reasoning:\n   {}\n", cot.format().replace('\n', "\n   "));
+    println!(
+        "   Reasoning:\n   {}\n",
+        cot.format().replace('\n', "\n   ")
+    );
 
     // Step 4: System Prompts
     println!("🤖 Step 4: System Prompts");
@@ -496,8 +499,11 @@ fn main() {
     println!("📚 Step 6: Prompt Library");
     let mut library = PromptLibrary::new();
     library.add(
-        PromptTemplate::new("summarize", "Summarize the following text:\n\n{text}\n\nSummary:")
-            .with_description("Text summarization"),
+        PromptTemplate::new(
+            "summarize",
+            "Summarize the following text:\n\n{text}\n\nSummary:",
+        )
+        .with_description("Text summarization"),
     );
     library.add(
         PromptTemplate::new(
@@ -557,8 +563,8 @@ mod tests {
 
     #[test]
     fn test_few_shot_build() {
-        let few_shot = FewShotPrompt::new("Classify:")
-            .add_example(FewShotExample::new("good", "positive"));
+        let few_shot =
+            FewShotPrompt::new("Classify:").add_example(FewShotExample::new("good", "positive"));
         let prompt = few_shot.build("test");
         assert!(prompt.contains("Classify:"));
         assert!(prompt.contains("good"));
@@ -575,9 +581,7 @@ mod tests {
 
     #[test]
     fn test_chain_of_thought() {
-        let cot = ChainOfThought::new()
-            .add_step("Step one")
-            .with_answer("42");
+        let cot = ChainOfThought::new().add_step("Step one").with_answer("42");
         let output = cot.format();
         assert!(output.contains("Step 1:"));
         assert!(output.contains("42"));
