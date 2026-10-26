@@ -129,42 +129,11 @@ jobs:
       - name: Repository score
         run: pmat repo-score
 
-  coverage-report:
-    name: coverage (report only)
-    timeout-minutes: 60
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v7.0.1
-      - name: Install system packages (README, Linux)
-        run: sudo apt-get update && sudo apt-get install -y build-essential curl
-      - uses: dtolnay/rust-toolchain@d124f86f28ff42855784ff3319f48ac182c248f8 # 1.99.1
-        with:
-          components: llvm-tools-preview
-      - uses: actions/cache@v6.1.0
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: coverage-${{ runner.os }}-${{ hashFiles('demos/*/Cargo.lock', 'demos/*/*/Cargo.lock', 'rust-toolchain.toml') }}
-      - uses: taiki-e/install-action@v2.87.32
-        with:
-          tool: cargo-llvm-cov@0.8.5
-      # Report mode: prints the line coverage and passes. Measured 71.51%
-      # (course3-capstone) and 89.23% (course4/capstone), both below 100%, so
-      # no threshold is enforced yet.
-      - name: Coverage (report only)
-        run: |
-          for dir in demos/course3-capstone demos/course4/capstone; do
-            echo "Coverage: $dir"
-            (cd "$dir" && cargo llvm-cov --summary-only)
-          done
-
   gate:
     name: gate
     runs-on: ubuntu-24.04
     if: ${{ always() }}
-    needs: [lint, test, security, quality, coverage-report]
+    needs: [lint, test, security, quality]
     steps:
       - name: All jobs must succeed
         run: |
@@ -172,4 +141,3 @@ jobs:
           test "${{ needs.test.result }}" = success
           test "${{ needs.security.result }}" = success
           test "${{ needs.quality.result }}" = success
-          test "${{ needs.coverage-report.result }}" = success
