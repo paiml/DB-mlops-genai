@@ -1,130 +1,175 @@
+# The `gate` check the paiml org ruleset requires on main.
+#
+# Python demos/labs are linted and type-checked, the structure tests run, and
+# the two Rust capstones are formatted, linted, tested and license-checked.
+# All jobs run on GitHub-hosted ubuntu-24.04 with pinned tool versions (Rust is
+# pinned by rust-toolchain.toml). `gate` needs every other job.
 name: CI
 
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    name: lint
+    timeout-minutes: 30
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-
+      - uses: actions/checkout@v7.0.1
+      - uses: astral-sh/setup-uv@v10.3.2
+        with:
+          version: "0.9.5"
+          enable-cache: true
       - name: Lint Python (ruff)
-        run: uvx ruff check demos/ labs/ examples/ --ignore E501,E722,E402,F821,F541,F811,F401,F841,I001
-
-      - name: Type check Python (ty) — course1 + tests (strict)
-        run: uvx ty check demos/course1/ labs/course1/ tests/
-
-      - name: Type check Python (ty) — courses 3-4 (informational)
-        run: uvx ty check demos/course3/ demos/course4/ labs/course3/ labs/course4/ || true
-        continue-on-error: true
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+        run: uvx ruff@0.14.1 check demos/ labs/ examples/ --ignore E501,E722,E402,F821,F541,F811,F401,F841,I001
+      - name: Type check Python (ty), course 1 and tests
+        run: uvx ty@0.0.92 check demos/course1/ labs/course1/ tests/
+      - name: Install system packages (README, Linux)
+        run: sudo apt-get update && sudo apt-get install -y build-essential curl
+      - uses: dtolnay/rust-toolchain@d124f86f28ff42855784ff3319f48ac182c248f8 # 1.99.1
         with:
           components: clippy, rustfmt
-
+      - uses: actions/cache@v6.1.0
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: lint-${{ runner.os }}-${{ hashFiles('demos/*/Cargo.lock', 'demos/*/*/Cargo.lock', 'rust-toolchain.toml') }}
+          restore-keys: lint-${{ runner.os }}-
       - name: Check Rust formatting
         run: |
-          for dir in demos/course*/week*/*; do
-            if [ -f "$dir/Cargo.toml" ]; then
-              echo "Checking format: $dir"
-              (cd "$dir" && cargo fmt --check)
-            fi
+          for dir in demos/course3-capstone demos/course4/capstone; do
+            echo "Checking format: $dir"
+            (cd "$dir" && cargo fmt --all -- --check)
           done
-
       - name: Clippy
         run: |
-          for dir in demos/course*/week*/*; do
-            if [ -f "$dir/Cargo.toml" ]; then
-              echo "Clippy: $dir"
-              (cd "$dir" && cargo clippy -- -D warnings)
-            fi
+          for dir in demos/course3-capstone demos/course4/capstone; do
+            echo "Clippy: $dir"
+            (cd "$dir" && cargo clippy -- -D warnings)
           done
 
   test:
-    runs-on: ubuntu-latest
+    name: test
+    timeout-minutes: 45
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-
+      - uses: actions/checkout@v7.0.1
+      - uses: astral-sh/setup-uv@v10.3.2
+        with:
+          version: "0.9.5"
+          enable-cache: true
       - name: Python syntax check
-        run: |
-          find demos/ labs/ examples/ -name '*.py' -exec python3 -m py_compile {} +
-
+        run: find demos/ labs/ examples/ -name '*.py' -exec python3 -m py_compile {} +
       - name: Python tests (pytest)
-        run: uvx pytest tests/ -v
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
+        run: uvx pytest@9.1.1 tests/ -v
+      - name: Install system packages (README, Linux)
+        run: sudo apt-get update && sudo apt-get install -y build-essential curl
+      - uses: dtolnay/rust-toolchain@d124f86f28ff42855784ff3319f48ac182c248f8 # 1.99.1
+      - uses: actions/cache@v6.1.0
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: test-${{ runner.os }}-${{ hashFiles('demos/*/Cargo.lock', 'demos/*/*/Cargo.lock', 'rust-toolchain.toml') }}
+          restore-keys: test-${{ runner.os }}-
       - name: Rust tests
         run: |
-          for dir in demos/course*/week*/*; do
-            if [ -f "$dir/Cargo.toml" ]; then
-              echo "Testing: $dir"
-              (cd "$dir" && cargo test)
-            fi
+          for dir in demos/course3-capstone demos/course4/capstone; do
+            echo "Testing: $dir"
+            (cd "$dir" && cargo test)
           done
 
   security:
-    runs-on: ubuntu-latest
+    name: security
+    timeout-minutes: 30
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Install cargo-audit
-        run: cargo install cargo-audit
-
+      - uses: actions/checkout@v7.0.1
+      - uses: dtolnay/rust-toolchain@d124f86f28ff42855784ff3319f48ac182c248f8 # 1.99.1
+      - uses: actions/cache@v6.1.0
+        with:
+          path: ~/.cargo/bin
+          key: tools-cargo-deny-0.19.0-${{ runner.os }}
       - name: Install cargo-deny
-        run: cargo install cargo-deny
-
-      - name: Security audit
+        run: command -v cargo-deny || cargo install --locked cargo-deny --version 0.19.0
+      # Licenses, banned crates and sources. Advisory scanning (cargo audit)
+      # runs in the weekly canary because the advisory database changes daily.
+      - name: License, ban and source check
         run: |
-          for dir in demos/course*/week*/*/; do
-            if [ -f "${dir}Cargo.toml" ]; then
-              echo "Auditing: $dir"
-              (cd "$dir" && cargo audit) || true
-            fi
+          for dir in demos/course3-capstone demos/course4/capstone; do
+            echo "Checking: $dir"
+            (cd "$dir" && cargo deny check --config "$GITHUB_WORKSPACE/deny.toml" licenses bans sources)
           done
-
-      - name: License check
-        run: |
-          for dir in demos/course*/week*/*/; do
-            if [ -f "${dir}Cargo.toml" ]; then
-              echo "Checking licenses: $dir"
-              (cd "$dir" && cargo deny check licenses 2>/dev/null) || true
-            fi
-          done
-        continue-on-error: true
 
   quality:
-    runs-on: ubuntu-latest
+    name: quality
+    timeout-minutes: 60
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
+      - uses: actions/checkout@v7.0.1
+      - uses: dtolnay/rust-toolchain@d124f86f28ff42855784ff3319f48ac182c248f8 # 1.99.1
+      - uses: actions/cache@v6.1.0
+        with:
+          path: ~/.cargo/bin
+          key: tools-pmat-3.42.0-${{ runner.os }}
       - name: Install pmat
-        run: cargo install pmat
-
+        run: command -v pmat || cargo install --locked pmat --version 3.42.0
       - name: Repository score
         run: pmat repo-score
 
-      - name: Quality gates (informational)
-        run: pmat quality-gate || echo "Quality gate violations found (expected for educational repo with intentional TODOs)"
-        continue-on-error: true
+  coverage-report:
+    name: coverage (report only)
+    timeout-minutes: 60
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Install system packages (README, Linux)
+        run: sudo apt-get update && sudo apt-get install -y build-essential curl
+      - uses: dtolnay/rust-toolchain@d124f86f28ff42855784ff3319f48ac182c248f8 # 1.99.1
+        with:
+          components: llvm-tools-preview
+      - uses: actions/cache@v6.1.0
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: coverage-${{ runner.os }}-${{ hashFiles('demos/*/Cargo.lock', 'demos/*/*/Cargo.lock', 'rust-toolchain.toml') }}
+      - uses: taiki-e/install-action@v2.87.32
+        with:
+          tool: cargo-llvm-cov@0.8.5
+      # Report mode: prints the line coverage and passes. Measured 71.51%
+      # (course3-capstone) and 89.23% (course4/capstone), both below 100%, so
+      # no threshold is enforced yet.
+      - name: Coverage (report only)
+        run: |
+          for dir in demos/course3-capstone demos/course4/capstone; do
+            echo "Coverage: $dir"
+            (cd "$dir" && cargo llvm-cov --summary-only)
+          done
+
+  gate:
+    name: gate
+    runs-on: ubuntu-24.04
+    if: ${{ always() }}
+    needs: [lint, test, security, quality, coverage-report]
+    steps:
+      - name: All jobs must succeed
+        run: |
+          test "${{ needs.lint.result }}" = success
+          test "${{ needs.test.result }}" = success
+          test "${{ needs.security.result }}" = success
+          test "${{ needs.quality.result }}" = success
+          test "${{ needs.coverage-report.result }}" = success

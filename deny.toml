@@ -2,13 +2,10 @@
 # https://embarkstudios.github.io/cargo-deny/
 
 [advisories]
-vulnerability = "warn"
-unmaintained = "warn"
+unmaintained = "workspace"
 yanked = "warn"
-notice = "warn"
 
 [licenses]
-unlicensed = "deny"
 allow = [
     "MIT",
     "Apache-2.0",
@@ -18,10 +15,9 @@ allow = [
     "ISC",
     "Zlib",
     "CC0-1.0",
-    "Unicode-DFS-2016",
+    "Unicode-3.0",
     "MPL-2.0",
 ]
-copyleft = "warn"
 
 [bans]
 multiple-versions = "warn"

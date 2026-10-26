@@ -318,7 +318,8 @@ mod tests {
 
     #[test]
     fn parse_valid_openai_response() {
-        let json = r#"{"choices":[{"message":{"content":"fn is_prime(n: u64) -> bool { true }"}}]}"#;
+        let json =
+            r#"{"choices":[{"message":{"content":"fn is_prime(n: u64) -> bool { true }"}}]}"#;
         assert_eq!(
             parse_chat_content(json),
             "fn is_prime(n: u64) -> bool { true }"
@@ -359,7 +360,8 @@ mod tests {
 
     #[test]
     fn parse_multiple_choices_takes_first() {
-        let json = r#"{"choices":[{"message":{"content":"first"}},{"message":{"content":"second"}}]}"#;
+        let json =
+            r#"{"choices":[{"message":{"content":"first"}},{"message":{"content":"second"}}]}"#;
         assert_eq!(parse_chat_content(json), "first");
     }
 
