@@ -2,6 +2,7 @@
 name = "course3-capstone"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
 description = "C3 MLOps Capstone: Serve Qwen2.5-Coder-1.5B with APR"
 
 [dependencies]

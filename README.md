@@ -36,11 +36,27 @@ cd DB-mlops-genai
 
 # Install Python dependencies
 pip install uv && uv sync --all-extras
+```
 
-# Install Rust toolchain (for Sovereign AI Stack)
+### Rust toolchain (for the Sovereign AI Stack capstones)
+
+The Rust version is pinned by `rust-toolchain.toml`; `rustup` installs it on first use.
+
+**Linux (Ubuntu)**
+```bash
+sudo apt-get update && sudo apt-get install -y build-essential curl
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
 
-# Install Sovereign AI Stack tools
+**macOS**
+```bash
+xcode-select --install
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+Then install the Sovereign AI Stack tools:
+
+```bash
 cargo install batuta realizar pmat
 ```
 
@@ -75,8 +91,8 @@ make test-course4
 ```
 demos/
   course1/           # Lakehouse Fundamentals demos (weeks 1-3)
-  course3/           # MLOps demos (weeks 1-3)
-  course4/           # GenAI demos (weeks 1-3)
+  course3-capstone/  # MLOps capstone (Rust)
+  course4/           # GenAI capstone (Rust)
 labs/
   course1/           # Lakehouse hands-on labs
   course3/           # MLOps hands-on labs

@@ -91,13 +91,7 @@ fn inspect_model(model_path: &str) {
 /// Spawn `apr serve` and poll /health until ready.
 fn start_server(model_path: &str) -> Child {
     let mut child = Command::new("apr")
-        .args([
-            "serve",
-            model_path,
-            "--port",
-            &PORT.to_string(),
-            "--gpu",
-        ])
+        .args(["serve", model_path, "--port", &PORT.to_string(), "--gpu"])
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
@@ -120,12 +114,13 @@ fn start_server(model_path: &str) -> Child {
 
 /// GET /health — returns Ok(()) when server responds 200.
 fn health_check() -> Result<(), String> {
-    let mut stream =
-        TcpStream::connect(format!("127.0.0.1:{PORT}")).map_err(|e| e.to_string())?;
+    let mut stream = TcpStream::connect(format!("127.0.0.1:{PORT}")).map_err(|e| e.to_string())?;
     stream.set_read_timeout(Some(Duration::from_secs(5))).ok();
 
     let req = build_health_request(PORT);
-    stream.write_all(req.as_bytes()).map_err(|e| e.to_string())?;
+    stream
+        .write_all(req.as_bytes())
+        .map_err(|e| e.to_string())?;
 
     let mut reader = BufReader::new(stream);
     let mut status_line = String::new();
@@ -143,12 +138,12 @@ fn query_server() -> String {
 
     let mut stream =
         TcpStream::connect(format!("127.0.0.1:{PORT}")).expect("failed to connect to server");
-    stream
-        .set_read_timeout(Some(Duration::from_secs(60)))
-        .ok();
+    stream.set_read_timeout(Some(Duration::from_secs(60))).ok();
 
     let req = build_post_request(PORT, "/v1/chat/completions", &body_str);
-    stream.write_all(req.as_bytes()).expect("failed to send request");
+    stream
+        .write_all(req.as_bytes())
+        .expect("failed to send request");
 
     let mut reader = BufReader::new(stream);
     let resp_body = read_http_body(&mut reader);

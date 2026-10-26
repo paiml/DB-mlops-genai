@@ -1,0 +1,55 @@
+# Weekly check that the learner steps still work on the latest runner images.
+name: canary
+
+on:
+  schedule:
+    - cron: "23 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  learner-check:
+    name: learner-check (${{ matrix.os }})
+    timeout-minutes: 45
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Install system packages (README, Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y build-essential curl
+      - uses: dtolnay/rust-toolchain@d124f86f28ff42855784ff3319f48ac182c248f8 # 1.99.1
+      - uses: astral-sh/setup-uv@v10.3.2
+        with:
+          version: "0.9.5"
+      - name: Python tests
+        run: uvx pytest@9.1.1 tests/ -v
+      - name: Rust tests
+        run: |
+          for dir in demos/course3-capstone demos/course4/capstone; do
+            (cd "$dir" && cargo test)
+          done
+
+  advisories:
+    name: advisories
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: dtolnay/rust-toolchain@d124f86f28ff42855784ff3319f48ac182c248f8 # 1.99.1
+      - name: Install cargo-audit
+        run: cargo install --locked cargo-audit --version 0.22.1
+      - name: Security advisories
+        run: |
+          for dir in demos/course3-capstone demos/course4/capstone; do
+            echo "Auditing: $dir"
+            (cd "$dir" && cargo audit)
+          done

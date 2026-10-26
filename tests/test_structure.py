@@ -31,8 +31,8 @@ def test_course1_lab_weeks():
 
 def test_course3_demos_exist():
     """Course 3 demos directory should exist."""
-    demos = Path("demos/course3")
-    assert demos.exists(), "demos/course3 directory must exist"
+    demos = Path("demos/course3-capstone")
+    assert demos.exists(), "demos/course3-capstone directory must exist"
 
 
 def test_course4_demos_exist():

@@ -15,12 +15,8 @@ use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 use trueno_rag::{
-    embed::MockEmbedder,
-    fusion::FusionStrategy,
-    metrics::RetrievalMetrics,
-    pipeline::RagPipelineBuilder,
-    rerank::NoOpReranker,
-    ChunkId, Document,
+    embed::MockEmbedder, fusion::FusionStrategy, metrics::RetrievalMetrics,
+    pipeline::RagPipelineBuilder, rerank::NoOpReranker, ChunkId, Document,
 };
 
 // ── CLI ─────────────────────────────────────────────────────────────────
@@ -268,7 +264,11 @@ fn run_pipeline(
         })
         .collect();
 
-    scored.sort_by(|a, b| b.fused_score.partial_cmp(&a.fused_score).unwrap_or(std::cmp::Ordering::Equal));
+    scored.sort_by(|a, b| {
+        b.fused_score
+            .partial_cmp(&a.fused_score)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
     scored.truncate(k);
 
     Ok(scored)
@@ -322,7 +322,10 @@ fn run_eval() -> Result<(), Box<dyn std::error::Error>> {
         .build()?;
 
     let total_chunks = pipeline.index_documents(&sample_docs)?;
-    println!("Indexed {total_chunks} chunks from {} documents\n", sample_docs.len());
+    println!(
+        "Indexed {total_chunks} chunks from {} documents\n",
+        sample_docs.len()
+    );
 
     let dataset = eval_dataset();
     let k_values = [1, 3, 5];
@@ -383,7 +386,6 @@ struct Config {
 }"#,
         )
         .with_title("config.rs"),
-
         Document::new(
             r#"use serde::{Serialize, Deserialize};
 
@@ -404,7 +406,6 @@ impl Embedding {
 }"#,
         )
         .with_title("embedding.rs"),
-
         Document::new(
             r#"/// Chunk text using recursive splitting at semantic boundaries.
 fn recursive_chunk(text: &str, max_size: usize, overlap: usize) -> Vec<String> {
@@ -439,7 +440,6 @@ fn split_recursive(text: &str, seps: &[&str], max_size: usize, overlap: usize) -
 }"#,
         )
         .with_title("chunker.rs"),
-
         Document::new(
             r#"use tokio::sync::mpsc;
 
@@ -466,7 +466,6 @@ async fn process_batch<T: Send + 'static>(
 }"#,
         )
         .with_title("pipeline.rs"),
-
         Document::new(
             r#"#[cfg(test)]
 mod tests {
@@ -657,18 +656,66 @@ mod tests {
 
     #[test]
     fn test_quality_score_monotonic() {
-        let a = QualityAnnotation { grade: "A".to_string(), complexity: 1, faults: vec![] };
-        let f = QualityAnnotation { grade: "F".to_string(), complexity: 50, faults: vec!["unwrap".into(), "panic".into()] };
+        let a = QualityAnnotation {
+            grade: "A".to_string(),
+            complexity: 1,
+            faults: vec![],
+        };
+        let f = QualityAnnotation {
+            grade: "F".to_string(),
+            complexity: 50,
+            faults: vec!["unwrap".into(), "panic".into()],
+        };
         assert!(a.quality_score() > f.quality_score());
     }
 
     #[test]
     fn test_grade_score_values() {
-        assert_eq!(QualityAnnotation { grade: "A".into(), complexity: 0, faults: vec![] }.grade_score(), 5.0);
-        assert_eq!(QualityAnnotation { grade: "B".into(), complexity: 0, faults: vec![] }.grade_score(), 4.0);
-        assert_eq!(QualityAnnotation { grade: "C".into(), complexity: 0, faults: vec![] }.grade_score(), 3.0);
-        assert_eq!(QualityAnnotation { grade: "D".into(), complexity: 0, faults: vec![] }.grade_score(), 2.0);
-        assert_eq!(QualityAnnotation { grade: "F".into(), complexity: 0, faults: vec![] }.grade_score(), 1.0);
+        assert_eq!(
+            QualityAnnotation {
+                grade: "A".into(),
+                complexity: 0,
+                faults: vec![]
+            }
+            .grade_score(),
+            5.0
+        );
+        assert_eq!(
+            QualityAnnotation {
+                grade: "B".into(),
+                complexity: 0,
+                faults: vec![]
+            }
+            .grade_score(),
+            4.0
+        );
+        assert_eq!(
+            QualityAnnotation {
+                grade: "C".into(),
+                complexity: 0,
+                faults: vec![]
+            }
+            .grade_score(),
+            3.0
+        );
+        assert_eq!(
+            QualityAnnotation {
+                grade: "D".into(),
+                complexity: 0,
+                faults: vec![]
+            }
+            .grade_score(),
+            2.0
+        );
+        assert_eq!(
+            QualityAnnotation {
+                grade: "F".into(),
+                complexity: 0,
+                faults: vec![]
+            }
+            .grade_score(),
+            1.0
+        );
     }
 
     // ── Pipeline tests ──────────────────────────────────────────────
@@ -692,7 +739,8 @@ mod tests {
 
     #[test]
     fn test_run_pipeline_single_doc() {
-        let docs = vec![Document::new("fn hello() { println!(\"world\"); }").with_title("hello.rs")];
+        let docs =
+            vec![Document::new("fn hello() { println!(\"world\"); }").with_title("hello.rs")];
         let results = run_pipeline(&docs, "hello function", 1).unwrap();
         assert_eq!(results.len(), 1);
     }
@@ -779,8 +827,16 @@ mod tests {
     #[test]
     fn test_fused_score_respects_quality() {
         // Higher quality should produce higher fused score for same retrieval score
-        let high_q = QualityAnnotation { grade: "A".into(), complexity: 1, faults: vec![] };
-        let low_q = QualityAnnotation { grade: "F".into(), complexity: 50, faults: vec!["unwrap".into()] };
+        let high_q = QualityAnnotation {
+            grade: "A".into(),
+            complexity: 1,
+            faults: vec![],
+        };
+        let low_q = QualityAnnotation {
+            grade: "F".into(),
+            complexity: 50,
+            faults: vec!["unwrap".into()],
+        };
 
         let retrieval = 0.8;
         let high_fused = retrieval * (0.6 + 0.4 * high_q.quality_score());
