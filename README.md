@@ -165,3 +165,11 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 ## License
 
 MIT
+
+<!-- funnel:start -->
+---
+
+**Learn data engineering:** [Databricks Lakehouse Fundamentals (Coursera)](https://www.coursera.org/learn/databricks-lakehouse-fundamentals?utm_source=github&utm_medium=readme&utm_campaign=funnel_2026q4&utm_content=DB-mlops-genai) · [Data Engineering Foundations program (edX)](https://www.edx.org/certificates/professional-certificate/ai-data-engineering-foundations?utm_source=github&utm_medium=readme&utm_campaign=funnel_2026q4&utm_content=DB-mlops-genai)
+
+More courses from [Noah Gift](https://github.com/noahgift) and Pragmatic AI Labs.
+<!-- funnel:end -->
